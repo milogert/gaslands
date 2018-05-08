@@ -1,4 +1,4 @@
-module Model.Model exposing (CurrentView(..), Model, Msg(..), init, viewToStr)
+module Model.Model exposing (CurrentView(..), Model, Msg(..), init, totalPoints, viewToStr)
 
 import Model.Upgrades exposing (..)
 import Model.Vehicles exposing (..)
@@ -7,6 +7,7 @@ import Model.Weapons exposing (..)
 
 type alias Model =
     { view : CurrentView
+    , pointsAllowed : Int
     , vehicles : List Vehicle
     , tmpVehicle : Vehicle
     , vehicleIndex : Int
@@ -43,10 +44,16 @@ viewToStr view =
             "Adding Upgrade to " ++ v.name
 
 
+totalPoints : Model -> Int
+totalPoints model =
+    0
+
+
 init : ( Model, Cmd Msg )
 init =
     Model
         Overview
+        50
         []
         defaultVehicle
         0
@@ -75,3 +82,4 @@ type Msg
     | AddWeapon Int Vehicle
     | TmpUpgradeUpdate String
     | AddUpgrade Int Vehicle
+    | UpdatePointsAllowed String

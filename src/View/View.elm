@@ -2,7 +2,7 @@ module View.View exposing (view)
 
 import Html exposing (Html, button, div, h1, h2, h3, h4, h5, h6, hr, img, input, label, li, node, option, p, select, small, span, text, textarea, ul)
 import Html.Attributes exposing (checked, class, classList, disabled, for, href, id, max, min, placeholder, rel, src, type_, value)
-import Html.Events exposing (onClick)
+import Html.Events exposing (onClick, onInput)
 import Model.Model exposing (..)
 import View.Details
 import View.NewUpgrade
@@ -28,9 +28,16 @@ view model =
                 [ toOverview
                 , text "Gaslands Manager "
                 , small [] [ text <| viewToStr model.view ]
-                , hr [] []
+                ]
+            , div [ class "col-md-2 col-sm-4" ]
+                [ span [] [ text <| toString <| totalPoints model ]
+                , span [] [ text "/" ]
+                , input
+                    [ type_ "number", onInput UpdatePointsAllowed ]
+                    [ text <| toString model.pointsAllowed ]
                 ]
             ]
+        , hr [] []
         , displayAlert model
         , render model
         ]
