@@ -46,7 +46,7 @@ viewToStr view =
 
 totalPoints : Model -> Int
 totalPoints model =
-    0
+    List.sum <| List.map vehicleCost model.vehicles
 
 
 init : ( Model, Cmd Msg )

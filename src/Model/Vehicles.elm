@@ -16,6 +16,7 @@ type alias Vehicle =
     , weapons : List Weapon
     , upgrades : List Upgrade
     , notes : String
+    , cost : Int
     }
 
 
@@ -49,6 +50,11 @@ allVehicleTypes =
     , Helicopter
     , NoType
     ]
+
+
+vehicleCost : Vehicle -> Int
+vehicleCost v =
+    v.cost + (List.sum <| List.map .cost v.weapons) + (List.sum <| List.map .cost v.upgrades)
 
 
 type WeightClass
@@ -86,8 +92,11 @@ emptyVehicle vtype =
 
         weight =
             typeToWeight vtype
+
+        cost =
+            typeToCost vtype
     in
-    Vehicle "" vtype handling hull crew gear weight False [] [] ""
+    Vehicle "" vtype handling hull crew gear weight False [] [] "" cost
 
 
 defaultVehicle : Vehicle
@@ -133,6 +142,12 @@ typeToWeight t =
 
         _ ->
             NoWeight
+
+
+typeToCost : VehicleType -> Int
+typeToCost t =
+    case t of
+        _ -> 2
 
 
 typeToGearMax : VehicleType -> Int

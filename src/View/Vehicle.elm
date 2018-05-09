@@ -138,7 +138,7 @@ render currentView isPreview i v =
                 ]
                 [ name
                 , small []
-                    [ vehicleType_, text <| " - " ++ weight ]
+                    [ vehicleType_, text <| " - " ++ weight ++ " (" ++ (toString <| vehicleCost v) ++ ")" ]
                 , button
                     [ class "btn btn-sm btn-secondary float-right"
                     , classList [ ( "d-none", currentView /= Overview || isPreview ) ]

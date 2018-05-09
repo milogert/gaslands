@@ -1,7 +1,7 @@
 module View.View exposing (view)
 
-import Html exposing (Html, button, div, h1, h2, h3, h4, h5, h6, hr, img, input, label, li, node, option, p, select, small, span, text, textarea, ul)
-import Html.Attributes exposing (checked, class, classList, disabled, for, href, id, max, min, placeholder, rel, src, type_, value)
+import Html exposing (Html, button, div, h1, h2, h3, h4, h5, h6, hr, img, input, label, li, node, option, p, select, small, span, text, textarea, ul, form)
+import Html.Attributes exposing (checked, class, classList, disabled, for, href, id, max, min, placeholder, rel, src, type_, value, readonly)
 import Html.Events exposing (onClick, onInput)
 import Model.Model exposing (..)
 import View.Details
@@ -29,12 +29,27 @@ view model =
                 , text "Gaslands Manager "
                 , small [] [ text <| viewToStr model.view ]
                 ]
-            , div [ class "col-md-2 col-sm-4" ]
-                [ span [] [ text <| toString <| totalPoints model ]
-                , span [] [ text "/" ]
-                , input
-                    [ type_ "number", onInput UpdatePointsAllowed ]
-                    [ text <| toString model.pointsAllowed ]
+            , form [ class "col-md-3 col-sm-12 my-auto" ]
+                [ div [ class "form-row" ]
+                    [ div [ class "col-4" ]
+                        [ input
+                            [ type_ "text"
+                            , readonly True
+                            , class "form-control-plaintext"
+                            , value <| (toString <| totalPoints model) ++ " of"
+                            ]
+                            []
+                        ]
+                    , div [ class "col-8" ]
+                        [ input
+                            [ type_ "number"
+                            , class "form-control form-control-sm my-1"
+                            , value <| toString model.pointsAllowed
+                            , onInput UpdatePointsAllowed
+                            ]
+                            []
+                        ]
+                    ]
                 ]
             ]
         , hr [] []

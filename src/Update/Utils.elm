@@ -54,6 +54,9 @@ setTmpVehicleType model vtstr =
         weight =
             typeToWeight vtype
 
+        cost =
+            typeToCost vtype
+
         newtv =
             Vehicle
                 model.tmpVehicle.name
@@ -67,6 +70,7 @@ setTmpVehicleType model vtstr =
                 model.tmpVehicle.weapons
                 model.tmpVehicle.upgrades
                 model.tmpVehicle.notes
+                cost
     in
     { model | tmpVehicle = newtv } ! []
 
