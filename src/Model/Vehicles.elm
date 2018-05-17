@@ -147,7 +147,41 @@ typeToWeight t =
 typeToCost : VehicleType -> Int
 typeToCost t =
     case t of
-        _ -> 2
+        Bike ->
+            5
+
+        Buggy ->
+            5
+
+        Car ->
+            12
+
+        PerformanceCar ->
+            15
+
+        PickupTruck ->
+            15
+
+        MonsterTruck ->
+            25
+
+        Bus ->
+            30
+
+        WarRig ->
+            40
+
+        Tank ->
+            40
+
+        Gyrocopter ->
+            10
+
+        Helicopter ->
+            30
+
+        _ ->
+            0
 
 
 typeToGearMax : VehicleType -> Int
