@@ -28,22 +28,7 @@ render currentView isPreview v =
             vTToStr v.vtype
 
         vehicleType_ =
-            if isPreview then
-                select
-                    [ onInput TmpVehicleType
-                    , class "form-control"
-                    ]
-                    (option [ value "" ] [ text "Vehicle Type" ]
-                        :: List.map
-                            (\x ->
-                                option
-                                    [ value <| vTToStr x ]
-                                    [ text <| vTToStr x ]
-                            )
-                            allVehicleTypes
-                    )
-            else
-                text <| vtype
+            text <| vtype
 
         weight =
             toString v.weight

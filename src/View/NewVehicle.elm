@@ -1,9 +1,11 @@
 module View.NewVehicle exposing (view)
 
 import Html exposing (Html, button, div, h1, h2, h3, h4, h5, h6, img, input, label, li, node, option, p, select, small, span, text, textarea, ul)
-import Html.Attributes exposing (checked, class, disabled, for, href, id, max, min, placeholder, rel, src, type_, value)
+import Html.Attributes exposing (checked, class, disabled, for, href, id, max, min, placeholder, rel, src, type_, value, multiple, size)
 import Html.Events exposing (onClick, onInput)
 import Model.Model exposing (..)
+import Model.Vehicles exposing (..)
+import View.Utils
 import View.Vehicle
 
 
@@ -17,11 +19,23 @@ view model =
             Nothing ->
                 text "Select a vehicle type."
     in
-    div []
-        [ body
-        , button
-            [ onClick AddVehicle
-            , class "btn btn-primary btn-block mt-3"
+    View.Utils.row
+        [ View.Utils.col "md-3"
+            [ button
+                [ onClick AddVehicle
+                , class "btn btn-primary btn-block mb-3"
+                ]
+                [ text "Add Vehicle" ]
+            , select
+                [ onInput TmpVehicleType
+                , class "form-control"
+                , multiple True
+                , size 15
+                ]
+                ( List.map
+                    (\x -> option [ value <| vTToStr x ] [ text <| vTToStr x ] )
+                    allVehicleTypes
+                )
             ]
-            [ text "Add Vehicle" ]
+        , View.Utils.col "md-9" [ body ]
         ]

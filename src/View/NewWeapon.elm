@@ -12,47 +12,48 @@ import View.Weapon
 
 view : Model -> Vehicle -> Html Msg
 view model v =
-    case model.tmpWeapon of
-        Just tmpWeapon ->
-            let
-                slotsList =
-                    List.map .slots v.weapons
+    let
+        slotsList =
+            List.map .slots v.weapons
 
-                slotsUsed =
-                    List.sum slotsList
+        slotsUsed =
+            List.sum slotsList
 
-                slotsLeft =
-                    v.equipment - slotsUsed
+        slotsLeft =
+            v.equipment - slotsUsed
 
-                crewLeft =
-                    v.crew - View.Utils.crewUsed v
+        crewLeft =
+            v.crew - View.Utils.crewUsed v
 
-                isCrewFree =
-                    crewLeft > 0
-            in
-            View.Utils.row
-                [ View.Utils.col "md-3"
-                    [ button [ class "form-control btn btn-primary mb-2", onClick (AddWeapon v) ] [ text "Add Weapon" ]
-                    , select
-                        [ onInput TmpWeaponUpdate
-                        , class "form-control mb-2"
-                        , multiple True
-                        , size 8
-                        ]
-                        (option [] []
-                            :: (List.filter (\x -> x.slots <= slotsLeft) allWeaponsList
-                                    |> List.filter
-                                        (\x ->
-                                            (not <| List.member CrewFired x.specials)
-                                                || (isCrewFree && List.member CrewFired x.specials)
-                                        )
-                                    |> List.map .name
-                                    |> List.map (\t -> option [ value t ] [ text t ])
-                               )
-                        )
-                    ]
-                , View.Utils.col "md-9" [ View.Weapon.render v tmpWeapon ]
+        isCrewFree =
+            crewLeft > 0
+
+        body = case model.tmpWeapon of
+            Just tmpWeapon ->
+                View.Weapon.render v tmpWeapon
+
+            Nothing ->
+                text "Select a weapon."
+    in
+    View.Utils.row
+        [ View.Utils.col "md-3"
+            [ button [ class "form-control btn btn-primary mb-3", onClick (AddWeapon v) ] [ text "Add Weapon" ]
+            , select
+                [ onInput TmpWeaponUpdate
+                , class "form-control mb-3"
+                , multiple True
+                , size 8
                 ]
-
-        Nothing ->
-            text "Select a weapon."
+                ( allWeaponsList
+                    |> List.filter (\x -> x.slots <= slotsLeft)
+                    |> List.filter
+                        (\x ->
+                            (not <| List.member CrewFired x.specials)
+                                || (isCrewFree && List.member CrewFired x.specials)
+                        )
+                    |> List.map .name
+                    |> List.map (\t -> option [ value t ] [ text t ])
+                )
+            ]
+        , View.Utils.col "md-9" [ body ]
+        ]
