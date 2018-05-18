@@ -11,29 +11,24 @@ import View.Utils
 
 render : Vehicle -> Weapon -> Html Msg
 render vehicle weapon =
-    case weapon.wtype of
-        NoWeapon ->
-            text "Select a weapon type."
+    let
+        wtype =
+            toString weapon.wtype
 
-        _ ->
-            let
-                wtype =
-                    toString weapon.wtype
-
-                range =
-                    toString weapon.range
-            in
-            div [ class "pl-4" ]
-                [ h6 []
-                    [ text <| weapon.name ++ " "
-                    , small []
-                        [ text <| wtype ++ " - " ++ range
-                        , button
-                            [ class "btn btn-sm btn-outline-danger float-right"
-                            , onClick <| DeleteWeapon vehicle weapon ]
-                            [ text "x" ]
-                        ]
-                    ]
-                , p [] [ text <| "Damage: " ++ View.Utils.renderDice weapon.attack ]
-                , ul [] <| List.map (\s -> li [] [ View.Utils.renderSpecial s ]) weapon.specials
+        range =
+            toString weapon.range
+    in
+    div [ class "pl-4" ]
+        [ h6 []
+            [ text <| weapon.name ++ " "
+            , small []
+                [ text <| wtype ++ " - " ++ range
+                , button
+                    [ class "btn btn-sm btn-outline-danger float-right"
+                    , onClick <| DeleteWeapon vehicle weapon ]
+                    [ text "x" ]
                 ]
+            ]
+        , p [] [ text <| "Damage: " ++ View.Utils.renderDice weapon.attack ]
+        , ul [] <| List.map (\s -> li [] [ View.Utils.renderSpecial s ]) weapon.specials
+        ]

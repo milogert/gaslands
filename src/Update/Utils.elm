@@ -22,9 +22,6 @@ addVehicle model =
                     model.vehicles
             in
             case ( vehicleTmp.vtype, vehicleTmp.name ) of
-                ( NoType, _ ) ->
-                    { model | error = VehicleTypeError :: model.error } ! []
-
                 ( _, "" ) ->
                     { model | error = VehicleNameError :: model.error } ! []
 
@@ -60,12 +57,7 @@ addWeapon model v =
                 newvehicles =
                     pre ++ vehicleNew :: post
             in
-            case weaponTmp.wtype of
-                NoWeapon ->
-                    { model | error = [ WeaponTypeError ] } ! []
-
-                _ ->
-                    { model | view = Details vehicleNew , error = [], vehicles = newvehicles } ! []
+            { model | view = Details vehicleNew , error = [], vehicles = newvehicles } ! []
         Nothing ->
             model ! []
 
@@ -104,65 +96,72 @@ addUpgrade model v =
 setTmpVehicleType : Model -> String -> ( Model, Cmd Msg )
 setTmpVehicleType model vtstr =
     let
-        name = case model.tmpVehicle of
-            Just v -> v.name
-            Nothing -> ""
-
-        vtype =
+        maybeVType =
             strToVT vtstr
 
-        gear =
-            GearTracker 0 (typeToGearMax vtype)
-
-        handling =
-            typeToHandling vtype
-
-        hull =
-            HullHolder 0 (typeToHullMax vtype)
-
-        crew =
-            typeToCrewMax vtype
-
-        equipment =
-            typeToEquipmentMax vtype
-
-        weight =
-            typeToWeight vtype
-
-        weapons = case model.tmpVehicle of
-            Just v -> v.weapons
-            Nothing -> []
-
-        upgrades = case model.tmpVehicle of
-            Just v -> v.upgrades
-            Nothing -> []
-
-        notes = case model.tmpVehicle of
-            Just v -> v.notes
-            Nothing -> ""
-
-
-        cost =
-            typeToCost vtype
-
-        newtv =
-            Vehicle
-                name
-                vtype
-                gear
-                handling
-                hull
-                crew
-                equipment
-                weight
-                False
-                weapons
-                upgrades
-                notes
-                cost
-                -1
     in
-    { model | tmpVehicle = Just newtv } ! []
+    case maybeVType of
+        Nothing ->
+            model ! []
+
+        Just vtype ->
+            let
+                name = case model.tmpVehicle of
+                    Just v -> v.name
+                    Nothing -> ""
+
+                gear =
+                    GearTracker 0 (typeToGearMax vtype)
+
+                handling =
+                    typeToHandling vtype
+
+                hull =
+                    HullHolder 0 (typeToHullMax vtype)
+
+                crew =
+                    typeToCrewMax vtype
+
+                equipment =
+                    typeToEquipmentMax vtype
+
+                weight =
+                    typeToWeight vtype
+
+                weapons = case model.tmpVehicle of
+                    Just v -> v.weapons
+                    Nothing -> []
+
+                upgrades = case model.tmpVehicle of
+                    Just v -> v.upgrades
+                    Nothing -> []
+
+                notes = case model.tmpVehicle of
+                    Just v -> v.notes
+                    Nothing -> ""
+
+
+                cost =
+                    typeToCost vtype
+
+                newtv =
+                    Vehicle
+                        name
+                        vtype
+                        gear
+                        handling
+                        hull
+                        crew
+                        equipment
+                        weight
+                        False
+                        weapons
+                        upgrades
+                        notes
+                        cost
+                        -1
+            in
+            { model | tmpVehicle = Just newtv } ! []
 
 
 updateActivated : Model -> Vehicle -> Bool -> ( Model, Cmd Msg )

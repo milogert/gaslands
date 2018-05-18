@@ -92,7 +92,7 @@ update msg model =
                 w =
                     nameToWeapon name
             in
-            { model | tmpWeapon = Just w } ! []
+            { model | tmpWeapon = w } ! []
 
         TmpUpgradeUpdate name ->
             let
