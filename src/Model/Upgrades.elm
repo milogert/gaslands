@@ -1,4 +1,4 @@
-module Model.Upgrades exposing (Upgrade, allUpgradesList, armourPlating, defaultUpgrade, extraCrewmember, nameToUpgrade, nitroBooster, tankTracks, turretMounting)
+module Model.Upgrades exposing (Upgrade, allUpgradesList, armourPlating, extraCrewmember, nameToUpgrade, nitroBooster, tankTracks, turretMounting)
 
 import Model.Weapons exposing (..)
 
@@ -22,31 +22,26 @@ allUpgradesList =
     ]
 
 
-nameToUpgrade : String -> Upgrade
+nameToUpgrade : String -> Maybe Upgrade
 nameToUpgrade name =
     case name of
         "Turret Mounting For Weapons" ->
-            turretMounting
+            Just turretMounting
 
         "Nitro Booster" ->
-            nitroBooster
+            Just nitroBooster
 
         "Armour Plating" ->
-            armourPlating
+            Just armourPlating
 
         "Tank Tracks" ->
-            tankTracks
+            Just tankTracks
 
         "Extra Crewmember" ->
-            extraCrewmember
+            Just extraCrewmember
 
         _ ->
-            defaultUpgrade
-
-
-defaultUpgrade : Upgrade
-defaultUpgrade =
-    Upgrade "" 0 [] 0 -1
+            Nothing
 
 
 turretMounting : Upgrade

@@ -99,7 +99,7 @@ update msg model =
                 u =
                     nameToUpgrade name
             in
-            { model | tmpUpgrade = Just u } ! []
+            { model | tmpUpgrade = u } ! []
 
         UpdatePointsAllowed s ->
             { model | pointsAllowed = Result.withDefault 0 (String.toInt s) } ! []
