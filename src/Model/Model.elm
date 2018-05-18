@@ -96,6 +96,8 @@ type Msg
     | AddWeapon Int Vehicle
     | AddUpgrade Int Vehicle
     | DeleteVehicle Int
+    | DeleteWeapon Int Vehicle Int Weapon
+    | DeleteUpgrade Int Vehicle Int Weapon
     | TmpName String
     | TmpVehicleType String
     | TmpNotes String

@@ -44,6 +44,6 @@ view model i v =
                         |> List.map (\t -> option [ value t ] [ text t ])
                    )
             )
-        , View.Weapon.render model.tmpWeapon
+        , View.Weapon.render i v -1 model.tmpWeapon
         , button [ class "form-control btn btn-primary", onClick (AddWeapon i v) ] [ text "Add Weapon" ]
         ]

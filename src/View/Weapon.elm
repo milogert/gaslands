@@ -4,12 +4,13 @@ import Html exposing (Html, button, div, h1, h2, h3, h4, h5, h6, hr, img, input,
 import Html.Attributes exposing (checked, class, classList, disabled, for, href, id, max, min, placeholder, rel, src, type_, value)
 import Html.Events exposing (onClick, onInput)
 import Model.Model exposing (..)
+import Model.Vehicles exposing (..)
 import Model.Weapons exposing (..)
 import View.Utils
 
 
-render : Weapon -> Html Msg
-render weapon =
+render : Int -> Vehicle -> Int -> Weapon -> Html Msg
+render vehicleI vehicle weaponI weapon =
     case weapon.wtype of
         NoWeapon ->
             text "Select a weapon type."
@@ -28,7 +29,8 @@ render weapon =
                     , small []
                         [ text <| wtype ++ " - " ++ range
                         , button
-                            [ class "btn btn-sm btn-outline-danger float-right" ]
+                            [ class "btn btn-sm btn-outline-danger float-right"
+                            , onClick <| DeleteWeapon vehicleI vehicle weaponI weapon ]
                             [ text "x" ]
                         ]
                     ]

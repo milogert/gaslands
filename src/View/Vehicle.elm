@@ -125,7 +125,7 @@ render currentView isPreview i v =
                         [ text "+" ]
                     ]
                 ]
-                (List.map View.Weapon.render v.weapons)
+                (List.indexedMap (View.Weapon.render i v) v.weapons)
 
         upgradeList =
             View.Utils.detailSection

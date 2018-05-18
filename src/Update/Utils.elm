@@ -1,8 +1,15 @@
-module Update.Utils exposing (addUpgrade, addVehicle, addWeapon, deleteVehicle, setTmpVehicleType, updateActivated, updateCrew, updateGear, updateHull, updateNotes)
+module Update.Utils exposing (addUpgrade, addVehicle, addWeapon, deleteVehicle, deleteWeapon, deleteUpgrade, setTmpVehicleType, updateActivated, updateCrew, updateGear, updateHull, updateNotes)
+
+import Debug exposing (log)
 
 import Model.Model exposing (..)
 import Model.Vehicles exposing (..)
 import Model.Weapons exposing (..)
+
+
+(!!) : Int -> List a -> Maybe a
+(!!) n xs  = 
+    log "to get" (List.head <| List.drop n xs)
 
 
 addVehicle : Model -> ( Model, Cmd Msg )
@@ -256,3 +263,64 @@ deleteVehicle model i =
             pre ++ post
     in
     { model | view = Overview, vehicles = newvehicles } ! []
+
+
+deleteWeapon : Model -> Int -> Int -> ( Model, Cmd Msg)
+deleteWeapon model vi wi =
+    let
+        vehicle = case vi !! model.vehicles of
+            Just v ->
+                log "getting a real value" v
+
+            Nothing ->
+                log "getting default vehicle" defaultVehicle
+
+        weaponsNew =
+            deleteFromList wi vehicle.weapons
+
+        vehiclesPre =
+            List.take vi model.vehicles
+
+        vehiclesPost =
+            List.drop (vi + 1) model.vehicles
+
+        vehicleUpdated =
+            { vehicle | weapons = weaponsNew }
+
+        vehiclesNew =
+            vehiclesPre ++ vehicleUpdated ::  vehiclesPost
+    in
+    { model | view = Details vi vehicleUpdated, vehicles = vehiclesNew } ! []
+
+
+deleteUpgrade : Model -> Int -> Int -> ( Model, Cmd Msg)
+deleteUpgrade model vi ui =
+    let
+        vehicle = case vi !! model.vehicles of
+            Just v ->
+                v
+
+            Nothing ->
+                defaultVehicle
+
+        upgradesNew =
+            deleteFromList ui vehicle.upgrades
+
+        vehiclesPre =
+            List.take vi model.vehicles
+
+        vehiclesPost =
+            List.drop (vi + 1) model.vehicles
+
+        vehicleUpdated =
+            { vehicle | upgrades = upgradesNew }
+
+        vehiclesNew =
+            vehiclesPre ++ vehicleUpdated ::  vehiclesPost
+    in
+    { model | view = Details vi vehicleUpdated, vehicles = vehiclesNew  } ! []
+
+
+deleteFromList : Int -> List a -> List a
+deleteFromList index list =
+    (List.take index list) ++ (List.drop (index + 1) list)

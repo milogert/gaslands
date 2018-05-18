@@ -44,6 +44,12 @@ update msg model =
         DeleteVehicle i ->
             Update.Utils.deleteVehicle model i
 
+        DeleteWeapon vi v wi w ->
+            Update.Utils.deleteWeapon model vi wi
+
+        DeleteUpgrade vi v ui u ->
+            Update.Utils.deleteUpgrade model vi ui
+
         -- UPDATING.
         TmpName name ->
             { model | tmpVehicle = { tv | name = name } } ! []
