@@ -21,9 +21,6 @@ addVehicle model =
 
         oldl =
             model.vehicles
-
-        newId =
-            model.autoIncrement + 1
     in
     case ( vehicleNew.vtype, vehicleNew.name ) of
         ( NoType, _ ) ->
@@ -35,12 +32,69 @@ addVehicle model =
         ( _, _ ) ->
             { model
                 | view = Overview
-                , vehicles = oldl ++ [ { vehicleNew | id = model.autoIncrement } ]
+                , vehicles = oldl ++ [ { vehicleNew | id = List.length oldl } ]
                 , tmpVehicle = defaultVehicle
-                , autoIncrement = newId 
                 , error = []
             }
                 ! []
+
+
+addWeapon : Model -> Vehicle -> ( Model, Cmd Msg )
+addWeapon model v =
+    let
+        weaponTmp =
+            model.tmpWeapon
+
+        weaponList =
+            v.weapons ++ [ { weaponTmp | id = List.length v.weapons } ]
+
+        pre =
+            List.take v.id model.vehicles
+
+        post =
+            List.drop (v.id + 1) model.vehicles
+
+        vehicleNew =
+            { v | weapons = weaponList }
+
+        newvehicles =
+            pre ++ vehicleNew :: post
+    in
+    case weaponTmp.wtype of
+        NoWeapon ->
+            { model | error = [ WeaponTypeError ] } ! []
+
+        _ ->
+            { model | view = Details vehicleNew , error = [], vehicles = newvehicles } ! []
+
+
+addUpgrade : Model -> Vehicle -> ( Model, Cmd Msg )
+addUpgrade model v =
+    let
+        upgradeTmp =
+            model.tmpUpgrade
+
+        upgradeList =
+            v.upgrades ++ [ { upgradeTmp | id = List.length v.upgrades } ]
+
+        pre =
+            List.take v.id model.vehicles
+
+        post =
+            List.drop (v.id + 1) model.vehicles
+
+        vehicleNew =
+            { v | upgrades = upgradeList }
+
+        newvehicles =
+            pre ++ vehicleNew :: post
+    in
+    case upgradeTmp.name of
+        "" ->
+            { model | error = [ UpgradeTypeError ] } ! []
+
+        _ ->
+            { model | view = Details vehicleNew, error = [], vehicles = newvehicles } ! []
 
 
 setTmpVehicleType : Model -> String -> ( Model, Cmd Msg )
@@ -169,101 +223,21 @@ updateNotes : Model -> Bool -> Vehicle -> String -> ( Model, Cmd Msg )
 updateNotes model isPreview v notes =
     case isPreview of
         True ->
-            let
-                tmpVehicle =
-                    { v | notes = notes }
-            in
             { model | tmpVehicle = { v | notes = notes } } ! []
 
         False ->
             let
-                pre =
-                    List.take v.id model.vehicles
-
-                nv =
-                    { v | notes = notes }
-
-                post =
-                    List.drop (v.id + 1) model.vehicles
+                vehiclesNew =
+                    joinAround v.id { v | notes = notes } model.vehicles
             in
-            { model | vehicles = pre ++ nv :: post } ! []
-
-
-addWeapon : Model -> Vehicle -> ( Model, Cmd Msg )
-addWeapon model v =
-    let
-        nw =
-            model.tmpWeapon
-
-        weaponlist =
-            v.weapons
-
-        newweaponlist =
-            weaponlist ++ [ nw ]
-
-        nv =
-            { v | weapons = newweaponlist }
-
-        pre =
-            List.take v.id model.vehicles
-
-        post =
-            List.drop (v.id + 1) model.vehicles
-
-        newvehicles =
-            pre ++ nv :: post
-    in
-    case nw.wtype of
-        NoWeapon ->
-            { model | error = [ WeaponTypeError ] } ! []
-
-        _ ->
-            { model | view = Details nv, error = [], vehicles = newvehicles } ! []
-
-
-addUpgrade : Model -> Vehicle -> ( Model, Cmd Msg )
-addUpgrade model v =
-    let
-        newUpgrade =
-            model.tmpUpgrade
-
-        upgradeList =
-            v.upgrades
-
-        newUpgradeList =
-            upgradeList ++ [ newUpgrade ]
-
-        nv =
-            { v | upgrades = newUpgradeList }
-
-        pre =
-            List.take v.id model.vehicles
-
-        post =
-            List.drop (v.id + 1) model.vehicles
-
-        newvehicles =
-            pre ++ nv :: post
-    in
-    case newUpgrade.name of
-        "" ->
-            { model | error = [ UpgradeTypeError ] } ! []
-
-        _ ->
-            { model | view = Details nv, error = [], vehicles = newvehicles } ! []
+            { model | vehicles = vehiclesNew } ! []
 
 
 deleteVehicle : Model -> Vehicle -> ( Model, Cmd Msg)
 deleteVehicle model v =
     let
-        pre =
-            List.take v.id model.vehicles
-
-        post =
-            List.drop (v.id + 1) model.vehicles
-
         newvehicles =
-            pre ++ post
+            deleteFromList v.id model.vehicles |> correctIds
     in
     { model | view = Overview, vehicles = newvehicles } ! []
 
@@ -272,19 +246,13 @@ deleteWeapon : Model -> Vehicle -> Weapon -> ( Model, Cmd Msg)
 deleteWeapon model v w =
     let
         weaponsNew =
-            deleteFromList w.id v.weapons
-
-        vehiclesPre =
-            List.take v.id model.vehicles
-
-        vehiclesPost =
-            List.drop (v.id + 1) model.vehicles
+            deleteFromList w.id v.weapons |> correctIds
 
         vehicleUpdated =
             { v | weapons = weaponsNew }
 
         vehiclesNew =
-            vehiclesPre ++ vehicleUpdated ::  vehiclesPost
+            joinAround v.id vehicleUpdated model.vehicles
     in
     { model | view = Details vehicleUpdated, vehicles = vehiclesNew } ! []
 
@@ -293,19 +261,13 @@ deleteUpgrade : Model -> Vehicle -> Upgrade -> ( Model, Cmd Msg )
 deleteUpgrade model v u=
     let
         upgradesNew =
-            deleteFromList u.id v.upgrades
-
-        vehiclesPre =
-            List.take v.id model.vehicles
-
-        vehiclesPost =
-            List.drop (v.id + 1) model.vehicles
+            deleteFromList u.id v.upgrades |> correctIds
 
         vehicleUpdated =
             { v | upgrades = upgradesNew }
 
         vehiclesNew =
-            vehiclesPre ++ vehicleUpdated ::  vehiclesPost
+            joinAround v.id vehicleUpdated model.vehicles
     in
     { model | view = Details vehicleUpdated, vehicles = vehiclesNew  } ! []
 
@@ -313,3 +275,13 @@ deleteUpgrade model v u=
 deleteFromList : Int -> List a -> List a
 deleteFromList index list =
     (List.take index list) ++ (List.drop (index + 1) list)
+
+
+correctIds : List { a | id : Int } -> List { a | id : Int }
+correctIds xs =
+    List.indexedMap (\i x -> { x | id = i } ) xs
+
+
+joinAround : Int -> a -> List a -> List a
+joinAround i item xs =
+    (List.take i xs) ++ item :: (List.drop (i + 1) xs)
