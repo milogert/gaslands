@@ -15,11 +15,27 @@ import View.Utils exposing (..)
 view : Model -> Html Msg
 view model =
     let
-        toOverview =
+        viewToGoTo = case model.view of
+            Details _ _ ->
+                ToOverview
+
+            AddingVehicle ->
+                ToOverview
+
+            AddingWeapon i v ->
+                ToDetails i v
+
+            AddingUpgrade i v ->
+                ToDetails i v
+
+            Overview ->
+                ToOverview
+
+        backButton =
             button
                 [ classList [ ( "d-none", model.view == Overview ) ]
                 , class "btn btn-default mr-3"
-                , onClick ToOverview
+                , onClick viewToGoTo
                 ]
                 [ text "<" ]
 
@@ -32,7 +48,7 @@ view model =
     div [ class "container" ]
         [ row
             [ h2 [ class "col mt-3" ]
-                [ toOverview
+                [ backButton
                 , text "Gaslands Manager "
                 , small [] [ text <| viewToStr model.view ]
                 ]
