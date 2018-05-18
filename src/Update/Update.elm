@@ -18,37 +18,37 @@ update msg model =
         ToOverview ->
             { model | view = Overview, tmpVehicle = defaultVehicle, tmpWeapon = defaultWeapon } ! []
 
-        ToDetails i v ->
-            { model | view = Details i v } ! []
+        ToDetails v ->
+            { model | view = Details v } ! []
 
         ToNewVehicle ->
             { model | view = AddingVehicle, tmpVehicle = defaultVehicle } ! []
 
-        ToNewWeapon i v ->
-            { model | view = AddingWeapon i v, tmpVehicle = v, vehicleIndex = i, tmpWeapon = defaultWeapon } ! []
+        ToNewWeapon v ->
+            { model | view = AddingWeapon v, tmpVehicle = v, tmpWeapon = defaultWeapon } ! []
 
-        ToNewUpgrade i v ->
-            { model | view = AddingUpgrade i v, tmpVehicle = v, vehicleIndex = i, tmpUpgrade = defaultUpgrade } ! []
+        ToNewUpgrade v ->
+            { model | view = AddingUpgrade v, tmpVehicle = v, tmpUpgrade = defaultUpgrade } ! []
 
         -- ADDING.
         AddVehicle ->
             Update.Utils.addVehicle model
 
-        AddWeapon i v ->
-            Update.Utils.addWeapon model i v
+        AddWeapon v ->
+            Update.Utils.addWeapon model v
 
-        AddUpgrade i v ->
-            Update.Utils.addUpgrade model i v
+        AddUpgrade v ->
+            Update.Utils.addUpgrade model v
 
         -- DELETING.
-        DeleteVehicle i ->
-            Update.Utils.deleteVehicle model i
+        DeleteVehicle v ->
+            Update.Utils.deleteVehicle model v
 
-        DeleteWeapon vi v wi w ->
-            Update.Utils.deleteWeapon model vi wi
+        DeleteWeapon v w ->
+            Update.Utils.deleteWeapon model v w
 
-        DeleteUpgrade vi v ui u ->
-            Update.Utils.deleteUpgrade model vi ui
+        DeleteUpgrade v u ->
+            Update.Utils.deleteUpgrade model v u
 
         -- UPDATING.
         TmpName name ->
@@ -60,20 +60,20 @@ update msg model =
         TmpNotes notes ->
             { model | tmpVehicle = { tv | notes = notes } } ! []
 
-        UpdateActivated i v activated ->
-            Update.Utils.updateActivated model i v activated
+        UpdateActivated v activated ->
+            Update.Utils.updateActivated model v activated
 
-        UpdateHull i v strCurrent ->
-            Update.Utils.updateHull model i v strCurrent
+        UpdateHull v strCurrent ->
+            Update.Utils.updateHull model v strCurrent
 
-        UpdateCrew i v strCurrent ->
-            Update.Utils.updateCrew model i v strCurrent
+        UpdateCrew v strCurrent ->
+            Update.Utils.updateCrew model v strCurrent
 
-        UpdateGear i v strCurrent ->
-            Update.Utils.updateGear model i v strCurrent
+        UpdateGear v strCurrent ->
+            Update.Utils.updateGear model v strCurrent
 
-        UpdateNotes isPreview i v notes ->
-            Update.Utils.updateNotes model isPreview i v notes
+        UpdateNotes isPreview v notes ->
+            Update.Utils.updateNotes model isPreview v notes
 
         TmpWeaponUpdate name ->
             let

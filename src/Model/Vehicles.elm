@@ -17,6 +17,7 @@ type alias Vehicle =
     , upgrades : List Upgrade
     , notes : String
     , cost : Int
+    , id : Int
     }
 
 
@@ -75,8 +76,8 @@ type alias HullHolder =
 -- Vehicle definitions.
 
 
-emptyVehicle : VehicleType -> Vehicle
-emptyVehicle vtype =
+emptyVehicle : VehicleType -> Int -> Vehicle
+emptyVehicle vtype index =
     let
         handling =
             typeToHandling vtype
@@ -96,12 +97,12 @@ emptyVehicle vtype =
         cost =
             typeToCost vtype
     in
-    Vehicle "" vtype handling hull crew gear weight False [] [] "" cost
+    Vehicle "" vtype handling hull crew gear weight False [] [] "" cost index
 
 
 defaultVehicle : Vehicle
 defaultVehicle =
-    emptyVehicle NoType
+    emptyVehicle NoType -1
 
 
 typeToWeight : VehicleType -> WeightClass

@@ -14,15 +14,16 @@ type alias Model =
     , tmpWeapon : Weapon
     , tmpUpgrade : Upgrade
     , error : List ErrorType
+    , autoIncrement : Int
     }
 
 
 type CurrentView
     = Overview
-    | Details Int Vehicle
+    | Details Vehicle
     | AddingVehicle
-    | AddingWeapon Int Vehicle
-    | AddingUpgrade Int Vehicle
+    | AddingWeapon Vehicle
+    | AddingUpgrade Vehicle
 
 
 type ErrorType
@@ -54,16 +55,16 @@ viewToStr view =
         Overview ->
             toString view
 
-        Details _ v ->
+        Details v ->
             "Details for " ++ v.name
 
         AddingVehicle ->
             "Adding Vehicle"
 
-        AddingWeapon _ v ->
+        AddingWeapon v ->
             "Adding Weapon to " ++ v.name
 
-        AddingUpgrade _ v ->
+        AddingUpgrade v ->
             "Adding Upgrade to " ++ v.name
 
 
@@ -83,29 +84,30 @@ init =
         defaultWeapon
         defaultUpgrade
         []
+        0
         ! []
 
 
 type Msg
     = ToOverview
-    | ToDetails Int Vehicle
+    | ToDetails Vehicle
     | ToNewVehicle
-    | ToNewWeapon Int Vehicle
-    | ToNewUpgrade Int Vehicle
+    | ToNewWeapon Vehicle
+    | ToNewUpgrade Vehicle
     | AddVehicle
-    | AddWeapon Int Vehicle
-    | AddUpgrade Int Vehicle
-    | DeleteVehicle Int
-    | DeleteWeapon Int Vehicle Int Weapon
-    | DeleteUpgrade Int Vehicle Int Weapon
+    | AddWeapon Vehicle
+    | AddUpgrade Vehicle
+    | DeleteVehicle Vehicle
+    | DeleteWeapon Vehicle Weapon
+    | DeleteUpgrade Vehicle Upgrade
     | TmpName String
     | TmpVehicleType String
     | TmpNotes String
-    | UpdateActivated Int Vehicle Bool
-    | UpdateHull Int Vehicle String
-    | UpdateCrew Int Vehicle String
-    | UpdateGear Int Vehicle String
-    | UpdateNotes Bool Int Vehicle String
+    | UpdateActivated Vehicle Bool
+    | UpdateHull Vehicle String
+    | UpdateCrew Vehicle String
+    | UpdateGear Vehicle String
+    | UpdateNotes Bool Vehicle String
     | TmpWeaponUpdate String
     | TmpUpgradeUpdate String
     | UpdatePointsAllowed String

@@ -9,6 +9,7 @@ type alias Weapon =
     , slots : Int
     , specials : List Special
     , cost : Int
+    , id : Int
     }
 
 
@@ -149,7 +150,7 @@ nameToWeapon s =
 
 defaultWeapon : Weapon
 defaultWeapon =
-    Weapon "" NoWeapon (Dice 0 0) NoRange 0 [] 0
+    Weapon "" NoWeapon (Dice 0 0) NoRange 0 [] 0 -1
 
 
 handgun : Weapon
@@ -161,6 +162,7 @@ handgun =
         0
         [ CrewFired ]
         0
+        -1
 
 
 machineGun : Weapon
@@ -172,6 +174,7 @@ machineGun =
         1
         []
         2
+        -1
 
 
 heavyMachineGun : Weapon
@@ -183,6 +186,7 @@ heavyMachineGun =
         1
         []
         4
+        -1
 
 
 miniGun : Weapon
@@ -194,6 +198,7 @@ miniGun =
         1
         []
         6
+        -1
 
 
 oneTwentyFiveMMCannon : Weapon
@@ -205,6 +210,7 @@ oneTwentyFiveMMCannon =
         3
         [ Ammo 3, SpecialRule "TBD" ]
         6
+        -1
 
 
 rockets : Weapon
@@ -216,6 +222,7 @@ rockets =
         2
         [ Ammo 3, Blast, HighlyExplosive ]
         4
+        -1
 
 
 flamethrower : Weapon
@@ -227,6 +234,7 @@ flamethrower =
         2
         [ Ammo 3, Fire, Explosive ]
         6
+        -1
 
 
 mortar : Weapon
@@ -238,6 +246,7 @@ mortar =
         1
         [ Ammo 3, SpecialRule "TBD" ]
         4
+        -1
 
 
 grenades : Weapon
@@ -249,6 +258,7 @@ grenades =
         0
         [ Ammo 5, CrewFired, Blast, Explosive, Blitz ]
         1
+        -1
 
 
 molotovCocktails : Weapon
@@ -260,6 +270,7 @@ molotovCocktails =
         0
         [ Ammo 5, CrewFired, Fire, Blitz ]
         1
+        -1
 
 
 oilSlickDropper : Weapon
@@ -271,6 +282,7 @@ oilSlickDropper =
         0
         [ Ammo 3, SpecialRule "TBD" ]
         2
+        -1
 
 
 caltropDropper : Weapon
@@ -282,6 +294,7 @@ caltropDropper =
         1
         [ Ammo 3, SpecialRule "TBD" ]
         1
+        -1
 
 
 glueDropper : Weapon
@@ -293,6 +306,7 @@ glueDropper =
         1
         [ Ammo 1, SpecialRule "TBD" ]
         1
+        -1
 
 
 mines : Weapon
@@ -304,6 +318,7 @@ mines =
         1
         [ Ammo 1, Blast ]
         1
+        -1
 
 
 smoke : Weapon
@@ -315,6 +330,7 @@ smoke =
         0
         [ Ammo 3, SpecialRule "TBD" ]
         1
+        -1
 
 
 ram : Weapon
@@ -326,6 +342,7 @@ ram =
         1
         [ SpecialRule "TBD" ]
         4
+        -1
 
 
 explodingRam : Weapon
@@ -337,6 +354,7 @@ explodingRam =
         1
         [ Ammo 1, HighlyExplosive, SpecialRule "TBD" ]
         3
+        -1
 
 
 thumper : Weapon
@@ -348,6 +366,7 @@ thumper =
         2
         [ Electrical, Ammo 1, SpecialRule "TBD" ]
         4
+        -1
 
 
 arcLightningProjector : Weapon
@@ -359,6 +378,7 @@ arcLightningProjector =
         2
         [ Electrical, Ammo 1, SpecialRule "TBD" ]
         6
+        -1
 
 
 kineticSuperBooster : Weapon
@@ -370,6 +390,7 @@ kineticSuperBooster =
         2
         [ Electrical, Ammo 1, SpecialRule "TBD" ]
         6
+        -1
 
 
 magneticJammer : Weapon
@@ -381,6 +402,7 @@ magneticJammer =
         0
         [ Electrical, SpecialRule "TBD" ]
         2
+        -1
 
 
 rollDice : Dice -> Int

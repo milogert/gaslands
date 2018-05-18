@@ -10,8 +10,8 @@ import View.Utils
 import View.Weapon
 
 
-render : CurrentView -> Bool -> Int -> Vehicle -> Html Msg
-render currentView isPreview i v =
+render : CurrentView -> Bool -> Vehicle -> Html Msg
+render currentView isPreview v =
     let
         name =
             if isPreview then
@@ -68,7 +68,7 @@ render currentView isPreview i v =
                 [ input
                     [ class "form-check-input"
                     , type_ "checkbox"
-                    , onClick (UpdateActivated i v (not v.activated))
+                    , onClick (UpdateActivated v (not v.activated))
                     , id ("activateCheck" ++ v.name)
                     , checked v.activated
                     , disabled isPreview
@@ -93,7 +93,7 @@ render currentView isPreview i v =
                             [ class "form-control form-control-sm"
                             , id "hullInput"
                             , type_ "number"
-                            , onInput <| UpdateHull i v
+                            , onInput <| UpdateHull v
                             , value <| toString v.hull.current
                             , Html.Attributes.min "0"
                             , Html.Attributes.max <| toString v.hull.max
@@ -105,7 +105,7 @@ render currentView isPreview i v =
         notes =
             div [ class "form-group form-row" ]
                 [ textarea
-                    [ onInput (UpdateNotes isPreview i v)
+                    [ onInput (UpdateNotes isPreview v)
                     , class "form-control"
                     , placeholder "Notes"
                     ]
@@ -119,13 +119,13 @@ render currentView isPreview i v =
                 [ text "Weapon List"
                 , small []
                     [ button
-                        [ onClick <| ToNewWeapon i v
+                        [ onClick <| ToNewWeapon v
                         , class "btn btn-sm btn-outline-secondary float-right"
                         ]
                         [ text "+" ]
                     ]
                 ]
-                (List.indexedMap (View.Weapon.render i v) v.weapons)
+                (List.map (View.Weapon.render v) v.weapons)
 
         upgradeList =
             View.Utils.detailSection
@@ -134,7 +134,7 @@ render currentView isPreview i v =
                 [ text "Upgrade List"
                 , small []
                     [ button
-                        [ onClick <| ToNewUpgrade i v
+                        [ onClick <| ToNewUpgrade v
                         , class "btn btn-sm btn-outline-secondary float-right"
                         ]
                         [ text "+" ]
@@ -146,7 +146,7 @@ render currentView isPreview i v =
             h4
                 [ classList
                     [ ( "form-inline", isPreview )
-                    , ( "card-title", currentView /= Details i v )
+                    , ( "card-title", currentView /= Details v )
                     ]
                 ]
                 [ name
@@ -155,7 +155,7 @@ render currentView isPreview i v =
                 ]
 
         body =
-            div [ classList [ ( "card-text", currentView /= Details i v ) ] ]
+            div [ classList [ ( "card-text", currentView /= Details v ) ] ]
                 [ activatedCheck
                 , hullChecks
                 , div []
@@ -177,20 +177,20 @@ render currentView isPreview i v =
                     [ button
                         [ class "btn btn-sm btn-danger"
                         , classList [("d-none", isPreview)]
-                        , onClick <| DeleteVehicle i
+                        , onClick <| DeleteVehicle v
                         ]
                         [ text "Delete" ]
                     , button
                         [ class "btn btn-sm btn-secondary float-right"
                         , classList [ ( "d-none", currentView /= Overview || isPreview ) ]
-                        , onClick <| ToDetails i v
+                        , onClick <| ToDetails v
                         ]
                         [ text "Details" ]
                     ]
                 ]
     in
     case currentView of
-        Details i v ->
+        Details v ->
             div [] [ header, body ]
 
         _ ->

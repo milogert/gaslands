@@ -9,8 +9,8 @@ import Model.Weapons exposing (..)
 import View.Utils
 
 
-render : Int -> Vehicle -> Int -> Weapon -> Html Msg
-render vehicleI vehicle weaponI weapon =
+render : Vehicle -> Weapon -> Html Msg
+render vehicle weapon =
     case weapon.wtype of
         NoWeapon ->
             text "Select a weapon type."
@@ -30,7 +30,7 @@ render vehicleI vehicle weaponI weapon =
                         [ text <| wtype ++ " - " ++ range
                         , button
                             [ class "btn btn-sm btn-outline-danger float-right"
-                            , onClick <| DeleteWeapon vehicleI vehicle weaponI weapon ]
+                            , onClick <| DeleteWeapon vehicle weapon ]
                             [ text "x" ]
                         ]
                     ]

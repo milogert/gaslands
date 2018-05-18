@@ -5,6 +5,7 @@ import Debug exposing (log)
 import Model.Model exposing (..)
 import Model.Vehicles exposing (..)
 import Model.Weapons exposing (..)
+import Model.Upgrades exposing (..)
 
 
 (!!) : Int -> List a -> Maybe a
@@ -15,16 +16,16 @@ import Model.Weapons exposing (..)
 addVehicle : Model -> ( Model, Cmd Msg )
 addVehicle model =
     let
-        newv =
+        vehicleNew =
             model.tmpVehicle
-
-        newvtype =
-            newv.vtype
 
         oldl =
             model.vehicles
+
+        newId =
+            model.autoIncrement + 1
     in
-    case ( newv.vtype, newv.name ) of
+    case ( vehicleNew.vtype, vehicleNew.name ) of
         ( NoType, _ ) ->
             { model | error = VehicleTypeError :: model.error } ! []
 
@@ -34,8 +35,9 @@ addVehicle model =
         ( _, _ ) ->
             { model
                 | view = Overview
-                , vehicles = newv :: oldl
+                , vehicles = oldl ++ [ { vehicleNew | id = model.autoIncrement } ]
                 , tmpVehicle = defaultVehicle
+                , autoIncrement = newId 
                 , error = []
             }
                 ! []
@@ -79,30 +81,31 @@ setTmpVehicleType model vtstr =
                 model.tmpVehicle.upgrades
                 model.tmpVehicle.notes
                 cost
+                -1
     in
     { model | tmpVehicle = newtv } ! []
 
 
-updateActivated : Model -> Int -> Vehicle -> Bool -> ( Model, Cmd Msg )
-updateActivated model i v activated =
+updateActivated : Model -> Vehicle -> Bool -> ( Model, Cmd Msg )
+updateActivated model v activated =
     let
         pre =
-            List.take i model.vehicles
+            List.take v.id model.vehicles
 
         nv =
             { v | activated = activated }
 
         post =
-            List.drop (i + 1) model.vehicles
+            List.drop (v.id + 1) model.vehicles
     in
     { model | vehicles = pre ++ nv :: post } ! []
 
 
-updateHull : Model -> Int -> Vehicle -> String -> ( Model, Cmd Msg )
-updateHull model i v strCurrent =
+updateHull : Model -> Vehicle -> String -> ( Model, Cmd Msg )
+updateHull model v strCurrent =
     let
         pre =
-            List.take i model.vehicles
+            List.take v.id model.vehicles
 
         nhull =
             v.hull
@@ -114,11 +117,11 @@ updateHull model i v strCurrent =
             { v | hull = { nhull | current = current } }
 
         post =
-            List.drop (i + 1) model.vehicles
+            List.drop (v.id + 1) model.vehicles
 
         newView = case model.view of
-            Details i v ->
-                Details i nv
+            Details v ->
+                Details nv
 
             _ ->
                 model.view
@@ -126,11 +129,11 @@ updateHull model i v strCurrent =
     { model | view = newView, vehicles = pre ++ nv :: post } ! []
 
 
-updateCrew : Model -> Int -> Vehicle -> String -> ( Model, Cmd Msg )
-updateCrew model i v strCurrent =
+updateCrew : Model -> Vehicle -> String -> ( Model, Cmd Msg )
+updateCrew model v strCurrent =
     let
         pre =
-            List.take i model.vehicles
+            List.take v.id model.vehicles
 
         current =
             String.toInt strCurrent |> Result.toMaybe |> Maybe.withDefault 0
@@ -139,16 +142,16 @@ updateCrew model i v strCurrent =
             { v | crew = current }
 
         post =
-            List.drop (i + 1) model.vehicles
+            List.drop (v.id + 1) model.vehicles
     in
     { model | vehicles = pre ++ nv :: post } ! []
 
 
-updateGear : Model -> Int -> Vehicle -> String -> ( Model, Cmd Msg )
-updateGear model i v strCurrent =
+updateGear : Model -> Vehicle -> String -> ( Model, Cmd Msg )
+updateGear model v strCurrent =
     let
         pre =
-            List.take i model.vehicles
+            List.take v.id model.vehicles
 
         current =
             String.toInt strCurrent |> Result.toMaybe |> Maybe.withDefault 0
@@ -157,13 +160,13 @@ updateGear model i v strCurrent =
             { v | gear = current }
 
         post =
-            List.drop (i + 1) model.vehicles
+            List.drop (v.id + 1) model.vehicles
     in
     { model | vehicles = pre ++ nv :: post } ! []
 
 
-updateNotes : Model -> Bool -> Int -> Vehicle -> String -> ( Model, Cmd Msg )
-updateNotes model isPreview i v notes =
+updateNotes : Model -> Bool -> Vehicle -> String -> ( Model, Cmd Msg )
+updateNotes model isPreview v notes =
     case isPreview of
         True ->
             let
@@ -175,23 +178,20 @@ updateNotes model isPreview i v notes =
         False ->
             let
                 pre =
-                    List.take i model.vehicles
+                    List.take v.id model.vehicles
 
                 nv =
                     { v | notes = notes }
 
                 post =
-                    List.drop (i + 1) model.vehicles
+                    List.drop (v.id + 1) model.vehicles
             in
             { model | vehicles = pre ++ nv :: post } ! []
 
 
-addWeapon : Model -> Int -> Vehicle -> ( Model, Cmd Msg )
-addWeapon model i v =
+addWeapon : Model -> Vehicle -> ( Model, Cmd Msg )
+addWeapon model v =
     let
-        pre =
-            List.take i model.vehicles
-
         nw =
             model.tmpWeapon
 
@@ -204,8 +204,11 @@ addWeapon model i v =
         nv =
             { v | weapons = newweaponlist }
 
+        pre =
+            List.take v.id model.vehicles
+
         post =
-            List.drop (i + 1) model.vehicles
+            List.drop (v.id + 1) model.vehicles
 
         newvehicles =
             pre ++ nv :: post
@@ -215,15 +218,12 @@ addWeapon model i v =
             { model | error = [ WeaponTypeError ] } ! []
 
         _ ->
-            { model | view = Details i nv, error = [], vehicles = newvehicles } ! []
+            { model | view = Details nv, error = [], vehicles = newvehicles } ! []
 
 
-addUpgrade : Model -> Int -> Vehicle -> ( Model, Cmd Msg )
-addUpgrade model i v =
+addUpgrade : Model -> Vehicle -> ( Model, Cmd Msg )
+addUpgrade model v =
     let
-        pre =
-            List.take i model.vehicles
-
         newUpgrade =
             model.tmpUpgrade
 
@@ -236,8 +236,11 @@ addUpgrade model i v =
         nv =
             { v | upgrades = newUpgradeList }
 
+        pre =
+            List.take v.id model.vehicles
+
         post =
-            List.drop (i + 1) model.vehicles
+            List.drop (v.id + 1) model.vehicles
 
         newvehicles =
             pre ++ nv :: post
@@ -247,17 +250,17 @@ addUpgrade model i v =
             { model | error = [ UpgradeTypeError ] } ! []
 
         _ ->
-            { model | view = Details i nv, error = [], vehicles = newvehicles } ! []
+            { model | view = Details nv, error = [], vehicles = newvehicles } ! []
 
 
-deleteVehicle : Model -> Int -> ( Model, Cmd Msg)
-deleteVehicle model i =
+deleteVehicle : Model -> Vehicle -> ( Model, Cmd Msg)
+deleteVehicle model v =
     let
         pre =
-            List.take i model.vehicles
+            List.take v.id model.vehicles
 
         post =
-            List.drop (i + 1) model.vehicles
+            List.drop (v.id + 1) model.vehicles
 
         newvehicles =
             pre ++ post
@@ -265,60 +268,46 @@ deleteVehicle model i =
     { model | view = Overview, vehicles = newvehicles } ! []
 
 
-deleteWeapon : Model -> Int -> Int -> ( Model, Cmd Msg)
-deleteWeapon model vi wi =
+deleteWeapon : Model -> Vehicle -> Weapon -> ( Model, Cmd Msg)
+deleteWeapon model v w =
     let
-        vehicle = case vi !! model.vehicles of
-            Just v ->
-                log "getting a real value" v
-
-            Nothing ->
-                log "getting default vehicle" defaultVehicle
-
         weaponsNew =
-            deleteFromList wi vehicle.weapons
+            deleteFromList w.id v.weapons
 
         vehiclesPre =
-            List.take vi model.vehicles
+            List.take v.id model.vehicles
 
         vehiclesPost =
-            List.drop (vi + 1) model.vehicles
+            List.drop (v.id + 1) model.vehicles
 
         vehicleUpdated =
-            { vehicle | weapons = weaponsNew }
+            { v | weapons = weaponsNew }
 
         vehiclesNew =
             vehiclesPre ++ vehicleUpdated ::  vehiclesPost
     in
-    { model | view = Details vi vehicleUpdated, vehicles = vehiclesNew } ! []
+    { model | view = Details vehicleUpdated, vehicles = vehiclesNew } ! []
 
 
-deleteUpgrade : Model -> Int -> Int -> ( Model, Cmd Msg)
-deleteUpgrade model vi ui =
+deleteUpgrade : Model -> Vehicle -> Upgrade -> ( Model, Cmd Msg )
+deleteUpgrade model v u=
     let
-        vehicle = case vi !! model.vehicles of
-            Just v ->
-                v
-
-            Nothing ->
-                defaultVehicle
-
         upgradesNew =
-            deleteFromList ui vehicle.upgrades
+            deleteFromList u.id v.upgrades
 
         vehiclesPre =
-            List.take vi model.vehicles
+            List.take v.id model.vehicles
 
         vehiclesPost =
-            List.drop (vi + 1) model.vehicles
+            List.drop (v.id + 1) model.vehicles
 
         vehicleUpdated =
-            { vehicle | upgrades = upgradesNew }
+            { v | upgrades = upgradesNew }
 
         vehiclesNew =
             vehiclesPre ++ vehicleUpdated ::  vehiclesPost
     in
-    { model | view = Details vi vehicleUpdated, vehicles = vehiclesNew  } ! []
+    { model | view = Details vehicleUpdated, vehicles = vehiclesNew  } ! []
 
 
 deleteFromList : Int -> List a -> List a

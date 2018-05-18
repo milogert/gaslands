@@ -10,8 +10,8 @@ import View.Upgrade
 import View.Utils
 
 
-view : Model -> Int -> Vehicle -> Html Msg
-view model i v =
+view : Model -> Vehicle -> Html Msg
+view model v =
     let
         slotsList =
             List.map .slots v.upgrades
@@ -34,5 +34,5 @@ view model i v =
                    )
             )
         , View.Upgrade.render model.tmpUpgrade
-        , button [ class "form-control btn btn-primary", onClick (AddUpgrade i v) ] [ text "Add Upgrade" ]
+        , button [ class "form-control btn btn-primary", onClick (AddUpgrade v) ] [ text "Add Upgrade" ]
         ]

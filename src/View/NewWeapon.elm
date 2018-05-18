@@ -10,8 +10,8 @@ import View.Utils
 import View.Weapon
 
 
-view : Model -> Int -> Vehicle -> Html Msg
-view model i v =
+view : Model -> Vehicle -> Html Msg
+view model v =
     let
         slotsList =
             List.map .slots v.weapons
@@ -44,6 +44,6 @@ view model i v =
                         |> List.map (\t -> option [ value t ] [ text t ])
                    )
             )
-        , View.Weapon.render i v -1 model.tmpWeapon
-        , button [ class "form-control btn btn-primary", onClick (AddWeapon i v) ] [ text "Add Weapon" ]
+        , View.Weapon.render v model.tmpWeapon
+        , button [ class "form-control btn btn-primary", onClick (AddWeapon v) ] [ text "Add Weapon" ]
         ]

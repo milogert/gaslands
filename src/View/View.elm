@@ -16,17 +16,17 @@ view : Model -> Html Msg
 view model =
     let
         viewToGoTo = case model.view of
-            Details _ _ ->
+            Details _ ->
                 ToOverview
 
             AddingVehicle ->
                 ToOverview
 
-            AddingWeapon i v ->
-                ToDetails i v
+            AddingWeapon v ->
+                ToDetails v
 
-            AddingUpgrade i v ->
-                ToDetails i v
+            AddingUpgrade v ->
+                ToDetails v
 
             Overview ->
                 ToOverview
@@ -104,14 +104,14 @@ render model =
         Overview ->
             View.Overview.view model
 
-        Details i v ->
-            View.Details.view i v
+        Details v ->
+            View.Details.view v
 
         AddingVehicle ->
             View.NewVehicle.view model
 
-        AddingWeapon i v ->
-            View.NewWeapon.view model i v
+        AddingWeapon v ->
+            View.NewWeapon.view model v
 
-        AddingUpgrade i v ->
-            View.NewUpgrade.view model i v
+        AddingUpgrade v ->
+            View.NewUpgrade.view model v

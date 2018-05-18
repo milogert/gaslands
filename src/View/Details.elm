@@ -9,11 +9,11 @@ import View.Utils
 import View.Vehicle
 
 
-view : Int -> Vehicle -> Html Msg
-view i v =
+view : Vehicle -> Html Msg
+view v =
     View.Utils.row
         [ View.Utils.col "12"
             [ div []
-                [ View.Vehicle.render (Details i v) False i v ]
+                [ View.Vehicle.render (Details v) False v ]
             ]
         ]

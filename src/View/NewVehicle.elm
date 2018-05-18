@@ -10,7 +10,7 @@ import View.Vehicle
 view : Model -> Html Msg
 view model =
     div []
-        [ View.Vehicle.render model.view True -1 model.tmpVehicle
+        [ View.Vehicle.render model.view True model.tmpVehicle
         , button
             [ onClick AddVehicle
             , class "btn btn-primary btn-block mt-3"
