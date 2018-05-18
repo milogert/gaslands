@@ -9,12 +9,10 @@ type alias Model =
     { view : CurrentView
     , pointsAllowed : Int
     , vehicles : List Vehicle
-    , tmpVehicle : Vehicle
-    , vehicleIndex : Int
-    , tmpWeapon : Weapon
-    , tmpUpgrade : Upgrade
+    , tmpVehicle : Maybe Vehicle
+    , tmpWeapon : Maybe Weapon
+    , tmpUpgrade : Maybe Upgrade
     , error : List ErrorType
-    , autoIncrement : Int
     }
 
 
@@ -79,12 +77,10 @@ init =
         Overview
         50
         []
-        defaultVehicle
-        0
-        defaultWeapon
-        defaultUpgrade
+        Nothing
+        Nothing
+        Nothing
         []
-        0
         ! []
 
 
@@ -104,9 +100,10 @@ type Msg
     | TmpVehicleType String
     | TmpNotes String
     | UpdateActivated Vehicle Bool
+    | UpdateGear Vehicle String
     | UpdateHull Vehicle String
     | UpdateCrew Vehicle String
-    | UpdateGear Vehicle String
+    | UpdateEquipment Vehicle String
     | UpdateNotes Bool Vehicle String
     | TmpWeaponUpdate String
     | TmpUpgradeUpdate String

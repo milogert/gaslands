@@ -2,7 +2,6 @@ module Update.Update exposing (update)
 
 import Model.Model exposing (..)
 import Model.Upgrades exposing (..)
-import Model.Vehicles exposing (..)
 import Model.Weapons exposing (..)
 import Update.Utils
 
@@ -16,19 +15,19 @@ update msg model =
     case msg of
         -- ROUTING.
         ToOverview ->
-            { model | view = Overview, tmpVehicle = defaultVehicle, tmpWeapon = defaultWeapon } ! []
+            { model | view = Overview, tmpVehicle = Nothing, tmpWeapon = Nothing, tmpUpgrade = Nothing } ! []
 
         ToDetails v ->
             { model | view = Details v } ! []
 
         ToNewVehicle ->
-            { model | view = AddingVehicle, tmpVehicle = defaultVehicle } ! []
+            { model | view = AddingVehicle } ! []
 
         ToNewWeapon v ->
-            { model | view = AddingWeapon v, tmpVehicle = v, tmpWeapon = defaultWeapon } ! []
+            { model | view = AddingWeapon v } ! []
 
         ToNewUpgrade v ->
-            { model | view = AddingUpgrade v, tmpVehicle = v, tmpUpgrade = defaultUpgrade } ! []
+            { model | view = AddingUpgrade v } ! []
 
         -- ADDING.
         AddVehicle ->
@@ -52,16 +51,29 @@ update msg model =
 
         -- UPDATING.
         TmpName name ->
-            { model | tmpVehicle = { tv | name = name } } ! []
+            case tv of
+                Just v ->
+                    { model | tmpVehicle = Just { v | name = name } } ! []
+
+                Nothing ->
+                    model ! []
 
         TmpVehicleType vtstr ->
             Update.Utils.setTmpVehicleType model vtstr
 
         TmpNotes notes ->
-            { model | tmpVehicle = { tv | notes = notes } } ! []
+            case tv of
+                Just v ->
+                    { model | tmpVehicle = Just { v | notes = notes } } ! []
+
+                Nothing ->
+                    model ! []
 
         UpdateActivated v activated ->
             Update.Utils.updateActivated model v activated
+
+        UpdateGear v strCurrent ->
+            Update.Utils.updateGear model v (String.toInt strCurrent |> Result.withDefault 1)
 
         UpdateHull v strCurrent ->
             Update.Utils.updateHull model v strCurrent
@@ -69,8 +81,8 @@ update msg model =
         UpdateCrew v strCurrent ->
             Update.Utils.updateCrew model v strCurrent
 
-        UpdateGear v strCurrent ->
-            Update.Utils.updateGear model v strCurrent
+        UpdateEquipment v strCurrent ->
+            Update.Utils.updateEquipment model v strCurrent
 
         UpdateNotes isPreview v notes ->
             Update.Utils.updateNotes model isPreview v notes
@@ -80,14 +92,14 @@ update msg model =
                 w =
                     nameToWeapon name
             in
-            { model | tmpWeapon = w } ! []
+            { model | tmpWeapon = Just w } ! []
 
         TmpUpgradeUpdate name ->
             let
                 u =
                     nameToUpgrade name
             in
-            { model | tmpUpgrade = u } ! []
+            { model | tmpUpgrade = Just u } ! []
 
         UpdatePointsAllowed s ->
             { model | pointsAllowed = Result.withDefault 0 (String.toInt s) } ! []

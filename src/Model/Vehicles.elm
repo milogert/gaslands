@@ -7,10 +7,11 @@ import Model.Weapons exposing (..)
 type alias Vehicle =
     { name : String
     , vtype : VehicleType
+    , gear : GearTracker
     , handling : Int
     , hull : HullHolder
     , crew : Int
-    , gear : Int
+    , equipment : Int
     , weight : WeightClass
     , activated : Bool
     , weapons : List Weapon
@@ -34,6 +35,12 @@ type VehicleType
     | Gyrocopter
     | Helicopter
     | NoType
+
+
+type alias GearTracker =
+    { current : Int
+    , max : Int
+    }
 
 
 allVehicleTypes : List VehicleType
@@ -79,6 +86,9 @@ type alias HullHolder =
 emptyVehicle : VehicleType -> Int -> Vehicle
 emptyVehicle vtype index =
     let
+        gear =
+            GearTracker 1 <| typeToGearMax vtype
+
         handling =
             typeToHandling vtype
 
@@ -88,8 +98,8 @@ emptyVehicle vtype index =
         crew =
             typeToCrewMax vtype
 
-        gear =
-            typeToGearMax vtype
+        equipment =
+            typeToEquipmentMax vtype
 
         weight =
             typeToWeight vtype
@@ -97,7 +107,21 @@ emptyVehicle vtype index =
         cost =
             typeToCost vtype
     in
-    Vehicle "" vtype handling hull crew gear weight False [] [] "" cost index
+    Vehicle
+        ""
+        vtype
+        gear
+        handling
+        hull
+        crew
+        equipment
+        weight
+        False
+        []
+        []
+        ""
+        cost
+        index
 
 
 defaultVehicle : Vehicle
@@ -223,6 +247,11 @@ typeToGearMax t =
 
         _ ->
             0
+
+
+typeToEquipmentMax : VehicleType -> Int
+typeToEquipmentMax t =
+    -100
 
 
 typeToCrewMax : VehicleType -> Int

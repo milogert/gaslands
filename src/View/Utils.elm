@@ -2,7 +2,6 @@ module View.Utils exposing (card, crewUsed, detailSection, renderChecksRange, re
 
 import Html exposing (Html, button, div, h1, h2, h3, h4, h5, h6, hr, img, input, label, li, node, option, p, select, small, span, text, textarea, ul)
 import Html.Attributes exposing (checked, class, classList, disabled, for, href, id, max, min, placeholder, rel, src, type_, value)
-import Html.Events exposing (onClick, onInput)
 import Model.Model exposing (..)
 import Model.Vehicles exposing (..)
 import Model.Weapons exposing (..)
@@ -64,6 +63,15 @@ renderSpecial s =
     case s of
         Ammo i ->
             div [] (text "Ammo: " :: renderChecksRange i)
+
+        CrewFired ->
+            text "Requires crew to fire."
+
+        HighlyExplosive ->
+            text "Highly Explosive"
+
+        SpecialRule s ->
+            text <| "Special: " ++ s
 
         _ ->
             text <| toString s

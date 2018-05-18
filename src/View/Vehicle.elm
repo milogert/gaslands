@@ -51,35 +51,56 @@ render currentView isPreview v =
         handling =
             toString v.handling
 
-        gearUsed =
+        equipmentUsed =
             List.sum (List.map .slots v.weapons)
 
-        gearRemaining =
-            toString <| v.gear - gearUsed
+        equipmentRemaining =
+            toString <| v.equipment - equipmentUsed
 
         crewRemaining =
             toString <| v.crew - View.Utils.crewUsed v
 
         activatedCheck =
-            div
-                [ classList [ ( "d-none", isPreview ) ]
-                , class "form-check"
+            div [ class "form-group col-md-6" ]
+                [ div [ class "form-check" ]
+                    [ input
+                        [ class "form-check-input"
+                        , type_ "checkbox"
+                        , onClick (UpdateActivated v (not v.activated))
+                        , id ("activateCheck" ++ v.name)
+                        , checked v.activated
+                        ]
+                        []
+                    , label
+                        [ class "form-check-label"
+                        , for ("activateCheck" ++ v.name)
+                        ]
+                        [ text "Activated" ]
+                    ]
                 ]
-                [ input
-                    [ class "form-check-input"
-                    , type_ "checkbox"
-                    , onClick (UpdateActivated v (not v.activated))
-                    , id ("activateCheck" ++ v.name)
-                    , checked v.activated
-                    , disabled isPreview
+
+        gearBox =
+            div [ class "form-group col-md-6" ]
+                [ label [ for "gearBox" ]
+                    [ text <| "Gear (max " ++ (toString v.gear.max) ++ "):" ]
+                , input
+                    [ class "form-control form-control-sm"
+                    , type_ "number"
+                    , id "gearBox"
+                    , Html.Attributes.min "0"
+                    , Html.Attributes.max <| toString v.gear.current
+                    , onInput (UpdateGear v)
+                    , value <| toString v.gear.current
                     ]
                     []
-                , label
-                    [ class "form-check-label"
-                    , for ("activateCheck" ++ v.name)
-                    ]
-                    [ text "Activated" ]
                 ]
+
+        activationRow =
+            div
+                [ class "form-row"
+                , classList [ ( "d-none", isPreview ) ]
+                ]
+                [ activatedCheck, gearBox ]
 
         hullChecks =
             if isPreview then
@@ -156,15 +177,15 @@ render currentView isPreview v =
 
         body =
             div [ classList [ ( "card-text", currentView /= Details v ) ] ]
-                [ activatedCheck
+                [ activationRow
                 , hullChecks
                 , div []
                     [ text "Handling: "
                     , span [] [ text <| handling ]
                     ]
                 , div []
-                    [ text "Gear slots remaining: "
-                    , span [] [ text <| gearRemaining ]
+                    [ text "Equipment slots remaining: "
+                    , span [] [ text <| equipmentRemaining ]
                     ]
                 , div []
                     [ text "Crew slots remaining: "

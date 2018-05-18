@@ -9,8 +9,16 @@ import View.Vehicle
 
 view : Model -> Html Msg
 view model =
+    let
+        body = case model.tmpVehicle of
+            Just v ->
+                View.Vehicle.render model.view True v
+
+            Nothing ->
+                text "Select a vehicle type."
+    in
     div []
-        [ View.Vehicle.render model.view True model.tmpVehicle
+        [ body
         , button
             [ onClick AddVehicle
             , class "btn btn-primary btn-block mt-3"

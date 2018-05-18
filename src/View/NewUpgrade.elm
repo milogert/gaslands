@@ -7,32 +7,35 @@ import Model.Model exposing (..)
 import Model.Upgrades exposing (..)
 import Model.Vehicles exposing (..)
 import View.Upgrade
-import View.Utils
 
 
 view : Model -> Vehicle -> Html Msg
 view model v =
-    let
-        slotsList =
-            List.map .slots v.upgrades
+    case model.tmpUpgrade of
+        Just tmpUpgrade ->
+            let
+                slotsList =
+                    List.map .slots v.upgrades
 
-        slotsUsed =
-            List.sum slotsList
+                slotsUsed =
+                    List.sum slotsList
 
-        slotsLeft =
-            v.gear - slotsUsed
-    in
-    div []
-        [ select
-            [ onInput TmpUpgradeUpdate
-            , class "form-control"
-            ]
-            (option [] []
-                :: (List.filter (\x -> x.slots <= slotsLeft) allUpgradesList
-                        |> List.map .name
-                        |> List.map (\t -> option [ value t ] [ text t ])
-                   )
-            )
-        , View.Upgrade.render model.tmpUpgrade
-        , button [ class "form-control btn btn-primary", onClick (AddUpgrade v) ] [ text "Add Upgrade" ]
-        ]
+                slotsLeft =
+                    v.equipment - slotsUsed
+            in
+            div []
+                [ select
+                    [ onInput TmpUpgradeUpdate
+                    , class "form-control"
+                    ]
+                    (option [] []
+                        :: (List.filter (\x -> x.slots <= slotsLeft) allUpgradesList
+                                |> List.map .name
+                                |> List.map (\t -> option [ value t ] [ text t ])
+                           )
+                    )
+                , View.Upgrade.render tmpUpgrade
+                , button [ class "form-control btn btn-primary", onClick (AddUpgrade v) ] [ text "Add Upgrade" ]
+                ]
+        Nothing ->
+            text "Select a upgrade."
