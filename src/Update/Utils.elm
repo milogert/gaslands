@@ -2,6 +2,7 @@ module Update.Utils exposing (addUpgrade, addVehicle, addWeapon, deleteVehicle, 
 
 import Model.Model exposing (..)
 import Model.Vehicles exposing (..)
+import Model.Weapons exposing (..)
 
 
 addVehicle : Model -> ( Model, Cmd Msg )
@@ -202,7 +203,12 @@ addWeapon model i v =
         newvehicles =
             pre ++ nv :: post
     in
-    { model | view = Details i nv, vehicles = newvehicles } ! []
+    case nw.wtype of
+        NoWeapon ->
+            { model | error = [ WeaponTypeError ] } ! []
+
+        _ ->
+            { model | view = Details i nv, error = [], vehicles = newvehicles } ! []
 
 
 addUpgrade : Model -> Int -> Vehicle -> ( Model, Cmd Msg )
@@ -211,14 +217,14 @@ addUpgrade model i v =
         pre =
             List.take i model.vehicles
 
-        nw =
+        newUpgrade =
             model.tmpUpgrade
 
         upgradeList =
             v.upgrades
 
         newUpgradeList =
-            upgradeList ++ [ nw ]
+            upgradeList ++ [ newUpgrade ]
 
         nv =
             { v | upgrades = newUpgradeList }
@@ -229,7 +235,12 @@ addUpgrade model i v =
         newvehicles =
             pre ++ nv :: post
     in
-    { model | view = Details i nv, vehicles = newvehicles } ! []
+    case newUpgrade.name of
+        "" ->
+            { model | error = [ UpgradeTypeError ] } ! []
+
+        _ ->
+            { model | view = Details i nv, error = [], vehicles = newvehicles } ! []
 
 
 deleteVehicle : Model -> Int -> ( Model, Cmd Msg)

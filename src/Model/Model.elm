@@ -28,6 +28,8 @@ type CurrentView
 type ErrorType
     = VehicleNameError
     | VehicleTypeError
+    | WeaponTypeError
+    | UpgradeTypeError
 
 
 errorToStr : ErrorType -> String
@@ -38,6 +40,12 @@ errorToStr e =
 
         VehicleTypeError ->
             "Vehicle requires a type."
+
+        WeaponTypeError ->
+            "Select a weapon from the dropdown to add."
+
+        UpgradeTypeError ->
+            "Select an upgrade from the dropdown to add."
 
 
 viewToStr : CurrentView -> String
