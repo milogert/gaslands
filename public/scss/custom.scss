@@ -1,12 +1,12 @@
 // custom.scss
 
-$theme-colors:(
+/*$theme-colors:(
     "primary": #3C4242,
     "secondary": #CC7C35,
     //"test1": #F5CAA2,
     "danger": #994102
     //"test": #A96C4A,
-);
+);*/
 
 // Import the rest of bootstrap.
 @import "bootstrap/scss/bootstrap";
@@ -22,4 +22,16 @@ $theme-colors:(
 
 .card-body {
     padding: .5rem;
+}
+
+.above-points {
+    border-color: $danger;
+}
+
+.at-points {
+    border-color: $success;
+}
+
+.below-points {
+    border-color: $warning;
 }
