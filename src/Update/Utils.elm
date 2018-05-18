@@ -1,4 +1,4 @@
-module Update.Utils exposing (addUpgrade, addVehicle, addWeapon, setTmpVehicleType, updateActivated, updateCrew, updateGear, updateHull, updateNotes)
+module Update.Utils exposing (addUpgrade, addVehicle, addWeapon, deleteVehicle, setTmpVehicleType, updateActivated, updateCrew, updateGear, updateHull, updateNotes)
 
 import Model.Model exposing (..)
 import Model.Vehicles exposing (..)
@@ -18,17 +18,17 @@ addVehicle model =
     in
     case ( newv.vtype, newv.name ) of
         ( NoType, _ ) ->
-            { model | error = "Pick a type." } ! []
+            { model | error = VehicleTypeError :: model.error } ! []
 
         ( _, "" ) ->
-            { model | error = "Enter a name." } ! []
+            { model | error = VehicleNameError :: model.error } ! []
 
         ( _, _ ) ->
             { model
                 | view = Overview
                 , vehicles = newv :: oldl
                 , tmpVehicle = defaultVehicle
-                , error = ""
+                , error = []
             }
                 ! []
 
@@ -107,8 +107,15 @@ updateHull model i v strCurrent =
 
         post =
             List.drop (i + 1) model.vehicles
+
+        newView = case model.view of
+            Details i v ->
+                Details i nv
+
+            _ ->
+                model.view
     in
-    { model | vehicles = pre ++ nv :: post } ! []
+    { model | view = newView, vehicles = pre ++ nv :: post } ! []
 
 
 updateCrew : Model -> Int -> Vehicle -> String -> ( Model, Cmd Msg )
@@ -223,3 +230,18 @@ addUpgrade model i v =
             pre ++ nv :: post
     in
     { model | view = Details i nv, vehicles = newvehicles } ! []
+
+
+deleteVehicle : Model -> Int -> ( Model, Cmd Msg)
+deleteVehicle model i =
+    let
+        pre =
+            List.take i model.vehicles
+
+        post =
+            List.drop (i + 1) model.vehicles
+
+        newvehicles =
+            pre ++ post
+    in
+    { model | view = Overview, vehicles = newvehicles } ! []

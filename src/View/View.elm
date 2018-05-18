@@ -9,6 +9,7 @@ import View.NewUpgrade
 import View.NewVehicle
 import View.NewWeapon
 import View.Overview
+import View.Utils exposing (..)
 
 
 view : Model -> Html Msg
@@ -21,30 +22,38 @@ view model =
                 , onClick ToOverview
                 ]
                 [ text "<" ]
+
+        currentPoints =
+            totalPoints model
+
+        maxPoints =
+            model.pointsAllowed
     in
     div [ class "container" ]
-        [ div [ class "row" ]
+        [ row
             [ h2 [ class "col mt-3" ]
                 [ toOverview
                 , text "Gaslands Manager "
                 , small [] [ text <| viewToStr model.view ]
                 ]
-            , form [ class "col-md-3 col-sm-12 my-auto" ]
-                [ div [ class "form-row" ]
-                    [ div [ class "col-4" ]
-                        [ input
-                            [ type_ "text"
-                            , readonly True
-                            , class "form-control-plaintext"
-                            , value <| (toString <| totalPoints model) ++ " of"
-                            ]
-                            []
+            , div [ class "col-lg-2 col-md-3 col-sm-12 my-auto" ]
+                [ div [ class "form-group form-row mb-0" ]
+                    [ label
+                        [ for "squadPoints"
+                        , class "col-form-label"
                         ]
-                    , div [ class "col-8" ]
+                        [ text <| (toString <| currentPoints) ++ " of" ]
+                    , col ""
                         [ input
                             [ type_ "number"
                             , class "form-control form-control-sm my-1"
-                            , value <| toString model.pointsAllowed
+                            , classList
+                                [ ("above-points", currentPoints > maxPoints)
+                                , ("at-points", currentPoints == maxPoints)
+                                , ("below-points", currentPoints < maxPoints)
+                                ]
+                            , id "squadPoints"
+                            , value <| toString maxPoints
                             , onInput UpdatePointsAllowed
                             ]
                             []
@@ -61,15 +70,16 @@ view model =
 displayAlert : Model -> Html Msg
 displayAlert model =
     case model.error of
-        "" ->
+        [] ->
             text ""
 
         _ ->
-            div [ class "row" ]
-                [ div
-                    [ class "col alert alert-danger" ]
-                    [ text model.error ]
-                ]
+            div [] <|
+                List.map (\x -> (row
+                    [ div
+                        [ class "col alert alert-danger" ]
+                        [ text <| errorToStr x ]
+                    ])) model.error
 
 
 render : Model -> Html Msg

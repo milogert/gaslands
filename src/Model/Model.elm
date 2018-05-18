@@ -1,4 +1,4 @@
-module Model.Model exposing (CurrentView(..), Model, Msg(..), init, totalPoints, viewToStr)
+module Model.Model exposing (CurrentView(..), ErrorType(..), Model, Msg(..), init, totalPoints, viewToStr, errorToStr)
 
 import Model.Upgrades exposing (..)
 import Model.Vehicles exposing (..)
@@ -13,7 +13,7 @@ type alias Model =
     , vehicleIndex : Int
     , tmpWeapon : Weapon
     , tmpUpgrade : Upgrade
-    , error : String
+    , error : List ErrorType
     }
 
 
@@ -23,6 +23,21 @@ type CurrentView
     | AddingVehicle
     | AddingWeapon Int Vehicle
     | AddingUpgrade Int Vehicle
+
+
+type ErrorType
+    = VehicleNameError
+    | VehicleTypeError
+
+
+errorToStr : ErrorType -> String
+errorToStr e =
+    case e of
+        VehicleNameError ->
+            "Vehicle requires a name."
+
+        VehicleTypeError ->
+            "Vehicle requires a type."
 
 
 viewToStr : CurrentView -> String
@@ -59,7 +74,7 @@ init =
         0
         defaultWeapon
         defaultUpgrade
-        ""
+        []
         ! []
 
 
@@ -70,6 +85,9 @@ type Msg
     | ToNewWeapon Int Vehicle
     | ToNewUpgrade Int Vehicle
     | AddVehicle
+    | AddWeapon Int Vehicle
+    | AddUpgrade Int Vehicle
+    | DeleteVehicle Int
     | TmpName String
     | TmpVehicleType String
     | TmpNotes String
@@ -79,7 +97,5 @@ type Msg
     | UpdateGear Int Vehicle String
     | UpdateNotes Bool Int Vehicle String
     | TmpWeaponUpdate String
-    | AddWeapon Int Vehicle
     | TmpUpgradeUpdate String
-    | AddUpgrade Int Vehicle
     | UpdatePointsAllowed String

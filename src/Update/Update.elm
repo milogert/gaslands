@@ -40,6 +40,10 @@ update msg model =
         AddUpgrade i v ->
             Update.Utils.addUpgrade model i v
 
+        -- DELETING.
+        DeleteVehicle i ->
+            Update.Utils.deleteVehicle model i
+
         -- UPDATING.
         TmpName name ->
             { model | tmpVehicle = { tv | name = name } } ! []

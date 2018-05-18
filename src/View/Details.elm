@@ -11,8 +11,8 @@ import View.Vehicle
 
 view : Int -> Vehicle -> Html Msg
 view i v =
-    div [ class "row" ]
-        [ div [ class "col-12" ]
+    View.Utils.row
+        [ View.Utils.col "12"
             [ div []
                 [ View.Vehicle.render (Details i v) False i v ]
             ]

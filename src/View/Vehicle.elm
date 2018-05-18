@@ -1,7 +1,7 @@
 module View.Vehicle exposing (render)
 
 import Html exposing (Html, button, div, h1, h2, h3, h4, h5, h6, hr, img, input, label, li, node, option, p, select, small, span, text, textarea, ul)
-import Html.Attributes exposing (checked, class, classList, disabled, for, href, id, max, min, placeholder, rel, src, type_, value)
+import Html.Attributes exposing (checked, class, classList, disabled, for, href, id, max, min, placeholder, rel, src, type_, value, max)
 import Html.Events exposing (onClick, onInput)
 import Model.Model exposing (..)
 import Model.Vehicles exposing (..)
@@ -83,21 +83,34 @@ render currentView isPreview i v =
 
         hullChecks =
             if isPreview then
-                text <| toString v.hull.max
+                text <| "Hull Max: " ++ toString v.hull.max
             else
-                let
-                    checks =
-                        View.Utils.renderChecksRangePreChecked v.hull.max v.hull.current
-                in
-                div [] (text "Hull: " :: checks)
+                div [ class "form-group form-row" ]
+                    [ label [ for "hullInput", class "col-6 col-form-label" ]
+                        [ text <| "Hull Damage (max: " ++ (toString v.hull.max) ++ "): "]
+                    , div [ class "col-6" ]
+                        [ input
+                            [ class "form-control form-control-sm"
+                            , id "hullInput"
+                            , type_ "number"
+                            , onInput <| UpdateHull i v
+                            , value <| toString v.hull.current
+                            , Html.Attributes.min "0"
+                            , Html.Attributes.max <| toString v.hull.max
+                            ]
+                            []
+                        ]
+                    ]
 
         notes =
-            textarea
-                [ onInput (UpdateNotes isPreview i v)
-                , class "form-control"
-                , placeholder "Notes"
+            div [ class "form-group form-row" ]
+                [ textarea
+                    [ onInput (UpdateNotes isPreview i v)
+                    , class "form-control"
+                    , placeholder "Notes"
+                    ]
+                    [ text v.notes ]
                 ]
-                [ text v.notes ]
 
         weaponList =
             View.Utils.detailSection
@@ -139,12 +152,6 @@ render currentView isPreview i v =
                 [ name
                 , small []
                     [ vehicleType_, text <| " - " ++ weight ++ " (" ++ (toString <| vehicleCost v) ++ ")" ]
-                , button
-                    [ class "btn btn-sm btn-secondary float-right"
-                    , classList [ ( "d-none", currentView /= Overview || isPreview ) ]
-                    , onClick <| ToDetails i v
-                    ]
-                    [ text "Details" ]
                 ]
 
         body =
@@ -166,6 +173,20 @@ render currentView isPreview i v =
                 , notes
                 , weaponList
                 , upgradeList
+                , div [ class "buttons" ]
+                    [ button
+                        [ class "btn btn-sm btn-danger"
+                        , classList [("d-none", isPreview)]
+                        , onClick <| DeleteVehicle i
+                        ]
+                        [ text "Delete" ]
+                    , button
+                        [ class "btn btn-sm btn-secondary float-right"
+                        , classList [ ( "d-none", currentView /= Overview || isPreview ) ]
+                        , onClick <| ToDetails i v
+                        ]
+                        [ text "Details" ]
+                    ]
                 ]
     in
     case currentView of

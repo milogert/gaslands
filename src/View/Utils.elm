@@ -1,4 +1,4 @@
-module View.Utils exposing (card, crewUsed, detailSection, renderChecksRange, renderChecksRangePreChecked, renderDice, renderSpecial)
+module View.Utils exposing (card, crewUsed, detailSection, renderChecksRange, renderChecksRangePreChecked, renderDice, renderSpecial, row, rowPlus, col)
 
 import Html exposing (Html, button, div, h1, h2, h3, h4, h5, h6, hr, img, input, label, li, node, option, p, select, small, span, text, textarea, ul)
 import Html.Attributes exposing (checked, class, classList, disabled, for, href, id, max, min, placeholder, rel, src, type_, value)
@@ -6,6 +6,43 @@ import Html.Events exposing (onClick, onInput)
 import Model.Model exposing (..)
 import Model.Vehicles exposing (..)
 import Model.Weapons exposing (..)
+
+
+row : List (Html Msg) -> Html Msg
+row body =
+    rowPlus [] body
+
+
+rowPlus : List String -> List (Html Msg) -> Html Msg
+rowPlus classes body =
+    div [ class "row", classList <| mapClassList classes ] body
+
+
+col : String -> List (Html Msg) -> Html Msg
+col colMod body =
+    case colMod of
+        "" ->
+            colPlus [] [] body
+
+        _ ->
+            colPlus [colMod] [] body
+
+
+colPlus : List String -> List String -> List (Html Msg) -> Html Msg
+colPlus colMods classes body =
+    case colMods of
+        [] ->
+            div [ class "col", classList <| mapClassList classes ] body
+
+        _ ->
+            div
+                [ classList <| (List.map (\x -> ("col-" ++ x, True)) colMods) ++ (mapClassList classes) ]
+                body
+
+
+mapClassList : List String -> List (String, Bool)
+mapClassList classes =
+    List.map (\x -> (x, True)) classes
 
 
 card : Html Msg -> Html Msg -> Html Msg
