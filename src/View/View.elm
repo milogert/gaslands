@@ -53,8 +53,7 @@ view model =
             [ row
                 [ h2 [ class "col mt-3" ]
                     [ backButton
-                    , text "Gaslands "
-                    , small [] [ text <| viewToStr model.view ]
+                    , text <| viewToStr model.view
                     ]
                 , View.Utils.colPlus [ "lg-2", "md-3", "sm-12" ]
                     [ "my-auto" ]
