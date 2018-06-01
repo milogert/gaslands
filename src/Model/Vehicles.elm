@@ -8,7 +8,9 @@ type alias Vehicle =
     { name : String
     , vtype : VehicleType
     , gear : GearTracker
+    , hazards : Int
     , handling : Int
+    , skidResults : List SkidResult
     , hull : HullHolder
     , crew : Int
     , equipment : Int
@@ -34,7 +36,13 @@ type VehicleType
     | Tank
     | Gyrocopter
     | Helicopter
-    | NoType
+
+
+type SkidResult
+    = Hazard
+    | Spin
+    | Slide
+    | Shift
 
 
 type alias GearTracker =
@@ -56,7 +64,6 @@ allVehicleTypes =
     , Tank
     , Gyrocopter
     , Helicopter
-    , NoType
     ]
 
 
@@ -107,26 +114,23 @@ emptyVehicle vtype index =
         cost =
             typeToCost vtype
     in
-    Vehicle
-        ""
-        vtype
-        gear
-        handling
-        hull
-        crew
-        equipment
-        weight
-        False
-        []
-        []
-        ""
-        cost
-        index
-
-
-defaultVehicle : Vehicle
-defaultVehicle =
-    emptyVehicle NoType -1
+        Vehicle
+            ""
+            vtype
+            gear
+            0
+            handling
+            []
+            hull
+            crew
+            equipment
+            weight
+            False
+            []
+            []
+            ""
+            cost
+            index
 
 
 typeToWeight : VehicleType -> WeightClass
@@ -165,9 +169,6 @@ typeToWeight t =
         Helicopter ->
             Airborne
 
-        _ ->
-            NoWeight
-
 
 typeToCost : VehicleType -> Int
 typeToCost t =
@@ -204,9 +205,6 @@ typeToCost t =
 
         Helicopter ->
             30
-
-        _ ->
-            0
 
 
 typeToGearMax : VehicleType -> Int
@@ -245,13 +243,42 @@ typeToGearMax t =
         PerformanceCar ->
             6
 
-        _ ->
-            0
-
 
 typeToEquipmentMax : VehicleType -> Int
 typeToEquipmentMax t =
-    -100
+    case t of
+        Bike ->
+            1
+
+        Buggy ->
+            2
+
+        Car ->
+            2
+
+        PerformanceCar ->
+            2
+
+        PickupTruck ->
+            3
+
+        MonsterTruck ->
+            2
+
+        Bus ->
+            3
+
+        WarRig ->
+            5
+
+        Tank ->
+            4
+
+        Gyrocopter ->
+            0
+
+        Helicopter ->
+            4
 
 
 typeToCrewMax : VehicleType -> Int
@@ -290,9 +317,6 @@ typeToCrewMax t =
         Helicopter ->
             2
 
-        _ ->
-            0
-
 
 typeToHandling : VehicleType -> Int
 typeToHandling t =
@@ -329,9 +353,6 @@ typeToHandling t =
 
         Helicopter ->
             3
-
-        _ ->
-            0
 
 
 typeToHullMax : VehicleType -> Int
@@ -370,9 +391,6 @@ typeToHullMax t =
         Helicopter ->
             8
 
-        _ ->
-            0
-
 
 vTToStr : VehicleType -> String
 vTToStr t =
@@ -410,45 +428,42 @@ vTToStr t =
         Helicopter ->
             "Helicopter"
 
-        _ ->
-            "No Type"
 
-
-strToVT : String -> VehicleType
+strToVT : String -> Maybe VehicleType
 strToVT s =
     case s of
         "Bike" ->
-            Bike
+            Just Bike
 
         "Buggy" ->
-            Buggy
+            Just Buggy
 
         "Car" ->
-            Car
+            Just Car
 
         "Performance Car" ->
-            PerformanceCar
+            Just PerformanceCar
 
         "Pickup Truck" ->
-            PickupTruck
+            Just PickupTruck
 
         "Monster Truck" ->
-            MonsterTruck
+            Just MonsterTruck
 
         "Bus" ->
-            Bus
+            Just Bus
 
         "War Rig" ->
-            WarRig
+            Just WarRig
 
         "Tank" ->
-            Tank
+            Just Tank
 
         "Gyrocopter" ->
-            Gyrocopter
+            Just Gyrocopter
 
         "Helicopter" ->
-            Helicopter
+            Just Helicopter
 
         _ ->
-            NoType
+            Nothing

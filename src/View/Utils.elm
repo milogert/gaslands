@@ -1,4 +1,4 @@
-module View.Utils exposing (card, crewUsed, detailSection, renderChecksRange, renderChecksRangePreChecked, renderDice, renderSpecial, row, rowPlus, col)
+module View.Utils exposing (card, crewUsed, detailSection, renderChecksRange, renderChecksRangePreChecked, renderDice, renderSpecial, row, rowPlus, col, colPlus)
 
 import Html exposing (Html, button, div, h1, h2, h3, h4, h5, h6, hr, img, input, label, li, node, option, p, select, small, span, text, textarea, ul)
 import Html.Attributes exposing (checked, class, classList, disabled, for, href, id, max, min, placeholder, rel, src, type_, value)
@@ -24,7 +24,7 @@ col colMod body =
             colPlus [] [] body
 
         _ ->
-            colPlus [colMod] [] body
+            colPlus [ colMod ] [] body
 
 
 colPlus : List String -> List String -> List (Html Msg) -> Html Msg
@@ -35,20 +35,21 @@ colPlus colMods classes body =
 
         _ ->
             div
-                [ classList <| (List.map (\x -> ("col-" ++ x, True)) colMods) ++ (mapClassList classes) ]
+                [ classList <| (List.map (\x -> ( "col-" ++ x, True )) colMods) ++ (mapClassList classes) ]
                 body
 
 
-mapClassList : List String -> List (String, Bool)
+mapClassList : List String -> List ( String, Bool )
 mapClassList classes =
-    List.map (\x -> (x, True)) classes
+    List.map (\x -> ( x, True )) classes
 
 
-card : Html Msg -> Html Msg -> Html Msg
-card header body =
-    div [ class "card p-1" ]
-        [ div [ class "card-body" ]
-            [ header, body ]
+card : List (String, Bool) -> Html Msg -> Html Msg -> Html Msg -> Html Msg
+card cl header body footer =
+    div [ class "card", classList cl ]
+        [ div [ class "card-header" ] [ header]
+        , div [ class "card-body" ] [ body ]
+        , div [ class "card-footer" ] [ footer ]
         ]
 
 
@@ -65,10 +66,13 @@ renderSpecial s =
             div [] (text "Ammo: " :: renderChecksRange i)
 
         CrewFired ->
-            text "Requires crew to fire."
+            text "360 degree firing"
 
         HighlyExplosive ->
             text "Highly Explosive"
+
+        TreacherousSurface ->
+            text "The dropped template counts as a treacherous surface."
 
         SpecialRule s ->
             text <| "Special: " ++ s
@@ -91,14 +95,14 @@ renderChecksRangePreChecked ti ci =
         cBox =
             input [ type_ "checkbox", class "ml-1", checked True ] []
     in
-    List.map
-        (\ri ->
-            if ri <= ci then
-                cBox
-            else
-                ucBox
-        )
-        (List.range 1 ti)
+        List.map
+            (\ri ->
+                if ri <= ci then
+                    cBox
+                else
+                    ucBox
+            )
+            (List.range 1 ti)
 
 
 renderDice : Dice -> String
@@ -113,4 +117,5 @@ renderDice { number, die } =
 
 crewUsed : Vehicle -> Int
 crewUsed v =
-    List.length <| List.filter (\x -> List.member CrewFired x.specials) v.weapons
+    List.length <| List.filter (\x -> x.status == WeaponFired) v.weapons
+

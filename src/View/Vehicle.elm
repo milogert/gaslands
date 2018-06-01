@@ -1,7 +1,7 @@
 module View.Vehicle exposing (render)
 
 import Html exposing (Html, button, div, h1, h2, h3, h4, h5, h6, hr, img, input, label, li, node, option, p, select, small, span, text, textarea, ul)
-import Html.Attributes exposing (checked, class, classList, disabled, for, href, id, max, min, placeholder, rel, src, type_, value, max)
+import Html.Attributes exposing (checked, class, classList, disabled, for, href, id, max, min, placeholder, rel, src, type_, value, max, attribute)
 import Html.Events exposing (onClick, onInput)
 import Model.Model exposing (..)
 import Model.Vehicles exposing (..)
@@ -10,19 +10,19 @@ import View.Utils
 import View.Weapon
 
 
-render : CurrentView -> Bool -> Vehicle -> Html Msg
-render currentView isPreview v =
+render : Model -> CurrentView -> Bool -> Vehicle -> Html Msg
+render model currentView isPreview v =
     let
         name =
             if isPreview then
                 input
                     [ onInput TmpName
                     , placeholder "Name"
-                    , class "form-control mr-3"
+                    , class "form-control mr-2"
                     ]
                     [ text v.name ]
             else
-                span [ class "mr-3" ] [ text v.name ]
+                span [ class "mr-2" ] [ text v.name ]
 
         vtype =
             vTToStr v.vtype
@@ -42,108 +42,190 @@ render currentView isPreview v =
         equipmentRemaining =
             toString <| v.equipment - equipmentUsed
 
+        isCrewAvailable =
+            v.crew > View.Utils.crewUsed v
+
         crewRemaining =
             toString <| v.crew - View.Utils.crewUsed v
 
+        wipedOut =
+            v.hazards >= 6
+
+        canActivate =
+            model.gearPhase <= v.gear.current
+
+        activatedText =
+            if not v.activated then
+                "Activate"
+            else
+                "Activated"
+
         activatedCheck =
-            div [ class "form-group col-md-6" ]
-                [ div [ class "form-check" ]
+            div
+                [ class "btn-group-toggle float-left mr-2"
+                , classList [ ( "d-none", isPreview || wipedOut ) ]
+                , attribute "data-toggle" "buttons"
+                ]
+                [ label
+                    [ class "btn btn-sm btn-secondary"
+                    , disabled <| not canActivate
+                    ]
                     [ input
-                        [ class "form-check-input"
-                        , type_ "checkbox"
+                        [ type_ "checkbox"
                         , onClick (UpdateActivated v (not v.activated))
                         , id ("activateCheck" ++ v.name)
                         , checked v.activated
+                        , disabled <| not canActivate
                         ]
                         []
-                    , label
-                        [ class "form-check-label"
-                        , for ("activateCheck" ++ v.name)
-                        ]
-                        [ text "Activated" ]
+                    , text activatedText
                     ]
                 ]
 
         gearBox =
-            div [ class "form-group col-md-6" ]
-                [ label [ for "gearBox" ]
-                    [ text <| "Gear (max " ++ (toString v.gear.max) ++ "):" ]
-                , input
-                    [ class "form-control form-control-sm"
-                    , type_ "number"
-                    , id "gearBox"
-                    , Html.Attributes.min "0"
-                    , Html.Attributes.max <| toString v.gear.current
-                    , onInput (UpdateGear v)
-                    , value <| toString v.gear.current
-                    ]
-                    []
-                ]
+            case (isPreview, wipedOut) of
+                (True, _) ->
+                    text <| "Gear Max: " ++ toString v.gear.max
 
-        activationRow =
-            div
-                [ class "form-row"
-                , classList [ ( "d-none", isPreview ) ]
-                ]
-                [ activatedCheck, gearBox ]
+                (_, True) ->
+                    text ""
 
-        hullChecks =
+                (False, False) ->
+                    div [ class "form-group form-row" ]
+                        [ label [ for "gearBox", class "col-form-label" ]
+                            [ text <| "Gear:" ]
+                        , View.Utils.col ""
+                            [ input
+                                [ class "form-control form-control-sm"
+                                , type_ "number"
+                                , id "gearBox"
+                                , Html.Attributes.min "1"
+                                , Html.Attributes.max <| toString v.gear.max
+                                , onInput (UpdateGear v)
+                                , value <| toString v.gear.current
+                                ]
+                                []
+                            ]
+                        , label [ for "gearBox", class "col-form-label" ]
+                            [ text <| "of " ++ toString v.gear.max ]
+                        ]
+
+        hazardTokens =
             if isPreview then
-                text <| "Hull Max: " ++ toString v.hull.max
+                text ""
             else
                 div [ class "form-group form-row" ]
-                    [ label [ for "hullInput", class "col-6 col-form-label" ]
-                        [ text <| "Hull Damage (max: " ++ (toString v.hull.max) ++ "): "]
-                    , div [ class "col-6" ]
+                    [ label [ for "hazardsGained", class "col-form-label" ]
+                        [ text <| "Hazards Gained:" ]
+                    , View.Utils.col ""
                         [ input
                             [ class "form-control form-control-sm"
-                            , id "hullInput"
                             , type_ "number"
-                            , onInput <| UpdateHull v
-                            , value <| toString v.hull.current
+                            , id "hazardsGained"
                             , Html.Attributes.min "0"
-                            , Html.Attributes.max <| toString v.hull.max
+                            , Html.Attributes.max "6"
+                            , onInput (UpdateHazards v)
+                            , value <| toString v.hazards
                             ]
                             []
                         ]
+                    , label [ for "hazardsGained", class "col-form-label" ]
+                        [ text <| "of 6" ]
                     ]
 
+        hullChecks =
+            case (isPreview, wipedOut) of
+                (True, _) ->
+                    text <| "Hull Max: " ++ toString v.hull.max
+
+                (_, True) ->
+                    text ""
+
+                (False, False) ->
+                    div [ class "form-group form-row" ]
+                        [ label [ for "hullInput", class "col-form-label" ]
+                            [ text "Hull Dmg: " ]
+                        , View.Utils.col ""
+                            [ input
+                                [ class "form-control form-control-sm"
+                                , id "hullInput"
+                                , type_ "number"
+                                , onInput <| UpdateHull v
+                                , value <| toString v.hull.current
+                                , Html.Attributes.min "0"
+                                , Html.Attributes.max <| toString v.hull.max
+                                ]
+                                []
+                            ]
+                        , label [ for "hullInput", class "col-form-label" ]
+                            [ text <| "of " ++ toString v.hull.max ]
+                        ]
+
         notes =
-            div [ class "form-group form-row" ]
-                [ textarea
-                    [ onInput (UpdateNotes isPreview v)
-                    , class "form-control"
-                    , placeholder "Notes"
-                    ]
-                    [ text v.notes ]
+            div
+                [ class "form-group form-row"
+                , classList [ ("d-none", wipedOut) ]
                 ]
+                [ View.Utils.col ""
+                    [ textarea
+                        [ onInput (UpdateNotes isPreview v)
+                        , class "form-control"
+                        , placeholder "Notes"
+                        ]
+                        [ text v.notes ]
+                    ]
+                ]
+
+        weaponsUsingSlots =
+            List.sum <| List.map .slots v.weapons
 
         weaponList =
             View.Utils.detailSection
                 currentView
                 isPreview
                 [ text "Weapon List"
+                , small [ class "ml-2" ]
+                    [ span
+                        [ class "badge"
+                        , classList
+                            [ ( "badge-success", isCrewAvailable )
+                            , ( "badge-danger", not isCrewAvailable )
+                            ]
+                        ]
+                        [ text <| (toString <| View.Utils.crewUsed v) ++ "/" ++ (toString v.crew) ++ " crew used" ]
+                    ]
+                , small [ class "ml-2" ]
+                    [ span [ class "badge badge-dark" ]
+                        [ text <| (toString <| weaponsUsingSlots) ++ "/" ++ (toString v.crew) ++ " slots used" ]
+                    ]
                 , small []
                     [ button
                         [ onClick <| ToNewWeapon v
-                        , class "btn btn-sm btn-outline-secondary float-right"
+                        , class "btn btn-sm btn-outline-secondary ml-2"
                         ]
-                        [ text "+" ]
+                        [ text "New Weapon" ]
                     ]
                 ]
                 (List.map (View.Weapon.render v) v.weapons)
+
+        upgradeUsingSlots =
+            List.sum <| List.map .slots v.upgrades
 
         upgradeList =
             View.Utils.detailSection
                 currentView
                 isPreview
                 [ text "Upgrade List"
+                , small [ class "ml-2" ]
+                    [ span [ class "badge badge-dark" ]
+                        [ text <| (toString <| upgradeUsingSlots) ++ "/" ++ (toString v.crew) ++ " slots used" ]
+                    ]
                 , small []
                     [ button
                         [ onClick <| ToNewUpgrade v
-                        , class "btn btn-sm btn-outline-secondary float-right"
+                        , class "btn btn-sm btn-outline-secondary ml-2"
                         ]
-                        [ text "+" ]
+                        [ text "New Upgrade" ]
                     ]
                 ]
                 (List.map View.Upgrade.render v.upgrades)
@@ -155,49 +237,49 @@ render currentView isPreview v =
                     , ( "card-title", currentView /= Details v )
                     ]
                 ]
-                [ name
+                [ activatedCheck
+                , name
                 , small []
                     [ vehicleType_, text <| " - " ++ weight ++ " (" ++ (toString <| vehicleCost v) ++ ")" ]
                 ]
 
         body =
             div [ classList [ ( "card-text", currentView /= Details v ) ] ]
-                [ activationRow
+                [ gearBox
+                , hazardTokens
                 , hullChecks
-                , div []
+                , div [ classList [ ("d-none", wipedOut) ] ]
                     [ text "Handling: "
                     , span [] [ text <| handling ]
-                    ]
-                , div []
-                    [ text "Equipment slots remaining: "
-                    , span [] [ text <| equipmentRemaining ]
-                    ]
-                , div []
-                    [ text "Crew slots remaining: "
-                    , span [] [ text <| crewRemaining ]
                     ]
                 , notes
                 , weaponList
                 , upgradeList
-                , div [ class "buttons" ]
-                    [ button
-                        [ class "btn btn-sm btn-danger"
-                        , classList [("d-none", isPreview)]
-                        , onClick <| DeleteVehicle v
-                        ]
-                        [ text "Delete" ]
-                    , button
-                        [ class "btn btn-sm btn-secondary float-right"
-                        , classList [ ( "d-none", currentView /= Overview || isPreview ) ]
-                        , onClick <| ToDetails v
-                        ]
-                        [ text "Details" ]
-                    ]
                 ]
-    in
-    case currentView of
-        Details v ->
-            div [] [ header, body ]
 
-        _ ->
-            View.Utils.card header body
+        footer =
+            div
+                [ class "buttons"
+                , classList [ ( "d-none", wipedOut ) ]
+                ]
+                [ button
+                    [ class "btn btn-sm btn-danger"
+                    , classList [ ( "d-none", isPreview ) ]
+                    , onClick <| DeleteVehicle v
+                    ]
+                    [ text "Delete" ]
+                , button
+                    [ class "btn btn-sm btn-secondary float-right"
+                    , classList [ ( "d-none", currentView /= Overview || isPreview ) ]
+                    , onClick <| ToDetails v
+                    ]
+                    [ text "Details" ]
+                ]
+            
+    in
+        case currentView of
+            Details v ->
+                div [] [ header, body ]
+
+            _ ->
+                View.Utils.card [ ("border-danger", wipedOut) ] header body footer

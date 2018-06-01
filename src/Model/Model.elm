@@ -8,6 +8,7 @@ import Model.Weapons exposing (..)
 type alias Model =
     { view : CurrentView
     , pointsAllowed : Int
+    , gearPhase : Int
     , vehicles : List Vehicle
     , tmpVehicle : Maybe Vehicle
     , tmpWeapon : Maybe Weapon
@@ -76,6 +77,7 @@ init =
     Model
         Overview
         50
+        1
         []
         Nothing
         Nothing
@@ -99,8 +101,10 @@ type Msg
     | TmpName String
     | TmpVehicleType String
     | TmpNotes String
+    | NextGearPhase
     | UpdateActivated Vehicle Bool
     | UpdateGear Vehicle String
+    | UpdateHazards Vehicle String
     | UpdateHull Vehicle String
     | UpdateCrew Vehicle String
     | UpdateEquipment Vehicle String
@@ -108,3 +112,5 @@ type Msg
     | TmpWeaponUpdate String
     | TmpUpgradeUpdate String
     | UpdatePointsAllowed String
+    | SetWeaponsReady
+    | SetWeaponFired Vehicle Weapon

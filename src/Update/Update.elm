@@ -12,94 +12,130 @@ update msg model =
         tv =
             model.tmpVehicle
     in
-    case msg of
-        -- ROUTING.
-        ToOverview ->
-            { model | view = Overview, tmpVehicle = Nothing, tmpWeapon = Nothing, tmpUpgrade = Nothing } ! []
+        case msg of
+            -- ROUTING.
+            ToOverview ->
+                { model | view = Overview, tmpVehicle = Nothing, tmpWeapon = Nothing, tmpUpgrade = Nothing } ! []
 
-        ToDetails v ->
-            { model | view = Details v } ! []
+            ToDetails v ->
+                { model | view = Details v } ! []
 
-        ToNewVehicle ->
-            { model | view = AddingVehicle } ! []
+            ToNewVehicle ->
+                { model | view = AddingVehicle } ! []
 
-        ToNewWeapon v ->
-            { model | view = AddingWeapon v } ! []
+            ToNewWeapon v ->
+                { model | view = AddingWeapon v } ! []
 
-        ToNewUpgrade v ->
-            { model | view = AddingUpgrade v } ! []
+            ToNewUpgrade v ->
+                { model | view = AddingUpgrade v } ! []
 
-        -- ADDING.
-        AddVehicle ->
-            Update.Utils.addVehicle model
+            -- ADDING.
+            AddVehicle ->
+                Update.Utils.addVehicle model
 
-        AddWeapon v ->
-            Update.Utils.addWeapon model v
+            AddWeapon v ->
+                Update.Utils.addWeapon model v
 
-        AddUpgrade v ->
-            Update.Utils.addUpgrade model v
+            AddUpgrade v ->
+                Update.Utils.addUpgrade model v
 
-        -- DELETING.
-        DeleteVehicle v ->
-            Update.Utils.deleteVehicle model v
+            -- DELETING.
+            DeleteVehicle v ->
+                Update.Utils.deleteVehicle model v
 
-        DeleteWeapon v w ->
-            Update.Utils.deleteWeapon model v w
+            DeleteWeapon v w ->
+                Update.Utils.deleteWeapon model v w
 
-        DeleteUpgrade v u ->
-            Update.Utils.deleteUpgrade model v u
+            DeleteUpgrade v u ->
+                Update.Utils.deleteUpgrade model v u
 
-        -- UPDATING.
-        TmpName name ->
-            case tv of
-                Just v ->
-                    { model | tmpVehicle = Just { v | name = name } } ! []
+            -- UPDATING.
+            NextGearPhase ->
+                let
+                    weaponFunc =
+                        \w -> { w | status = WeaponReady }
 
-                Nothing ->
-                    model ! []
+                    vehicleFunc =
+                        \v -> { v | weapons = v.weapons |> List.map weaponFunc }
 
-        TmpVehicleType vtstr ->
-            Update.Utils.setTmpVehicleType model vtstr
+                    vs =
+                        model.vehicles
+                            |> List.map vehicleFunc
+                            |> List.map (\v -> { v | activated = False })
 
-        TmpNotes notes ->
-            case tv of
-                Just v ->
-                    { model | tmpVehicle = Just { v | notes = notes } } ! []
+                    gearPhase =
+                        if model.gearPhase < 6 then
+                            model.gearPhase + 1
+                        else
+                            1
+                in
+                    { model
+                        | view = Overview
+                        , gearPhase = gearPhase
+                        , vehicles = vs
+                    }
+                        ! []
 
-                Nothing ->
-                    model ! []
+            TmpName name ->
+                case tv of
+                    Just v ->
+                        { model | tmpVehicle = Just { v | name = name } } ! []
 
-        UpdateActivated v activated ->
-            Update.Utils.updateActivated model v activated
+                    Nothing ->
+                        model ! []
 
-        UpdateGear v strCurrent ->
-            Update.Utils.updateGear model v (String.toInt strCurrent |> Result.withDefault 1)
+            TmpVehicleType vtstr ->
+                Update.Utils.setTmpVehicleType model vtstr
 
-        UpdateHull v strCurrent ->
-            Update.Utils.updateHull model v strCurrent
+            TmpNotes notes ->
+                case tv of
+                    Just v ->
+                        { model | tmpVehicle = Just { v | notes = notes } } ! []
 
-        UpdateCrew v strCurrent ->
-            Update.Utils.updateCrew model v strCurrent
+                    Nothing ->
+                        model ! []
 
-        UpdateEquipment v strCurrent ->
-            Update.Utils.updateEquipment model v strCurrent
+            UpdateActivated v activated ->
+                Update.Utils.updateActivated model v activated
 
-        UpdateNotes isPreview v notes ->
-            Update.Utils.updateNotes model isPreview v notes
+            UpdateGear v strCurrent ->
+                Update.Utils.updateGear model v (String.toInt strCurrent |> Result.withDefault 1)
 
-        TmpWeaponUpdate name ->
-            let
-                w =
-                    nameToWeapon name
-            in
-            { model | tmpWeapon = Just w } ! []
+            UpdateHazards v strCurrent ->
+                Update.Utils.updateHazards model v (String.toInt strCurrent |> Result.withDefault 1)
 
-        TmpUpgradeUpdate name ->
-            let
-                u =
-                    nameToUpgrade name
-            in
-            { model | tmpUpgrade = Just u } ! []
+            UpdateHull v strCurrent ->
+                Update.Utils.updateHull model v strCurrent
 
-        UpdatePointsAllowed s ->
-            { model | pointsAllowed = Result.withDefault 0 (String.toInt s) } ! []
+            UpdateCrew v strCurrent ->
+                Update.Utils.updateCrew model v strCurrent
+
+            UpdateEquipment v strCurrent ->
+                Update.Utils.updateEquipment model v strCurrent
+
+            UpdateNotes isPreview v notes ->
+                Update.Utils.updateNotes model isPreview v notes
+
+            TmpWeaponUpdate name ->
+                let
+                    w =
+                        nameToWeapon name
+                in
+                    { model | tmpWeapon = Just w } ! []
+
+            TmpUpgradeUpdate name ->
+                let
+                    u =
+                        nameToUpgrade name
+                in
+                    { model | tmpUpgrade = Just u } ! []
+
+            UpdatePointsAllowed s ->
+                { model | pointsAllowed = Result.withDefault 0 (String.toInt s) } ! []
+
+            -- STATE MANAGEMENT.
+            SetWeaponsReady ->
+                model ! []
+
+            SetWeaponFired v w ->
+                Update.Utils.setWeaponFired model v w

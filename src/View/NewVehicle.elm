@@ -12,30 +12,31 @@ import View.Vehicle
 view : Model -> Html Msg
 view model =
     let
-        body = case model.tmpVehicle of
-            Just v ->
-                View.Vehicle.render model.view True v
+        body =
+            case model.tmpVehicle of
+                Just v ->
+                    View.Vehicle.render model model.view True v
 
-            Nothing ->
-                text "Select a vehicle type."
+                Nothing ->
+                    text "Select a vehicle type."
     in
-    View.Utils.row
-        [ View.Utils.col "md-3"
-            [ button
-                [ onClick AddVehicle
-                , class "btn btn-primary btn-block mb-3"
+        View.Utils.row
+            [ View.Utils.col "md-3"
+                [ button
+                    [ onClick AddVehicle
+                    , class "btn btn-primary btn-block mb-3"
+                    ]
+                    [ text "Add Vehicle" ]
+                , select
+                    [ onInput TmpVehicleType
+                    , class "form-control"
+                    , multiple True
+                    , size 15
+                    ]
+                    (List.map
+                        (\x -> option [ value <| vTToStr x ] [ text <| vTToStr x ])
+                        allVehicleTypes
+                    )
                 ]
-                [ text "Add Vehicle" ]
-            , select
-                [ onInput TmpVehicleType
-                , class "form-control"
-                , multiple True
-                , size 15
-                ]
-                ( List.map
-                    (\x -> option [ value <| vTToStr x ] [ text <| vTToStr x ] )
-                    allVehicleTypes
-                )
+            , View.Utils.col "md-9" [ body ]
             ]
-        , View.Utils.col "md-9" [ body ]
-        ]

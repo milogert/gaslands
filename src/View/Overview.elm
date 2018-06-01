@@ -21,6 +21,6 @@ view model =
         , View.Utils.col "12"
             [ div
                 [ class "card-columns" ]
-                (List.map (View.Vehicle.render model.view False) model.vehicles)
+                (List.map (View.Vehicle.render model model.view False) model.vehicles)
             ]
         ]

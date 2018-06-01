@@ -28,32 +28,28 @@ view model v =
         isCrewFree =
             crewLeft > 0
 
-        body = case model.tmpWeapon of
-            Just tmpWeapon ->
-                View.Weapon.render v tmpWeapon
+        body =
+            case model.tmpWeapon of
+                Just tmpWeapon ->
+                    View.Weapon.render v tmpWeapon
 
-            Nothing ->
-                text "Select a weapon."
+                Nothing ->
+                    text "Select a weapon."
     in
-    View.Utils.row
-        [ View.Utils.col "md-3"
-            [ button [ class "form-control btn btn-primary mb-3", onClick (AddWeapon v) ] [ text "Add Weapon" ]
-            , select
-                [ onInput TmpWeaponUpdate
-                , class "form-control mb-3"
-                , multiple True
-                , size 8
+        View.Utils.row
+            [ View.Utils.col "md-3"
+                [ button [ class "form-control btn btn-primary mb-3", onClick (AddWeapon v) ] [ text "Add Weapon" ]
+                , select
+                    [ onInput TmpWeaponUpdate
+                    , class "form-control mb-3"
+                    , multiple True
+                    , size 8
+                    ]
+                    (allWeaponsList
+                        |> List.filter (\x -> x.slots <= slotsLeft)
+                        |> List.map .name
+                        |> List.map (\t -> option [ value t ] [ text t ])
+                    )
                 ]
-                ( allWeaponsList
-                    |> List.filter (\x -> x.slots <= slotsLeft)
-                    |> List.filter
-                        (\x ->
-                            (not <| List.member CrewFired x.specials)
-                                || (isCrewFree && List.member CrewFired x.specials)
-                        )
-                    |> List.map .name
-                    |> List.map (\t -> option [ value t ] [ text t ])
-                )
+            , View.Utils.col "md-9" [ body ]
             ]
-        , View.Utils.col "md-9" [ body ]
-        ]
