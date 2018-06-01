@@ -49,7 +49,7 @@ render model currentView isPreview v =
             toString <| v.crew - View.Utils.crewUsed v
 
         wipedOut =
-            v.hazards >= 6
+            v.hazards >= 6 || v.hull.current >= v.hull.max
 
         canActivate =
             model.gearPhase <= v.gear.current
@@ -85,7 +85,7 @@ render model currentView isPreview v =
         gearBox =
             case (isPreview, wipedOut) of
                 (True, _) ->
-                    text <| "Gear Max: " ++ toString v.gear.max
+                    div [] [ text <| "Gear Max: " ++ toString v.gear.max ]
 
                 (_, True) ->
                     text ""
@@ -111,37 +111,34 @@ render model currentView isPreview v =
                         ]
 
         hazardTokens =
-            if isPreview then
-                text ""
-            else
-                div [ class "form-group form-row" ]
-                    [ label [ for "hazardsGained", class "col-form-label" ]
-                        [ text <| "Hazards Gained:" ]
-                    , View.Utils.col ""
-                        [ input
-                            [ class "form-control form-control-sm"
-                            , type_ "number"
-                            , id "hazardsGained"
-                            , Html.Attributes.min "0"
-                            , Html.Attributes.max "6"
-                            , onInput (UpdateHazards v)
-                            , value <| toString v.hazards
-                            ]
-                            []
+            div
+                [ class "form-group form-row"
+                , classList [ ("d-none", isPreview) ]
+                ]
+                [ label [ for "hazardsGained", class "col-form-label" ]
+                    [ text <| "Hazards Gained:" ]
+                , View.Utils.col ""
+                    [ input
+                        [ class "form-control form-control-sm"
+                        , type_ "number"
+                        , id "hazardsGained"
+                        , Html.Attributes.min "0"
+                        , Html.Attributes.max "6"
+                        , onInput (UpdateHazards v)
+                        , value <| toString v.hazards
                         ]
-                    , label [ for "hazardsGained", class "col-form-label" ]
-                        [ text <| "of 6" ]
+                        []
                     ]
+                , label [ for "hazardsGained", class "col-form-label" ]
+                    [ text <| "of 6" ]
+                ]
 
         hullChecks =
             case (isPreview, wipedOut) of
                 (True, _) ->
-                    text <| "Hull Max: " ++ toString v.hull.max
+                    div [] [ text <| "Hull Max: " ++ toString v.hull.max ]
 
-                (_, True) ->
-                    text ""
-
-                (False, False) ->
+                (False, _) ->
                     div [ class "form-group form-row" ]
                         [ label [ for "hullInput", class "col-form-label" ]
                             [ text "Hull Dmg: " ]
@@ -182,7 +179,7 @@ render model currentView isPreview v =
         weaponList =
             View.Utils.detailSection
                 currentView
-                isPreview
+                (isPreview || wipedOut)
                 [ text "Weapon List"
                 , small [ class "ml-2" ]
                     [ span
@@ -214,7 +211,7 @@ render model currentView isPreview v =
         upgradeList =
             View.Utils.detailSection
                 currentView
-                isPreview
+                (isPreview || wipedOut)
                 [ text "Upgrade List"
                 , small [ class "ml-2" ]
                     [ span [ class "badge badge-dark" ]
