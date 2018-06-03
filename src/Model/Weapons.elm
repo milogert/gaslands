@@ -69,7 +69,7 @@ mountPointToString point =
 
 strToMountPoint : String -> Maybe WeaponMounting
 strToMountPoint point =
-    case (log "str to poin" point) of
+    case point of
         "360° mounted" ->
             Just Full
 
