@@ -110,6 +110,7 @@ type Msg
     | UpdateEquipment Vehicle String
     | UpdateNotes Bool Vehicle String
     | TmpWeaponUpdate String
+    | TmpWeaponMountPoint String
     | TmpUpgradeUpdate String
     | UpdatePointsAllowed String
     | SetWeaponsReady

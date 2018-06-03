@@ -1,6 +1,5 @@
 module Update.Utils exposing (addUpgrade, addVehicle, addWeapon, deleteVehicle, deleteWeapon, deleteUpgrade, setTmpVehicleType, setWeaponFired, updateActivated, updateGear, updateHazards, updateCrew, updateEquipment, updateHull, updateNotes, rollSkidDice, rollAttackDice)
 
-import Debug exposing (log)
 import Task
 import Dom
 import Model.Model exposing (..)
@@ -11,7 +10,7 @@ import Model.Upgrades exposing (..)
 
 (!!) : Int -> List a -> Maybe a
 (!!) n xs =
-    log "to get" (List.head <| List.drop n xs)
+    List.head <| List.drop n xs
 
 
 addVehicle : Model -> ( Model, Cmd Msg )
@@ -201,7 +200,7 @@ updateGear : Model -> Vehicle -> Int -> ( Model, Cmd Msg )
 updateGear model v newGear =
     let
         newGearTracker =
-            GearTracker (log "new gear" newGear) v.gear.max
+            GearTracker newGear v.gear.max
 
         vehicleUpdated =
             { v | gear = newGearTracker }

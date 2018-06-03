@@ -1,5 +1,6 @@
 module Update.Update exposing (update)
 
+import Debug exposing (..)
 import Model.Model exposing (..)
 import Model.Upgrades exposing (..)
 import Model.Weapons exposing (..)
@@ -122,6 +123,21 @@ update msg model =
                         nameToWeapon name
                 in
                     { model | tmpWeapon = Just w } ! []
+
+            TmpWeaponMountPoint mountPointStr ->
+                let
+                    mountPoint =
+                        log "stringified" <| strToMountPoint (log "string point" mountPointStr)
+
+                    w =
+                        case (log "weapon" model.tmpWeapon) of
+                            Nothing ->
+                                Nothing
+
+                            Just tmpWeapon ->
+                                Just { tmpWeapon | mountPoint = mountPoint }
+                in
+                    { model | tmpWeapon = (log "setting weapon" w) } ! []
 
             TmpUpgradeUpdate name ->
                 let

@@ -48,6 +48,47 @@ type WeaponMounting
     | Rear
 
 
+mountPointToString : WeaponMounting -> String
+mountPointToString point =
+    case point of
+        Full ->
+            "360° mounted"
+
+        Front ->
+            "Front mounted"
+
+        LeftSide ->
+            "Left mounted"
+
+        RightSide ->
+            "Right mounted"
+
+        Rear ->
+            "Rear mounted"
+
+
+strToMountPoint : String -> Maybe WeaponMounting
+strToMountPoint point =
+    case (log "str to poin" point) of
+        "360° mounted" ->
+            Just Full
+
+        "Front mounted" ->
+            Just Front
+
+        "Left mounted" ->
+            Just LeftSide
+
+        "Right mounted" ->
+            Just RightSide
+
+        "Rear mounted" ->
+            Just Rear
+
+        _ ->
+            Nothing
+
+
 type Range
     = Medium
     | Double

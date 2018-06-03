@@ -31,7 +31,7 @@ view model =
                     [ onInput TmpVehicleType
                     , class "form-control"
                     , multiple True
-                    , size 15
+                    , size 8
                     ]
                     (List.map
                         (\x -> option [ value <| vTToStr x ] [ text <| vTToStr x ])

@@ -31,7 +31,7 @@ view model v =
         body =
             case model.tmpWeapon of
                 Just tmpWeapon ->
-                    View.Weapon.render v tmpWeapon
+                    View.Weapon.render model.view v tmpWeapon
 
                 Nothing ->
                     text "Select a weapon."

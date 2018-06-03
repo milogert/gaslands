@@ -5,6 +5,7 @@ import Html.Attributes exposing (checked, class, classList, disabled, for, href,
 import Html.Events exposing (onClick, onInput)
 import Model.Model exposing (..)
 import Model.Vehicles exposing (..)
+import Model.Weapons exposing (handgun)
 import View.Upgrade
 import View.Utils
 import View.Weapon
@@ -55,31 +56,28 @@ render model currentView isPreview v =
             model.gearPhase <= v.gear.current
 
         activatedText =
-            if not v.activated then
-                "Activate"
-            else
-                "Activated"
+            case (v.activated, canActivate) of
+                (True, False) ->
+                    "Activated"
+
+                (_, False) ->
+                    "Cannot Activated"
+
+                (_, _) ->
+                    "Activate"
 
         activatedCheck =
             div
-                [ class "btn-group-toggle float-left mr-2"
+                [ class "form-row mb-2"
                 , classList [ ( "d-none", isPreview || wipedOut ) ]
-                , attribute "data-toggle" "buttons"
                 ]
-                [ label
-                    [ class "btn btn-sm btn-secondary"
-                    , disabled <| not canActivate
+                [ button
+                    [ class "btn btn-sm btn-primary btn-block form-control"
+                    , onClick (UpdateActivated v (not v.activated))
+                    , checked v.activated
+                    , disabled <| not canActivate || v.activated
                     ]
-                    [ input
-                        [ type_ "checkbox"
-                        , onClick (UpdateActivated v (not v.activated))
-                        , id ("activateCheck" ++ v.name)
-                        , checked v.activated
-                        , disabled <| not canActivate
-                        ]
-                        []
-                    , text activatedText
-                    ]
+                    [ text activatedText ]
                 ]
 
         gearBox =
@@ -91,7 +89,7 @@ render model currentView isPreview v =
                     text ""
 
                 (False, False) ->
-                    div [ class "form-group form-row" ]
+                    div [ class "form-row" ]
                         [ label [ for "gearBox", class "col-form-label" ]
                             [ text <| "Gear:" ]
                         , View.Utils.col ""
@@ -112,7 +110,7 @@ render model currentView isPreview v =
 
         hazardTokens =
             div
-                [ class "form-group form-row"
+                [ class "form-row"
                 , classList [ ("d-none", isPreview) ]
                 ]
                 [ label [ for "hazardsGained", class "col-form-label" ]
@@ -139,7 +137,7 @@ render model currentView isPreview v =
                     div [] [ text <| "Hull Max: " ++ toString v.hull.max ]
 
                 (False, _) ->
-                    div [ class "form-group form-row" ]
+                    div [ class "form-row" ]
                         [ label [ for "hullInput", class "col-form-label" ]
                             [ text "Hull Dmg: " ]
                         , View.Utils.col ""
@@ -160,7 +158,7 @@ render model currentView isPreview v =
 
         notes =
             div
-                [ class "form-group form-row"
+                [ class "form-row"
                 , classList [ ("d-none", wipedOut) ]
                 ]
                 [ View.Utils.col ""
@@ -175,6 +173,12 @@ render model currentView isPreview v =
 
         weaponsUsingSlots =
             List.sum <| List.map .slots v.weapons
+
+        upgradeUsingSlots =
+            List.sum <| List.map .slots v.upgrades
+
+        totalSlotsUsed =
+            weaponsUsingSlots + upgradeUsingSlots
 
         weaponList =
             View.Utils.detailSection
@@ -193,20 +197,18 @@ render model currentView isPreview v =
                     ]
                 , small [ class "ml-2" ]
                     [ span [ class "badge badge-dark" ]
-                        [ text <| (toString <| weaponsUsingSlots) ++ "/" ++ (toString v.crew) ++ " slots used" ]
+                        [ text <| (toString <| weaponsUsingSlots) ++ "/" ++ (toString v.equipment) ++ " slots used" ]
                     ]
                 , small []
                     [ button
                         [ onClick <| ToNewWeapon v
-                        , class "btn btn-sm btn-outline-secondary ml-2"
+                        , class "btn btn-sm btn-link ml-2"
+                        , disabled <| totalSlotsUsed >= v.equipment
                         ]
                         [ text "New Weapon" ]
                     ]
                 ]
-                (List.map (View.Weapon.render v) v.weapons)
-
-        upgradeUsingSlots =
-            List.sum <| List.map .slots v.upgrades
+                (List.map (View.Weapon.render currentView v) v.weapons)
 
         upgradeList =
             View.Utils.detailSection
@@ -215,12 +217,13 @@ render model currentView isPreview v =
                 [ text "Upgrade List"
                 , small [ class "ml-2" ]
                     [ span [ class "badge badge-dark" ]
-                        [ text <| (toString <| upgradeUsingSlots) ++ "/" ++ (toString v.crew) ++ " slots used" ]
+                        [ text <| (toString <| upgradeUsingSlots) ++ "/" ++ (toString v.equipment) ++ " slots used" ]
                     ]
                 , small []
                     [ button
                         [ onClick <| ToNewUpgrade v
-                        , class "btn btn-sm btn-outline-secondary ml-2"
+                        , class "btn btn-sm btn-link ml-2"
+                        , disabled <| totalSlotsUsed >= v.equipment
                         ]
                         [ text "New Upgrade" ]
                     ]
@@ -234,15 +237,16 @@ render model currentView isPreview v =
                     , ( "card-title", currentView /= Details v )
                     ]
                 ]
-                [ activatedCheck
-                , name
+                [ name
                 , small []
                     [ vehicleType_, text <| " - " ++ weight ++ " (" ++ (toString <| vehicleCost v) ++ ")" ]
                 ]
 
         body =
             div [ classList [ ( "card-text", currentView /= Details v ) ] ]
-                [ gearBox
+                [ header
+                , activatedCheck
+                , gearBox
                 , hazardTokens
                 , hullChecks
                 , div [ classList [ ("d-none", wipedOut) ] ]
@@ -276,7 +280,7 @@ render model currentView isPreview v =
     in
         case currentView of
             Details v ->
-                div [] [ header, body ]
+                div [] [ body ]
 
             _ ->
-                View.Utils.card [ ("border-danger", wipedOut) ] header body footer
+                View.Utils.card [ ("border-danger", wipedOut) ] body footer
