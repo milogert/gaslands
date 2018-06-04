@@ -3,6 +3,7 @@ module Update.Update exposing (update)
 import Model.Model exposing (..)
 import Model.Upgrades exposing (..)
 import Model.Weapons exposing (..)
+import Ports.Ports exposing (..)
 import Update.Utils
 
 
@@ -28,6 +29,9 @@ update msg model =
 
         ToNewUpgrade v ->
             { model | view = AddingUpgrade v } ! []
+
+        ToExport ->
+            { model | view = ImportExport } ! []
 
         -- ADDING.
         AddVehicle ->
@@ -103,3 +107,6 @@ update msg model =
 
         UpdatePointsAllowed s ->
             { model | pointsAllowed = Result.withDefault 0 (String.toInt s) } ! []
+
+        Export ->
+            model ! [ exportModel <| toString model ]

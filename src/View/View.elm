@@ -5,6 +5,7 @@ import Html.Attributes exposing (checked, class, classList, disabled, for, href,
 import Html.Events exposing (onClick, onInput)
 import Model.Model exposing (..)
 import View.Details
+import View.ImportExport
 import View.NewUpgrade
 import View.NewVehicle
 import View.NewWeapon
@@ -27,6 +28,9 @@ view model =
 
             AddingUpgrade v ->
                 ToDetails v
+
+            ImportExport ->
+                ToOverview
 
             Overview ->
                 ToOverview
@@ -76,6 +80,8 @@ view model =
                         ]
                     ]
                 ]
+            , div [ class "col-md-2 my-auto" ]
+                [ button [ class "btn btn-sm btn-block btn-primary", onClick ToExport ] [ text "Export" ] ]
             ]
         , hr [] []
         , displayAlert model
@@ -115,3 +121,6 @@ render model =
 
         AddingUpgrade v ->
             View.NewUpgrade.view model v
+
+        ImportExport ->
+            View.ImportExport.view model

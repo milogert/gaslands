@@ -1,5 +1,8 @@
 module Model.Weapons exposing (..)
 
+import Json.Decode as D exposing (Decoder)
+import Json.Decode.Pipeline exposing (decode, required, hardcoded)
+
 
 type alias Weapon =
     { name : String
@@ -11,6 +14,20 @@ type alias Weapon =
     , cost : Int
     , id : Int
     }
+
+
+weaponDecoder : Decoder Weapon
+weaponDecoder =
+    decode Weapon
+        |> required "name" D.string
+        |> required "wtype" wtypeDecoder
+        |> required "attack" diceDecoder
+        |> required "range" rangeDecoder
+        |> required "slots" D.int
+        --|> required "specials" (D.list specialDecoder)
+        |> hardcoded []
+        |> required "cost" D.int
+        |> required "id" D.int
 
 
 type Special
@@ -29,10 +46,44 @@ type Special
     | CrewMod Int
 
 
+specialsDecoder : Decoder Special
+specialsDecoder =
+    D.string
+        |> D.andThen (\str ->
+            case str of
+                --"Ammo" -> D.field "count" D.int |> D.andThen ammoHelper
+                --"SpecialRule" -> D.field "text" D.int |> D.andThen D.succeed SpecialRule
+                "Blast" -> D.succeed Blast
+                "Fire" -> D.succeed Fire
+                "Explosive" -> D.succeed Explosive
+                "Blitz" -> D.succeed Blitz
+                "CrewFired" -> D.succeed CrewFired
+                "HighlyExplosive" -> D.succeed HighlyExplosive
+                "Electrical" -> D.succeed Electrical
+                --"HandlingMod" -> D.field "amount" D.int |> D.succeed HandlingMod 
+                --"HullMod" -> D.field "amount" D.int |> D.succeed HullMod 
+                --"GearMod" -> D.field "amount" D.int |> D.succeed GearMod 
+                --"CrewMod" -> D.field "amount" D.int |> D.succeed CrewMod 
+                _ -> D.fail <| str ++ " is not a valid special type"
+        )
+
+
 type WeaponType
     = Shooting
     | Dropped
     | SmashType
+
+
+wtypeDecoder : Decoder WeaponType
+wtypeDecoder =
+    D.string
+        |> D.andThen (\str ->
+            case str of
+                "Shooting" -> D.succeed Shooting
+                "Dropped" -> D.succeed Dropped
+                "SmashType" -> D.succeed SmashType
+                _ -> D.fail <| str ++ " is not a valid weapon type"
+        )
 
 
 type Range
@@ -44,10 +95,32 @@ type Range
     | SmashRange
 
 
+rangeDecoder : Decoder Range
+rangeDecoder =
+    D.string
+        |> D.andThen (\str ->
+            case str of
+                "Medium" -> D.succeed Medium
+                "Double" -> D.succeed Double
+                "TemplateLarge" -> D.succeed TemplateLarge
+                "BurstLarge" -> D.succeed BurstLarge
+                "BurstSmall" -> D.succeed BurstSmall
+                "SmashRange" -> D.succeed SmashRange
+                _ -> D.fail <| str ++ " is not a valid range type"
+        )
+
+
 type alias Dice =
     { number : Int
     , die : Int
     }
+
+
+diceDecoder : Decoder Dice
+diceDecoder =
+    decode Dice
+        |> required "number" D.int
+        |> required "die" D.int
 
 
 allWeaponsList : List Weapon

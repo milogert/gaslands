@@ -1,5 +1,7 @@
-module Model.Upgrades exposing (Upgrade, allUpgradesList, armourPlating, extraCrewmember, nameToUpgrade, nitroBooster, tankTracks, turretMounting)
+module Model.Upgrades exposing (Upgrade, allUpgradesList, armourPlating, extraCrewmember, nameToUpgrade, nitroBooster, tankTracks, turretMounting, upgradeDecoder)
 
+import Json.Decode as D exposing (Decoder)
+import Json.Decode.Pipeline exposing (decode, required, hardcoded)
 import Model.Weapons exposing (..)
 
 
@@ -10,6 +12,17 @@ type alias Upgrade =
     , cost : Int
     , id : Int
     }
+
+
+upgradeDecoder : Decoder Upgrade
+upgradeDecoder =
+    decode Upgrade
+        |> required "name" D.string
+        |> required "slots" D.int
+        --|> required "specials" (D.list specialDecoder)
+        |> hardcoded []
+        |> required "cost" D.int
+        |> required "id" D.int
 
 
 allUpgradesList : List Upgrade
