@@ -1,5 +1,9 @@
 module Update.Update exposing (update)
 
+import Json.Encode
+import Json.Decode
+import Model.Decoders.Model exposing (modelDecoder)
+import Model.Encoders.Model exposing (modelEncoder)
 import Model.Model exposing (..)
 import Model.Upgrades exposing (..)
 import Model.Weapons exposing (..)
@@ -108,5 +112,32 @@ update msg model =
         UpdatePointsAllowed s ->
             { model | pointsAllowed = Result.withDefault 0 (String.toInt s) } ! []
 
+        Import ->
+            let
+                decodeRes = 
+                    Json.Decode.decodeString modelDecoder model.importValue
+
+                newModel : Model
+                newModel = case decodeRes of
+                    Ok m ->
+                        m
+
+                    Err s ->
+                        { model | error = [ JsonDecodeError s ] }
+            in
+                { model
+                    | view = newModel.view
+                    , pointsAllowed = newModel.pointsAllowed 
+                    , vehicles = newModel.vehicles
+                    , tmpVehicle = newModel.tmpVehicle
+                    , tmpWeapon = newModel.tmpWeapon
+                    , tmpUpgrade = newModel.tmpUpgrade
+                    , error = newModel.error
+                    , importValue = newModel.importValue
+                } ! []
+
+        SetImport json ->
+            { model | importValue = json } ! []
+
         Export ->
-            model ! [ exportModel <| toString model ]
+            model ! [ exportModel <| Json.Encode.encode 4 <| modelEncoder model ]

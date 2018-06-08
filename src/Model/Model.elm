@@ -1,7 +1,5 @@
 module Model.Model exposing (CurrentView(..), ErrorType(..), Model, Msg(..), init, totalPoints, viewToStr, errorToStr)
 
-import Json.Decode exposing (int, list, Decoder)
-import Json.Decode.Pipeline exposing (decode, required, hardcoded)
 import Model.Upgrades exposing (..)
 import Model.Vehicles exposing (..)
 import Model.Weapons exposing (..)
@@ -15,20 +13,10 @@ type alias Model =
     , tmpWeapon : Maybe Weapon
     , tmpUpgrade : Maybe Upgrade
     , error : List ErrorType
+    , importValue : String
     }
 
 
-modelDecoder : Decoder Model
-modelDecoder =
-    decode Model
-        |> hardcoded Overview
-        |> required "pointsAllowed" int
-        |> required "vehicles" (list vehicleDecoder)
-        |> hardcoded Nothing
-        |> hardcoded Nothing
-        |> hardcoded Nothing
-        |> hardcoded []
-    
 type CurrentView
     = Overview
     | Details Vehicle
@@ -43,6 +31,7 @@ type ErrorType
     | VehicleTypeError
     | WeaponTypeError
     | UpgradeTypeError
+    | JsonDecodeError String
 
 
 errorToStr : ErrorType -> String
@@ -59,6 +48,9 @@ errorToStr e =
 
         UpgradeTypeError ->
             "Select an upgrade from the dropdown to add."
+
+        JsonDecodeError s ->
+            "Json decode error: " ++ s
 
 
 viewToStr : CurrentView -> String
@@ -98,6 +90,7 @@ init =
         Nothing
         Nothing
         []
+        ""
         ! []
 
 
@@ -126,4 +119,6 @@ type Msg
     | TmpWeaponUpdate String
     | TmpUpgradeUpdate String
     | UpdatePointsAllowed String
+    | Import
+    | SetImport String
     | Export
