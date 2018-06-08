@@ -37,7 +37,6 @@ type WeaponType
     = Shooting
     | Dropped
     | SmashType
-    | NoWeapon
 
 
 type WeaponMounting
@@ -103,7 +102,6 @@ type Range
     | BurstLarge
     | BurstSmall
     | SmashRange
-    | NoRange
 
 
 type WeaponStatus
@@ -143,79 +141,79 @@ allWeaponsList =
     ]
 
 
-nameToWeapon : String -> Weapon
+nameToWeapon : String -> Maybe Weapon
 nameToWeapon s =
     case s of
         "Handgun" ->
-            handgun
+            Just handgun
 
         "Machine Gun" ->
-            machineGun
+            Just machineGun
 
         "Heavy Machine Gun" ->
-            heavyMachineGun
+            Just heavyMachineGun
 
         "Mini-Gun" ->
-            miniGun
+            Just miniGun
 
         "125mm Cannon" ->
-            oneTwentyFiveMMCannon
+            Just oneTwentyFiveMMCannon
 
         "Rockets" ->
-            rockets
+            Just rockets
 
         "Flamethrower" ->
-            flamethrower
+            Just flamethrower
 
         "Mortar" ->
-            mortar
+            Just mortar
 
         "Grenades" ->
-            grenades
+            Just grenades
 
         "Molotov Cocktails" ->
-            molotovCocktails
+            Just molotovCocktails
 
         "Oil Slick Dropper" ->
-            oilSlickDropper
+            Just oilSlickDropper
 
         "Caltrop Dropper" ->
-            caltropDropper
+            Just caltropDropper
 
         "Glue Dropper" ->
-            glueDropper
+            Just glueDropper
 
         "Mines" ->
-            mines
+            Just mines
 
         "Smoke" ->
-            smoke
+            Just smoke
 
         "Ram" ->
-            ram
+            Just ram
 
         "Exploding Ram" ->
-            explodingRam
+            Just explodingRam
 
         "Thumper" ->
-            thumper
+            Just thumper
 
         "Arc Lightning Projector" ->
-            arcLightningProjector
+            Just arcLightningProjector
 
         "Kinetic Super Booster" ->
-            kineticSuperBooster
+            Just kineticSuperBooster
 
         "Magnetic Jammer" ->
-            magneticJammer
+            Just magneticJammer
 
         _ ->
-            defaultWeapon
+            Nothing
 
 
 defaultWeapon : Weapon
 defaultWeapon =
-    Weapon "" NoWeapon Nothing (Dice 0 0) [] NoRange 0 [] 0 -1 WeaponReady 0
+    Weapon "" Shooting Nothing (Dice 0 0) [] Medium 0 [] 0 -1 WeaponReady 0
 
 
 handgun : Weapon

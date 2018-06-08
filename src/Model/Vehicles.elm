@@ -77,7 +77,6 @@ type WeightClass
     | Middle
     | Heavy
     | Airborne
-    | NoWeight
 
 
 type alias HullHolder =

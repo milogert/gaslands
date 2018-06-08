@@ -25,7 +25,7 @@ update msg model =
                 { model | view = AddingVehicle, tmpVehicle = Nothing } ! []
 
             ToNewWeapon v ->
-                { model | view = AddingWeapon v,tmpWeapon = Nothing } ! []
+                { model | view = AddingWeapon v, tmpWeapon = Nothing } ! []
 
             ToNewUpgrade v ->
                 { model | view = AddingUpgrade v, tmpUpgrade = Nothing } ! []
@@ -125,7 +125,7 @@ update msg model =
                     w =
                         nameToWeapon name
                 in
-                    { model | tmpWeapon = Just w } ! []
+                    { model | tmpWeapon = w } ! []
 
             TmpWeaponMountPoint mountPointStr ->
                 let
@@ -147,7 +147,7 @@ update msg model =
                     u =
                         nameToUpgrade name
                 in
-                    { model | tmpUpgrade = Just u } ! []
+                    { model | tmpUpgrade = u } ! []
 
             UpdatePointsAllowed s ->
                 { model | pointsAllowed = Result.withDefault 0 (String.toInt s) } ! []

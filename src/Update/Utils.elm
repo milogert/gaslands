@@ -54,14 +54,11 @@ addWeapon model v w =
         newvehicles =
             pre ++ vehicleNew :: post
     in
-        case (w.wtype, w.mountPoint) of
-            (NoWeapon, _) ->
-                { model | error = [ WeaponTypeError ] } ! []
-
-            (_, Nothing) ->
+        case ( w.wtype, w.mountPoint ) of
+            ( _, Nothing ) ->
                 { model | error = [ WeaponMountPointError ] } ! []
 
-            (_, _) ->
+            ( _, _ ) ->
                 { model | view = Details vehicleNew, error = [], vehicles = newvehicles } ! []
 
 
@@ -174,7 +171,11 @@ setTmpVehicleType model vtstr =
                 cost
                 -1
     in
-        { model | tmpVehicle = Just newtv } ! [] {--[ Task.perform Dom.focus "nameInput" ]--}
+        { model | tmpVehicle = Just newtv } ! []
+
+
+
+{--[ Task.perform Dom.focus "nameInput" ]--}
 
 
 updateActivated : Model -> Vehicle -> Bool -> ( Model, Cmd Msg )
@@ -312,6 +313,7 @@ updateNotes model isPreview v notes =
                     joinAround v.id { v | notes = notes } model.vehicles
             in
                 { model | vehicles = vehiclesNew } ! []
+
 
 updateAmmoUsed : Model -> Vehicle -> Weapon -> Int -> ( Model, Cmd Msg )
 updateAmmoUsed model v w used =
