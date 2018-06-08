@@ -25,7 +25,7 @@ view model v =
         body =
             case model.tmpUpgrade of
                 Just tmpUpgrade ->
-                    View.Upgrade.render tmpUpgrade
+                    View.Upgrade.render model tmpUpgrade
 
                 Nothing ->
                     text "Select an upgrade."
@@ -36,7 +36,7 @@ view model v =
                     [ class "form-control btn btn-primary mb-3", onClick (AddUpgrade v) ]
                     [ text "Add Upgrade" ]
                 , select
-                    [ onInput TmpWeaponUpdate
+                    [ onInput TmpUpgradeUpdate
                     , class "form-control mb-3"
                     , multiple True
                     , size 8

@@ -1,7 +1,8 @@
-module View.Utils exposing (card, crewUsed, detailSection, renderChecksRange, renderChecksRangePreChecked, renderDice, renderSpecial, row, rowPlus, col, colPlus)
+module View.Utils exposing (card, crewUsed, detailSection, renderCountDown, renderDice, renderSpecial, row, rowPlus, col, colPlus)
 
 import Html exposing (Html, button, div, h1, h2, h3, h4, h5, h6, hr, img, input, label, li, node, option, p, select, small, span, text, textarea, ul)
 import Html.Attributes exposing (checked, class, classList, disabled, for, href, id, max, min, placeholder, rel, src, type_, value)
+import Html.Events exposing (onInput)
 import Model.Model exposing (..)
 import Model.Vehicles exposing (..)
 import Model.Weapons exposing (..)
@@ -44,7 +45,7 @@ mapClassList classes =
     List.map (\x -> ( x, True )) classes
 
 
-card : List (String, Bool) -> Html Msg -> Html Msg -> Html Msg
+card : List ( String, Bool ) -> Html Msg -> Html Msg -> Html Msg
 card cl body footer =
     div [ class "card", classList cl ]
         [ div [ class "card-body" ] [ body ]
@@ -58,14 +59,19 @@ detailSection currentView isPreview headerContents bodyContents =
         [ hr [] [], h5 [] headerContents, div [] bodyContents ]
 
 
-renderSpecial : Special -> Html Msg
-renderSpecial s =
+renderSpecial : Bool -> Maybe (Int -> String -> Msg) -> Int -> Special -> Html Msg
+renderSpecial isPreview ammoMsg ammoUsed s =
     case s of
         Ammo i ->
-            div [] (text "Ammo: " :: renderChecksRange i)
+            case isPreview of
+                True ->
+                    div [] [ text <| "Ammo: " ++ (toString i) ]
 
-        CrewFired ->
-            text "360 degree firing"
+                False ->
+                    div [ class "form-row" ]
+                        [ label [ class "col-form-label" ] [ text "Ammo: " ]
+                        , renderCountDown ammoMsg i ammoUsed
+                        ]
 
         HighlyExplosive ->
             text "Highly Explosive"
@@ -80,28 +86,26 @@ renderSpecial s =
             text <| toString s
 
 
-renderChecksRange : Int -> List (Html Msg)
-renderChecksRange i =
-    renderChecksRangePreChecked i 0
-
-
-renderChecksRangePreChecked : Int -> Int -> List (Html Msg)
-renderChecksRangePreChecked ti ci =
+renderCountDown : Maybe (Int -> String -> Msg) -> Int -> Int -> Html Msg
+renderCountDown msg start current =
     let
-        ucBox =
-            input [ type_ "checkbox", class "ml-1" ] []
+        baseAttr =
+            [ class "form-control form-control-sm"
+            , type_ "number"
+            , Html.Attributes.max <| toString start
+            , Html.Attributes.min "0"
+            , value <| toString <| start - current
+            ]
 
-        cBox =
-            input [ type_ "checkbox", class "ml-1", checked True ] []
+        attr =
+            case msg of
+                Nothing ->
+                    baseAttr
+
+                Just m ->
+                    (onInput <| m start) :: baseAttr
     in
-        List.map
-            (\ri ->
-                if ri <= ci then
-                    cBox
-                else
-                    ucBox
-            )
-            (List.range 1 ti)
+        col "" [ input attr [] ]
 
 
 renderDice : Dice -> String
@@ -117,4 +121,3 @@ renderDice { number, die } =
 crewUsed : Vehicle -> Int
 crewUsed v =
     List.length <| List.filter (\x -> x.status == WeaponFired) v.weapons
-

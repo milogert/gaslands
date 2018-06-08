@@ -22,20 +22,20 @@ update msg model =
                 { model | view = Details v } ! []
 
             ToNewVehicle ->
-                { model | view = AddingVehicle } ! []
+                { model | view = AddingVehicle, tmpVehicle = Nothing } ! []
 
             ToNewWeapon v ->
-                { model | view = AddingWeapon v } ! []
+                { model | view = AddingWeapon v,tmpWeapon = Nothing } ! []
 
             ToNewUpgrade v ->
-                { model | view = AddingUpgrade v } ! []
+                { model | view = AddingUpgrade v, tmpUpgrade = Nothing } ! []
 
             -- ADDING.
             AddVehicle ->
                 Update.Utils.addVehicle model
 
-            AddWeapon v ->
-                Update.Utils.addWeapon model v
+            AddWeapon v w ->
+                Update.Utils.addWeapon model v w
 
             AddUpgrade v ->
                 Update.Utils.addUpgrade model v
@@ -116,6 +116,9 @@ update msg model =
 
             UpdateNotes isPreview v notes ->
                 Update.Utils.updateNotes model isPreview v notes
+
+            UpdateAmmoUsed v w total strLeft ->
+                Update.Utils.updateAmmoUsed model v w (total - (String.toInt strLeft |> Result.withDefault 1))
 
             TmpWeaponUpdate name ->
                 let

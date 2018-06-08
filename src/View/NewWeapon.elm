@@ -28,17 +28,33 @@ view model v =
         isCrewFree =
             crewLeft > 0
 
+        addButton =
+            case (model.tmpWeapon) of
+                (Just w) ->
+                    button
+                        [ class "form-control btn btn-primary mb-3"
+                        , onClick (AddWeapon v w)
+                        ]
+                        [ text "Add Weapon" ]
+
+                (Nothing) ->
+                    button
+                        [ class "form-control btn btn-primary mb-3"
+                        , disabled True
+                        ]
+                        [ text "Select Weapon" ]
+
         body =
             case model.tmpWeapon of
                 Just tmpWeapon ->
-                    View.Weapon.render model.view v tmpWeapon
+                    View.Weapon.render model v tmpWeapon
 
                 Nothing ->
                     text "Select a weapon."
     in
         View.Utils.row
             [ View.Utils.col "md-3"
-                [ button [ class "form-control btn btn-primary mb-3", onClick (AddWeapon v) ] [ text "Add Weapon" ]
+                [ addButton
                 , select
                     [ onInput TmpWeaponUpdate
                     , class "form-control mb-3"
@@ -47,6 +63,7 @@ view model v =
                     ]
                     (allWeaponsList
                         |> List.filter (\x -> x.slots <= slotsLeft)
+                        |> List.filter (\x -> x.name /= handgun.name)
                         |> List.map .name
                         |> List.map (\t -> option [ value t ] [ text t ])
                     )

@@ -19,14 +19,31 @@ view model =
 
                 Nothing ->
                     text "Select a vehicle type."
+
+        disabledButton =
+            case model.tmpVehicle of
+                Just _ ->
+                    False
+
+                Nothing ->
+                    True
+
+        buttonText =
+            case model.tmpVehicle of
+                Just _ ->
+                    "Add Vehicle"
+
+                Nothing ->
+                    "Select Vehicle"
     in
         View.Utils.row
             [ View.Utils.col "md-3"
                 [ button
                     [ onClick AddVehicle
                     , class "btn btn-primary btn-block mb-3"
+                    , disabled disabledButton
                     ]
-                    [ text "Add Vehicle" ]
+                    [ text buttonText ]
                 , select
                     [ onInput TmpVehicleType
                     , class "form-control"

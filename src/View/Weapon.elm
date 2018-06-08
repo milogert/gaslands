@@ -9,22 +9,16 @@ import Model.Weapons exposing (..)
 import View.Utils
 
 
-render : CurrentView -> Vehicle -> Weapon -> Html Msg
-render view vehicle weapon =
+render : Model -> Vehicle -> Weapon -> Html Msg
+render model vehicle weapon =
     let
         isPreview =
-            case view of
+            case model.view of
                 AddingWeapon _ ->
                     True
 
                 _ ->
                     False
-
-        wtype =
-            toString weapon.wtype
-
-        range =
-            toString weapon.range
 
         firingToggle =
             case weapon.status of
@@ -38,14 +32,14 @@ render view vehicle weapon =
             View.Utils.crewUsed vehicle < vehicle.crew
 
         canFire =
-            case (weapon.status, crewAvailable) of
-                (WeaponReady, True) ->
+            case ( weapon.status, crewAvailable ) of
+                ( WeaponReady, True ) ->
                     True
 
-                (WeaponFired, False) ->
+                ( WeaponFired, False ) ->
                     False
 
-                (_, _) ->
+                ( _, _ ) ->
                     False
 
         firingText =
@@ -68,36 +62,90 @@ render view vehicle weapon =
                 , onClick firingToggle
                 ]
                 [ text firingText ]
-            
+
         mountPointId =
             "mountPoint-" ++ (toString weapon.id)
 
         mountPoint =
-            case (weapon.mountPoint, isPreview) of
-                (Just point, False) ->
+            case ( weapon.mountPoint, isPreview ) of
+                ( Just CrewFired, _ ) ->
+                    span [ class "badge badge-secondary mr-2" ]
+                        [ text <| mountPointToString CrewFired ]
+
+                ( Just point, False ) ->
                     span [ class "badge badge-secondary mr-2" ]
                         [ text <| mountPointToString point ]
 
-                (_, True) ->
+                ( _, True ) ->
                     div [ class "mr-2" ]
                         [ select
                             [ class "form-control form-control-sm"
                             , onInput TmpWeaponMountPoint
                             , id mountPointId
                             ]
-                            ((option [ value "" ] [ text "" ]) ::
-                            (List.map
-                                (\m -> option
-                                    [ value <| mountPointToString m ]
-                                    [ text <| mountPointToString m ]
-                                )
-                                [ Full, Front, LeftSide, RightSide, Rear ]
-                            ))
+                            ((option [ value "" ] [ text "" ])
+                                :: (List.map
+                                        (\m ->
+                                            option
+                                                [ value <| mountPointToString m ]
+                                                [ text <| mountPointToString m ]
+                                        )
+                                        [ Full, Front, LeftSide, RightSide, Rear ]
+                                   )
+                            )
                         ]
 
-                (Nothing, False) ->
+                ( Nothing, False ) ->
                     span [ class "badge badge-secondary mr-2" ]
                         [ text "No mount point" ]
+
+        slotsTakenBadge =
+            let
+                slotLabel =
+                    case weapon.slots of
+                        1 ->
+                            "slot"
+
+                        _ ->
+                            "slots"
+            in
+                span [ class "badge badge-secondary mr-2" ]
+                    [ text <| toString weapon.slots ++ " " ++ slotLabel ++ " used" ]
+
+        typeBadge =
+            span [ class "badge badge-secondary mr-2" ]
+                [ text <| toString weapon.wtype ++ " type" ]
+
+        rangeBadge =
+            span [ class "badge badge-secondary mr-2" ]
+                [ text <| toString weapon.range ++ " range" ]
+
+        pointBadge =
+            let
+                finalCost =
+                    weaponCost weapon
+
+                pointLabel =
+                    case finalCost of
+                        1 ->
+                            "point"
+
+                        _ ->
+                            "points"
+            in
+                span [ class "badge badge-secondary mr-2" ]
+                    [ text <| toString finalCost ++ " " ++ pointLabel ]
+
+        factsHolder =
+            div []
+                [ slotsTakenBadge
+                , typeBadge
+                , rangeBadge
+                , pointBadge
+                ]
+
+        renderSpecialFunc special =
+            li [] [ View.Utils.renderSpecial isPreview (Just <| UpdateAmmoUsed vehicle weapon) weapon.ammoUsed special ]
 
         specials =
             case weapon.specials of
@@ -105,27 +153,24 @@ render view vehicle weapon =
                     text ""
 
                 _ ->
-                    ul [] <| List.map (\s -> li [] [ View.Utils.renderSpecial s ]) weapon.specials
-                    
+                    ul [] <| List.map renderSpecialFunc weapon.specials
     in
         div [ class "pl-4" ]
             [ h6
-                [ classList [ ("form-inline", isPreview) ] ]
+                [ classList [ ( "form-inline", isPreview ) ] ]
                 [ mountPoint
                 , text <| weapon.name ++ " "
-                , small [ class "ml-2" ]
-                    [ text <| wtype ++ " - " ++ range
+                , button
+                    [ class "btn btn-sm btn-link"
+                    , classList [ ( "d-none", isPreview ) ]
+                    , onClick <| DeleteWeapon vehicle weapon
                     ]
+                    [ text "Remove Weapon" ]
                 ]
+            , factsHolder
             , div []
                 [ fireButton
                 , text <| "Damage: " ++ View.Utils.renderDice weapon.attack
                 ]
             , specials
-            , button
-                [ class "btn btn-sm btn-link"
-                , classList [ ("d-none", isPreview) ]
-                , onClick <| DeleteWeapon vehicle weapon
-                ]
-                [ text "Remove Weapon" ]
             ]

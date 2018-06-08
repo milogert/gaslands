@@ -69,7 +69,7 @@ allVehicleTypes =
 
 vehicleCost : Vehicle -> Int
 vehicleCost v =
-    v.cost + (List.sum <| List.map .cost v.weapons) + (List.sum <| List.map .cost v.upgrades)
+    v.cost + (List.sum <| List.map weaponCost v.weapons) + (List.sum <| List.map .cost v.upgrades)
 
 
 type WeightClass

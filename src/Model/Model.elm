@@ -29,6 +29,7 @@ type ErrorType
     = VehicleNameError
     | VehicleTypeError
     | WeaponTypeError
+    | WeaponMountPointError
     | UpgradeTypeError
 
 
@@ -43,6 +44,9 @@ errorToStr e =
 
         WeaponTypeError ->
             "Select a weapon from the dropdown to add."
+
+        WeaponMountPointError ->
+            "Select a mount point from the dropdown."
 
         UpgradeTypeError ->
             "Select an upgrade from the dropdown to add."
@@ -93,7 +97,7 @@ type Msg
     | ToNewWeapon Vehicle
     | ToNewUpgrade Vehicle
     | AddVehicle
-    | AddWeapon Vehicle
+    | AddWeapon Vehicle Weapon
     | AddUpgrade Vehicle
     | DeleteVehicle Vehicle
     | DeleteWeapon Vehicle Weapon
@@ -109,6 +113,7 @@ type Msg
     | UpdateCrew Vehicle String
     | UpdateEquipment Vehicle String
     | UpdateNotes Bool Vehicle String
+    | UpdateAmmoUsed Vehicle Weapon Int String
     | TmpWeaponUpdate String
     | TmpWeaponMountPoint String
     | TmpUpgradeUpdate String

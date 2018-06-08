@@ -13,6 +13,7 @@ type alias Weapon =
     , cost : Int
     , id : Int
     , status : WeaponStatus
+    , ammoUsed : Int
     }
 
 
@@ -24,7 +25,6 @@ type Special
     | Fire
     | Explosive
     | Blitz
-    | CrewFired
     | HighlyExplosive
     | Electrical
     | HandlingMod Int
@@ -46,6 +46,7 @@ type WeaponMounting
     | LeftSide
     | RightSide
     | Rear
+    | CrewFired
 
 
 mountPointToString : WeaponMounting -> String
@@ -66,6 +67,9 @@ mountPointToString point =
         Rear ->
             "Rear mounted"
 
+        CrewFired ->
+            "Crew fired"
+
 
 strToMountPoint : String -> Maybe WeaponMounting
 strToMountPoint point =
@@ -84,6 +88,9 @@ strToMountPoint point =
 
         "Rear mounted" ->
             Just Rear
+
+        "Crew fired" ->
+            Just CrewFired
 
         _ ->
             Nothing
@@ -208,7 +215,7 @@ nameToWeapon s =
 
 defaultWeapon : Weapon
 defaultWeapon =
-    Weapon "" NoWeapon Nothing (Dice 0 0) [] NoRange 0 [] 0 -1 WeaponReady
+    Weapon "" NoWeapon Nothing (Dice 0 0) [] NoRange 0 [] 0 -1 WeaponReady 0
 
 
 handgun : Weapon
@@ -220,10 +227,9 @@ handgun =
         { def
             | name = "Handgun"
             , wtype = Shooting
-            , mountPoint = Just Full
+            , mountPoint = Just CrewFired
             , attack = Dice 1 6
             , range = Medium
-            , specials = [ CrewFired ]
         }
 
 
@@ -356,10 +362,10 @@ grenades =
         { def
             | name = "Grenades"
             , wtype = Shooting
-            , mountPoint = Just Full
+            , mountPoint = Just CrewFired
             , attack = (Dice 1 6)
             , range = Medium
-            , specials = [ Ammo 5, CrewFired, Blast, Explosive, Blitz ]
+            , specials = [ Ammo 5, Blast, Explosive, Blitz ]
             , cost = 1
         }
 
@@ -373,10 +379,10 @@ molotovCocktails =
         { def
             | name = "Molotov Cocktails"
             , wtype = Shooting
-            , mountPoint = Just Full
+            , mountPoint = Just CrewFired
             , attack = (Dice 1 6)
             , range = Medium
-            , specials = [ Ammo 5, CrewFired, Fire, Blitz ]
+            , specials = [ Ammo 5, Fire, Blitz ]
             , cost = 1
         }
 
@@ -596,3 +602,23 @@ magneticJammer =
 rollDice : Dice -> Int
 rollDice dice =
     -100
+
+
+weaponCost : Weapon -> Int
+weaponCost w =
+    let
+        baseCost =
+            w.cost
+
+        mountModifier =
+            case w.mountPoint of
+                Just Full ->
+                    (*) 3
+
+                _ ->
+                    (*) 1
+
+        totalModifier =
+            mountModifier << ((*) 1)
+    in
+        totalModifier <| baseCost

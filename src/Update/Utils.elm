@@ -1,7 +1,5 @@
-module Update.Utils exposing (addUpgrade, addVehicle, addWeapon, deleteVehicle, deleteWeapon, deleteUpgrade, setTmpVehicleType, setWeaponFired, updateActivated, updateGear, updateHazards, updateCrew, updateEquipment, updateHull, updateNotes, rollSkidDice, rollAttackDice)
+module Update.Utils exposing (addUpgrade, addVehicle, addWeapon, deleteVehicle, deleteWeapon, deleteUpgrade, setTmpVehicleType, setWeaponFired, updateActivated, updateGear, updateHazards, updateCrew, updateEquipment, updateHull, updateNotes, updateAmmoUsed, rollSkidDice, rollAttackDice)
 
-import Task
-import Dom
 import Model.Model exposing (..)
 import Model.Vehicles exposing (..)
 import Model.Weapons exposing (..)
@@ -38,35 +36,33 @@ addVehicle model =
             model ! []
 
 
-addWeapon : Model -> Vehicle -> ( Model, Cmd Msg )
-addWeapon model v =
-    case model.tmpWeapon of
-        Just weaponTmp ->
-            let
-                weaponList =
-                    v.weapons ++ [ { weaponTmp | id = List.length v.weapons } ]
+addWeapon : Model -> Vehicle -> Weapon -> ( Model, Cmd Msg )
+addWeapon model v w =
+    let
+        weaponList =
+            v.weapons ++ [ { w | id = List.length v.weapons } ]
 
-                pre =
-                    List.take v.id model.vehicles
+        pre =
+            List.take v.id model.vehicles
 
-                post =
-                    List.drop (v.id + 1) model.vehicles
+        post =
+            List.drop (v.id + 1) model.vehicles
 
-                vehicleNew =
-                    { v | weapons = weaponList }
+        vehicleNew =
+            { v | weapons = weaponList }
 
-                newvehicles =
-                    pre ++ vehicleNew :: post
-            in
-                case weaponTmp.wtype of
-                    NoWeapon ->
-                        { model | error = [ WeaponTypeError ] } ! []
+        newvehicles =
+            pre ++ vehicleNew :: post
+    in
+        case (w.wtype, w.mountPoint) of
+            (NoWeapon, _) ->
+                { model | error = [ WeaponTypeError ] } ! []
 
-                    _ ->
-                        { model | view = Details vehicleNew, error = [], vehicles = newvehicles } ! []
+            (_, Nothing) ->
+                { model | error = [ WeaponMountPointError ] } ! []
 
-        Nothing ->
-            model ! []
+            (_, _) ->
+                { model | view = Details vehicleNew, error = [], vehicles = newvehicles } ! []
 
 
 addUpgrade : Model -> Vehicle -> ( Model, Cmd Msg )
@@ -316,6 +312,23 @@ updateNotes model isPreview v notes =
                     joinAround v.id { v | notes = notes } model.vehicles
             in
                 { model | vehicles = vehiclesNew } ! []
+
+updateAmmoUsed : Model -> Vehicle -> Weapon -> Int -> ( Model, Cmd Msg )
+updateAmmoUsed model v w used =
+    let
+        weaponUpdated =
+            { w | ammoUsed = used }
+
+        weaponsNew =
+            joinAround w.id weaponUpdated v.weapons |> correctIds
+
+        vehicleUpdated =
+            { v | weapons = weaponsNew }
+
+        vehiclesNew =
+            joinAround v.id vehicleUpdated model.vehicles
+    in
+        { model | view = Details vehicleUpdated, vehicles = vehiclesNew } ! []
 
 
 deleteVehicle : Model -> Vehicle -> ( Model, Cmd Msg )

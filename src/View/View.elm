@@ -34,11 +34,12 @@ view model =
 
         backButton =
             button
-                [ classList [ ( "d-none", model.view == Overview ) ]
-                , class "btn btn-default mr-3"
+                [ -- classList [ ( "d-none", model.view == Overview ) ]
+                  disabled <| model.view == Overview
+                , class "btn btn-default mr-2 btn-sm"
                 , onClick viewToGoTo
                 ]
-                [ text "<" ]
+                [ text "Back" ]
 
         currentPoints =
             totalPoints model
