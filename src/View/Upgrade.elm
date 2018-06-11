@@ -10,9 +10,18 @@ import Model.Weapons exposing (..)
 import View.Utils
 
 
-render : Upgrade -> Html Msg
-render upgrade =
+render : Model -> Upgrade -> Html Msg
+render model upgrade =
+    let
+        isPreview =
+            case model.view of
+                AddingUpgrade _ ->
+                    True
+
+                _ ->
+                    False
+    in
     div [ class "ml-4" ]
         [ h6 [] [ text upgrade.name ]
-        , div [] (List.map View.Utils.renderSpecial upgrade.specials)
+        , div [] (List.map (View.Utils.renderSpecial isPreview Nothing 0) upgrade.specials)
         ]

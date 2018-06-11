@@ -8,7 +8,9 @@ type alias Vehicle =
     { name : String
     , vtype : VehicleType
     , gear : GearTracker
+    , hazards : Int
     , handling : Int
+    , skidResults : List SkidResult
     , hull : HullHolder
     , crew : Int
     , equipment : Int
@@ -36,6 +38,13 @@ type VehicleType
     | Helicopter
 
 
+type SkidResult
+    = Hazard
+    | Spin
+    | Slide
+    | Shift
+
+
 type alias GearTracker =
     { current : Int
     , max : Int
@@ -60,7 +69,7 @@ allVehicleTypes =
 
 vehicleCost : Vehicle -> Int
 vehicleCost v =
-    v.cost + (List.sum <| List.map .cost v.weapons) + (List.sum <| List.map .cost v.upgrades)
+    v.cost + (List.sum <| List.map weaponCost v.weapons) + (List.sum <| List.map .cost v.upgrades)
 
 
 type WeightClass
@@ -103,21 +112,23 @@ emptyVehicle vtype index =
         cost =
             typeToCost vtype
     in
-    Vehicle
-        ""
-        vtype
-        gear
-        handling
-        hull
-        crew
-        equipment
-        weight
-        False
-        []
-        []
-        ""
-        cost
-        index
+        Vehicle
+            ""
+            vtype
+            gear
+            0
+            handling
+            []
+            hull
+            crew
+            equipment
+            weight
+            False
+            []
+            []
+            ""
+            cost
+            index
 
 
 typeToWeight : VehicleType -> WeightClass
@@ -233,7 +244,39 @@ typeToGearMax t =
 
 typeToEquipmentMax : VehicleType -> Int
 typeToEquipmentMax t =
-    -100
+    case t of
+        Bike ->
+            1
+
+        Buggy ->
+            2
+
+        Car ->
+            2
+
+        PerformanceCar ->
+            2
+
+        PickupTruck ->
+            3
+
+        MonsterTruck ->
+            2
+
+        Bus ->
+            3
+
+        WarRig ->
+            5
+
+        Tank ->
+            4
+
+        Gyrocopter ->
+            0
+
+        Helicopter ->
+            4
 
 
 typeToCrewMax : VehicleType -> Int

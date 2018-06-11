@@ -22,29 +22,30 @@ view model v =
         slotsLeft =
             v.equipment - slotsUsed
 
-        body = case model.tmpUpgrade of
-            Just tmpUpgrade ->
-                View.Upgrade.render tmpUpgrade
+        body =
+            case model.tmpUpgrade of
+                Just tmpUpgrade ->
+                    View.Upgrade.render model tmpUpgrade
 
-            Nothing ->
-                text "Select an upgrade."
+                Nothing ->
+                    text "Select an upgrade."
     in
-    View.Utils.row
-        [ View.Utils.col "md-3"
-            [ button
-                [ class "form-control btn btn-primary mb-3", onClick (AddUpgrade v) ]
-                [ text "Add Upgrade" ]
-            , select
-                [ onInput TmpWeaponUpdate
-                , class "form-control mb-3"
-                , multiple True
-                , size 8
+        View.Utils.row
+            [ View.Utils.col "md-3"
+                [ button
+                    [ class "form-control btn btn-primary mb-3", onClick (AddUpgrade v) ]
+                    [ text "Add Upgrade" ]
+                , select
+                    [ onInput TmpUpgradeUpdate
+                    , class "form-control mb-3"
+                    , multiple True
+                    , size 8
+                    ]
+                    (allUpgradesList
+                        |> List.filter (\x -> x.slots <= slotsLeft)
+                        |> List.map .name
+                        |> List.map (\t -> option [ value t ] [ text t ])
+                    )
                 ]
-                ( allUpgradesList
-                    |> List.filter (\x -> x.slots <= slotsLeft)
-                    |> List.map .name
-                    |> List.map (\t -> option [ value t ] [ text t ])
-                )
+            , View.Utils.col "md-9" [ body ]
             ]
-        , View.Utils.col "md-9" [ body ]
-        ]

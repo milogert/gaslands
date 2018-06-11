@@ -27,22 +27,22 @@ view model i v =
         isCrewFree =
             crewLeft > 0
     in
-    div []
-        [ select
-            [ onInput TmpWeaponUpdate
-            , class "form-control"
+        div []
+            [ select
+                [ onInput TmpWeaponUpdate
+                , class "form-control"
+                ]
+                (option [] []
+                    :: (List.filter (\x -> x.slots <= slotsLeft) weapons
+                            |> List.filter
+                                (\x ->
+                                    (not <| List.member CrewFired x.specials)
+                                        || (isCrewFree && List.member CrewFired x.specials)
+                                )
+                            |> List.map .name
+                            |> List.map (\t -> option [ value t ] [ text t ])
+                       )
+                )
+            , View.Utils.renderWeapon model.tmpWeapon
+            , button [ class "form-control btn btn-primary", onClick (AddWeapon i v) ] [ text "Add Weapon" ]
             ]
-            (option [] []
-                :: (List.filter (\x -> x.slots <= slotsLeft) weapons
-                        |> List.filter
-                            (\x ->
-                                (not <| List.member CrewFired x.specials)
-                                    || (isCrewFree && List.member CrewFired x.specials)
-                            )
-                        |> List.map .name
-                        |> List.map (\t -> option [ value t ] [ text t ])
-                   )
-            )
-        , View.Utils.renderWeapon model.tmpWeapon
-        , button [ class "form-control btn btn-primary", onClick (AddWeapon i v) ] [ text "Add Weapon" ]
-        ]

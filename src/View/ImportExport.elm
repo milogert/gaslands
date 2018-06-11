@@ -4,18 +4,23 @@ import Html exposing (Html, button, div, text, textarea)
 import Html.Attributes exposing (class)
 import Html.Events exposing (onClick, onInput)
 import Model.Model exposing (..)
+import View.Utils
 
 view : Model -> Html Msg
 view model =
-    div []
-        [ button
-            [ class "btn btn-primary"
-            , onClick Export
+    View.Utils.row
+        [ View.Utils.col "6"
+            [ button
+                [ class "btn btn-primary btn-block btn-lg"
+                , onClick Export
+                ]
+                [ text "Export" ]
             ]
-            [ text "Export" ]
-        , textarea [ onInput SetImport ] []
-        , button [ class "btn btn-primary", onClick Import ]
-            [ text "Import" ]
+        , View.Utils.col "6"
+            [ button [ class "btn btn-primary btn-block btn-lg", onClick Import ]
+                [ text "Import" ]
+            , div [] [ textarea [ class "form-control mt-2", onInput SetImport ] [] ]
+            ]
         ]
 
 

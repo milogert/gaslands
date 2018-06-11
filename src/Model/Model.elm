@@ -8,6 +8,7 @@ import Model.Weapons exposing (..)
 type alias Model =
     { view : CurrentView
     , pointsAllowed : Int
+    , gearPhase : Int
     , vehicles : List Vehicle
     , tmpVehicle : Maybe Vehicle
     , tmpWeapon : Maybe Weapon
@@ -30,6 +31,7 @@ type ErrorType
     = VehicleNameError
     | VehicleTypeError
     | WeaponTypeError
+    | WeaponMountPointError
     | UpgradeTypeError
     | JsonDecodeError String
 
@@ -45,6 +47,9 @@ errorToStr e =
 
         WeaponTypeError ->
             "Select a weapon from the dropdown to add."
+
+        WeaponMountPointError ->
+            "Select a mount point from the dropdown."
 
         UpgradeTypeError ->
             "Select an upgrade from the dropdown to add."
@@ -85,6 +90,7 @@ init =
     Model
         Overview
         50
+        1
         []
         Nothing
         Nothing
@@ -102,7 +108,7 @@ type Msg
     | ToNewUpgrade Vehicle
     | ToExport
     | AddVehicle
-    | AddWeapon Vehicle
+    | AddWeapon Vehicle Weapon
     | AddUpgrade Vehicle
     | DeleteVehicle Vehicle
     | DeleteWeapon Vehicle Weapon
@@ -110,15 +116,21 @@ type Msg
     | TmpName String
     | TmpVehicleType String
     | TmpNotes String
+    | NextGearPhase
     | UpdateActivated Vehicle Bool
     | UpdateGear Vehicle String
+    | UpdateHazards Vehicle String
     | UpdateHull Vehicle String
     | UpdateCrew Vehicle String
     | UpdateEquipment Vehicle String
     | UpdateNotes Bool Vehicle String
+    | UpdateAmmoUsed Vehicle Weapon Int String
     | TmpWeaponUpdate String
+    | TmpWeaponMountPoint String
     | TmpUpgradeUpdate String
     | UpdatePointsAllowed String
+    | SetWeaponsReady
+    | SetWeaponFired Vehicle Weapon
     | Import
     | SetImport String
     | Export

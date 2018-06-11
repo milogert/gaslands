@@ -1,6 +1,6 @@
 module Model.Decoders.Vehicles exposing (..)
 
-import Json.Decode as D exposing (Decoder)
+import Json.Decode exposing (Decoder, string, int, bool, list, succeed, fail, andThen)
 import Json.Decode.Pipeline exposing (decode, required, hardcoded)
 import Model.Vehicles exposing (..)
 import Model.Decoders.Weapons exposing (..)
@@ -10,53 +10,56 @@ import Model.Decoders.Upgrades exposing (..)
 vehicleDecoder : Decoder Vehicle
 vehicleDecoder =
     decode Vehicle
-        |> required "name" D.string
+        |> required "name" string
         |> required "vtype" vtypeDecoder
         |> required "gear" gearDecoder
-        |> required "handling" D.int
+        |> hardcoded 0
+        |> required "handling" int
+        --|> required "skidResults" (list skidResultDecoder)
+        |> hardcoded []
         |> required "hull" hullDecoder
-        |> required "crew" D.int
-        |> required "equipment" D.int
+        |> required "crew" int
+        |> required "equipment" int
         |> required "weight" weightDecoder
-        |> required "activated" D.bool
-        |> required "weapons" (D.list weaponDecoder)
-        |> required "upgrades" (D.list upgradeDecoder)
-        |> required "notes" D.string
-        |> required "cost" D.int
-        |> required "id" D.int
+        |> required "activated" bool
+        |> required "weapons" (list weaponDecoder)
+        |> required "upgrades" (list upgradeDecoder)
+        |> required "notes" string
+        |> required "cost" int
+        |> required "id" int
 
 
 vtypeDecoder : Decoder VehicleType
 vtypeDecoder =
-    D.string
-        |> D.andThen (\str ->
+    string
+        |> andThen (\str ->
             let
                 vtype =
                     strToVT str
             in
                 case vtype of
-                    Just vt -> D.succeed vt
-                    Nothing -> D.fail <| str ++ " is not a valid vehicle type"
+                    Just vt -> succeed vt
+                    Nothing -> fail <| str ++ " is not a valid vehicle type"
         )
 
 
 gearDecoder : Decoder GearTracker
 gearDecoder =
     decode GearTracker
-        |> hardcoded 0
-        |> required "max" D.int
+        |> hardcoded 1
+        |> required "max" int
 
 
 weightDecoder : Decoder WeightClass
 weightDecoder =
-    D.string
-        |> D.andThen (\str ->
+    string
+        |> andThen (\str ->
             case str of
-                "Light" -> D.succeed Light
-                "Middle" -> D.succeed Middle
-                "Heavy" -> D.succeed Heavy
-                "Ariborne" -> D.succeed Airborne
-                _ -> D.fail <| str ++ " is not a valid weight."
+                "Light" -> succeed Light
+                "Middle" -> succeed Middle
+                "Heavy" -> succeed Heavy
+                "Ariborne" -> succeed Airborne
+                _ -> fail <| str ++ " is not a valid weight."
         )
 
 
@@ -64,7 +67,20 @@ hullDecoder : Decoder HullHolder
 hullDecoder =
     decode HullHolder
         |> hardcoded 0
-        |> required "max" D.int
+        |> required "max" int
 
 
+skidResultDecoder : Decoder SkidResult
+skidResultDecoder =
+    string |>
+        andThen skidResultHelper
 
+
+skidResultHelper : String -> Decoder SkidResult
+skidResultHelper s =
+    case s of
+        "Hazard" -> succeed Hazard
+        "Spin" -> succeed Spin
+        "Slide" -> succeed Slide
+        "Shift" -> succeed Shift
+        _ -> fail <| s ++ " is not a valid skid result."

@@ -7,11 +7,11 @@ import View.Utils
 import View.Vehicle
 
 
-view : Vehicle -> Html Msg
-view v =
+view : Model -> Vehicle -> Html Msg
+view model v =
     View.Utils.row
         [ View.Utils.col "12"
             [ div []
-                [ View.Vehicle.render (Details v) False v ]
+                [ View.Vehicle.render model (Details v) False v ]
             ]
         ]

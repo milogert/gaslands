@@ -1,139 +1,156 @@
 module Model.Decoders.Weapons exposing (..)
 
-import Json.Decode as D exposing (Decoder)
-import Json.Decode.Pipeline exposing (decode, required, hardcoded)
+import Json.Decode exposing (..)
+import Json.Decode.Pipeline exposing (..)
 import Model.Weapons exposing (..)
 
 
 weaponDecoder : Decoder Weapon
 weaponDecoder =
     decode Weapon
-        |> required "name" D.string
+        |> required "name" string
         |> required "wtype" wtypeDecoder
+        |> optional "mountPoint" (oneOf [ mountPointDecoder, null Nothing ]) Nothing
         |> required "attack" diceDecoder
+        |> hardcoded []
         |> required "range" rangeDecoder
-        |> required "slots" D.int
-        |> required "specials" (D.list specialDecoder)
-        |> required "cost" D.int
-        |> required "id" D.int
+        |> required "slots" int
+        |> required "specials" (list specialDecoder)
+        |> required "cost" int
+        |> required "id" int
+        |> hardcoded WeaponReady
+        |> hardcoded 0
+
+
+mountPointDecoder : Decoder (Maybe WeaponMounting)
+mountPointDecoder =
+    string
+        |> andThen (\str ->
+            case str of
+                "Full" -> succeed <| Just Full
+                "Front" -> succeed <| Just Front
+                "LeftSide" -> succeed <| Just LeftSide
+                "RightSide" -> succeed <| Just RightSide
+                "Rear" -> succeed <| Just Rear
+                "CrewFired" -> succeed <| Just CrewFired
+                _ -> fail <| str ++ " is not a valid mount point type"
+        )
 
 
 specialDecoder : Decoder Special
 specialDecoder =
-    D.field "type" D.string
-        |> D.andThen (\str ->
+    field "type" string
+        |> andThen (\str ->
             case str of
                 "Ammo" -> ammoDecoder
                 "SpecialRule" -> specialRuleDecoder
+                "TrecherousSurface" -> succeed TreacherousSurface
                 "Blast" -> blastDecoder
                 "Fire" -> fireDecoder
                 "Explosive" -> explosiveDecoder
                 "Blitz" -> blitzDecoder
-                "CrewFired" -> crewFiredDecoder
                 "HighlyExplosive" -> highlyExplosiveDecoder
                 "Electrical" -> electricalDecoder
                 "HandlingMod" -> handlingModDecoder
                 "HullMod" -> hullModDecoder
                 "GearMod" -> gearModDecoder
                 "CrewMod" -> crewModDecoder
-                _ -> D.fail <| str ++ " is not a valid special type"
+                _ -> fail <| str ++ " is not a valid special type"
         )
 
 
 ammoDecoder : Decoder Special
 ammoDecoder =
-    D.map Ammo (D.field "count" D.int)
+    map Ammo (field "count" int)
 
 
 specialRuleDecoder : Decoder Special
 specialRuleDecoder =
-    D.map SpecialRule (D.field "text" D.string)
+    map SpecialRule (field "text" string)
 
 
 blastDecoder : Decoder Special
 blastDecoder =
-    D.succeed Blast
+    succeed Blast
 
 
 fireDecoder : Decoder Special
 fireDecoder =
-    D.succeed Fire
+    succeed Fire
 
 
 explosiveDecoder : Decoder Special
 explosiveDecoder =
-    D.succeed Explosive
+    succeed Explosive
 
 
 blitzDecoder : Decoder Special
 blitzDecoder =
-    D.succeed Blitz
-
-
-crewFiredDecoder : Decoder Special
-crewFiredDecoder =
-    D.succeed CrewFired
+    succeed Blitz
 
 
 highlyExplosiveDecoder : Decoder Special
 highlyExplosiveDecoder =
-    D.succeed HighlyExplosive
+    succeed HighlyExplosive
 
 
 electricalDecoder : Decoder Special
 electricalDecoder =
-    D.succeed Electrical
+    succeed Electrical
 
 
 handlingModDecoder : Decoder Special
 handlingModDecoder =
-    D.map HandlingMod (D.field "modifier" D.int)
+    map HandlingMod (field "modifier" int)
 
 
 hullModDecoder : Decoder Special
 hullModDecoder =
-    D.map HullMod (D.field "modifier" D.int)
+    map HullMod (field "modifier" int)
 
 
 gearModDecoder : Decoder Special
 gearModDecoder =
-    D.map GearMod (D.field "modifier" D.int)
+    map GearMod (field "modifier" int)
 
 
 crewModDecoder : Decoder Special
 crewModDecoder =
-    D.map CrewMod (D.field "modifier" D.int)
+    map CrewMod (field "modifier" int)
 
 
 wtypeDecoder : Decoder WeaponType
 wtypeDecoder =
-    D.string
-        |> D.andThen (\str ->
+    string
+        |> andThen (\str ->
             case str of
-                "Shooting" -> D.succeed Shooting
-                "Dropped" -> D.succeed Dropped
-                "SmashType" -> D.succeed SmashType
-                _ -> D.fail <| str ++ " is not a valid weapon type"
-        )
-
-
-rangeDecoder : Decoder Range
-rangeDecoder =
-    D.string
-        |> D.andThen (\str ->
-            case str of
-                "Medium" -> D.succeed Medium
-                "Double" -> D.succeed Double
-                "TemplateLarge" -> D.succeed TemplateLarge
-                "BurstLarge" -> D.succeed BurstLarge
-                "BurstSmall" -> D.succeed BurstSmall
-                "SmashRange" -> D.succeed SmashRange
-                _ -> D.fail <| str ++ " is not a valid range type"
+                "Shooting" -> succeed Shooting
+                "Dropped" -> succeed Dropped
+                "SmashType" -> succeed SmashType
+                _ -> fail <| str ++ " is not a valid weapon type"
         )
 
 
 diceDecoder : Decoder Dice
 diceDecoder =
     decode Dice
-        |> required "number" D.int
-        |> required "die" D.int
+        |> required "number" int
+        |> required "die" int
+
+
+rangeDecoder : Decoder Range
+rangeDecoder =
+    string
+        |> andThen rangeHelper
+        
+        
+rangeHelper : String -> Decoder Range
+rangeHelper str =
+    case str of
+        "Medium" -> succeed Medium
+        "Double" -> succeed Double
+        "TemplateLarge" -> succeed TemplateLarge
+        "BurstLarge" -> succeed BurstLarge
+        "BurstSmall" -> succeed BurstSmall
+        "SmashRange" -> succeed SmashRange
+        _ -> fail <| str ++ " is not a valid range type"
