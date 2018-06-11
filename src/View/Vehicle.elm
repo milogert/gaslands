@@ -7,7 +7,7 @@ import Model.Model exposing (..)
 import Model.Vehicles exposing (..)
 import Model.Weapons exposing (handgun)
 import View.Upgrade
-import View.Utils
+import View.Utils exposing (icon)
 import View.Weapon
 
 
@@ -91,7 +91,7 @@ render model currentView isPreview v =
                 ( False, False ) ->
                     div [ class "form-row" ]
                         [ label [ for "gearBox", class "col-form-label" ]
-                            [ text <| "Gear:" ]
+                            [ icon "cogs" ]
                         , View.Utils.col ""
                             [ input
                                 [ class "form-control form-control-sm"
@@ -114,7 +114,7 @@ render model currentView isPreview v =
                 , classList [ ( "d-none", isPreview ) ]
                 ]
                 [ label [ for "hazardsGained", class "col-form-label" ]
-                    [ text <| "Hazards Gained:" ]
+                    [ icon "exclamation-triangle" ]
                 , View.Utils.col ""
                     [ input
                         [ class "form-control form-control-sm"
@@ -139,7 +139,7 @@ render model currentView isPreview v =
                 ( False, _ ) ->
                     div [ class "form-row" ]
                         [ label [ for "hullInput", class "col-form-label" ]
-                            [ text "Hull Dmg: " ]
+                            [ icon "shield-alt" ]
                         , View.Utils.col ""
                             [ input
                                 [ class "form-control form-control-sm"
@@ -206,12 +206,12 @@ render model currentView isPreview v =
 
                         --, disabled <| totalSlotsUsed >= v.equipment
                         ]
-                        [ text "New Weapon" ]
+                        [ icon "plus", text "Weapon" ]
                     , button
                         [ onClick <| AddWeapon v handgun
                         , class "btn btn-sm btn-link"
                         ]
-                        [ text "Add Handgun" ]
+                        [ icon "plus", text "Handgun" ]
                     ]
                 ]
                 (List.map (View.Weapon.render model v) v.weapons)
@@ -231,7 +231,7 @@ render model currentView isPreview v =
                         , class "btn btn-sm btn-link ml-2"
                         , disabled <| totalSlotsUsed >= v.equipment
                         ]
-                        [ text "New Upgrade" ]
+                        [ icon "plus", text "Upgrade" ]
                     ]
                 ]
                 (List.map (View.Upgrade.render model) v.upgrades)
@@ -274,13 +274,13 @@ render model currentView isPreview v =
                     , classList [ ( "d-none", isPreview ) ]
                     , onClick <| DeleteVehicle v
                     ]
-                    [ text "Delete" ]
+                    [ icon "trash-alt" ]
                 , button
                     [ class "btn btn-sm btn-secondary float-right"
                     , classList [ ( "d-none", currentView /= Overview || isPreview ) ]
                     , onClick <| ToDetails v
                     ]
-                    [ text "Details" ]
+                    [ icon "info" ]
                 ]
     in
         case currentView of

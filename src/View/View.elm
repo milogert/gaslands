@@ -43,7 +43,7 @@ view model =
                 , class "btn btn-default mr-2 btn-sm"
                 , onClick viewToGoTo
                 ]
-                [ text "Back" ]
+                [ icon "arrow-left" ]
 
         currentPoints =
             totalPoints model
@@ -52,7 +52,7 @@ view model =
             model.pointsAllowed
 
         gearPhaseText =
-            "Gear Phase: " ++ (toString model.gearPhase)
+            (toString model.gearPhase)
     in
         div [ class "container" ]
             [ row
@@ -67,7 +67,7 @@ view model =
                         , value <| toString model.gearPhase
                         , onClick NextGearPhase
                         ]
-                        [ text gearPhaseText ]
+                        [ icon "cogs", text gearPhaseText ]
                     ]
                 , View.Utils.colPlus [ "lg-2", "md-3", "sm-12" ]
                     [ "my-auto" ]
@@ -94,8 +94,11 @@ view model =
                             ]
                         ]
                     ]
-                , div [ class "col-md-2 my-auto" ]
-                    [ button [ class "btn btn-sm btn-block btn-primary", onClick ToExport ] [ text "Export" ] ]
+                , div [ class "col-2 my-auto" ]
+                    [ button
+                        [ class "btn btn-sm btn-block btn-primary", onClick ToExport ]
+                        [ icon "download", text " / ", icon "upload" ]
+                    ]
                 ]
             , hr [] []
             , displayAlert model

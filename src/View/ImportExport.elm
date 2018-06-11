@@ -4,7 +4,7 @@ import Html exposing (Html, button, div, text, textarea)
 import Html.Attributes exposing (class)
 import Html.Events exposing (onClick, onInput)
 import Model.Model exposing (..)
-import View.Utils
+import View.Utils exposing (icon)
 
 view : Model -> Html Msg
 view model =
@@ -14,11 +14,11 @@ view model =
                 [ class "btn btn-primary btn-block btn-lg"
                 , onClick Export
                 ]
-                [ text "Export" ]
+                [ icon "download", text " Export" ]
             ]
         , View.Utils.col "6"
             [ button [ class "btn btn-primary btn-block btn-lg", onClick Import ]
-                [ text "Import" ]
+                [ icon "upload", text " Import" ]
             , div [] [ textarea [ class "form-control mt-2", onInput SetImport ] [] ]
             ]
         ]

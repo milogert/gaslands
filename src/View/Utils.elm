@@ -1,4 +1,4 @@
-module View.Utils exposing (card, crewUsed, detailSection, renderCountDown, renderDice, renderSpecial, row, rowPlus, col, colPlus)
+module View.Utils exposing (icon, card, crewUsed, detailSection, renderCountDown, renderDice, renderSpecial, row, rowPlus, col, colPlus)
 
 import Html exposing (Html, node, button, div, h1, h2, h3, h4, h5, h6, hr, img, input, label, li, node, option, p, select, small, span, text, textarea, ul)
 import Html.Attributes exposing (checked, class, classList, disabled, for, href, id, max, min, placeholder, rel, src, type_, value)
@@ -10,7 +10,7 @@ import Model.Weapons exposing (..)
 
 icon : String -> Html Msg
 icon s =
-    node "i" [ class <| "fas fa-" ++ s ] []
+    node "i" [ class <| "m-1 fas fa-" ++ s ] []
 
 
 row : List (Html Msg) -> Html Msg
