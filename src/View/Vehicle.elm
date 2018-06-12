@@ -288,4 +288,4 @@ render model currentView isPreview v =
                 div [] [ body ]
 
             _ ->
-                View.Utils.card [ ( "border-danger", wipedOut ) ] body footer
+                View.Utils.card [ ( "border-danger", wipedOut ) ] body footer isPreview

@@ -45,11 +45,13 @@ mapClassList classes =
     List.map (\x -> ( x, True )) classes
 
 
-card : List ( String, Bool ) -> Html Msg -> Html Msg -> Html Msg
-card cl body footer =
+card : List ( String, Bool ) -> Html Msg -> Html Msg -> Bool -> Html Msg
+card cl body footer hideFooter =
     div [ class "card", classList cl ]
         [ div [ class "card-body" ] [ body ]
-        , div [ class "card-footer" ] [ footer ]
+        , div
+            [ class "card-footer", classList [ ( "d-none", hideFooter ) ] ]
+            [ footer ]
         ]
 
 

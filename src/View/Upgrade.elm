@@ -6,6 +6,7 @@ import Html.Events exposing (onClick, onInput)
 import Model.Model exposing (..)
 import Model.Upgrades exposing (..)
 import Model.Vehicles exposing (..)
+import View.EquipmentLayout
 import View.Utils
 
 
@@ -63,22 +64,19 @@ render model vehicle upgrade =
                 _ ->
                     ul [] <| List.map renderSpecialFunc upgrade.specials
     in
-        div [ class "pl-4" ]
+        View.EquipmentLayout.render
+            (not isPreview)
             [ h6
                 [ classList [ ( "form-inline", isPreview ) ] ]
                 [ text <| upgrade.name ++ " "
-                , button
-                    [ class "btn btn-sm btn-link"
-                    , classList [ ( "d-none", isPreview ) ]
-                    , onClick <| DeleteUpgrade vehicle upgrade
-                    ]
-                    [ text "Remove Upgrade" ]
                 ]
-            , factsHolder
+            , button
+                [ class "btn btn-sm btn-link"
+                , classList [ ( "d-none", isPreview ) ]
+                , onClick <| DeleteUpgrade vehicle upgrade
+                ]
+                [ text "Remove Upgrade" ]
+            ]
+            [ factsHolder
             , specials
             ]
-
-
-
---, div [] (List.map (View.Utils.renderSpecial isPreview Nothing 0) upgrade.specials)
---]
