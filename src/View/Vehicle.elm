@@ -4,6 +4,7 @@ import Html exposing (Html, button, div, h1, h2, h3, h4, h5, h6, hr, img, input,
 import Html.Attributes exposing (checked, class, classList, disabled, for, href, id, max, min, placeholder, rel, src, type_, value, max, attribute)
 import Html.Events exposing (onClick, onInput)
 import Model.Model exposing (..)
+import Model.Utils exposing (..)
 import Model.Vehicles exposing (..)
 import Model.Weapons exposing (handgun)
 import View.Upgrade
@@ -35,7 +36,7 @@ render model currentView isPreview v =
             toString v.weight
 
         handling =
-            toString v.handling
+            toString <| totalHandling v
 
         equipmentUsed =
             List.sum (List.map .slots v.weapons)
@@ -44,13 +45,13 @@ render model currentView isPreview v =
             toString <| v.equipment - equipmentUsed
 
         isCrewAvailable =
-            v.crew > View.Utils.crewUsed v
+            (totalCrew v) > View.Utils.crewUsed v
 
         crewRemaining =
-            toString <| v.crew - View.Utils.crewUsed v
+            toString <| (totalCrew v) - View.Utils.crewUsed v
 
         wipedOut =
-            v.hazards >= 6 || v.hull.current >= v.hull.max
+            v.hazards >= 6 || v.hull.current >= (totalHull v)
 
         canActivate =
             model.gearPhase <= v.gear.current
@@ -83,7 +84,8 @@ render model currentView isPreview v =
         gearBox =
             case ( isPreview, wipedOut ) of
                 ( True, _ ) ->
-                    div [] [ text <| "Gear Max: " ++ toString v.gear.max ]
+                    div []
+                        [ text <| "Gear Max: " ++ toString (totalGear v) ]
 
                 ( _, True ) ->
                     text ""
@@ -98,14 +100,14 @@ render model currentView isPreview v =
                                 , type_ "number"
                                 , id "gearBox"
                                 , Html.Attributes.min "1"
-                                , Html.Attributes.max <| toString v.gear.max
+                                , Html.Attributes.max <| toString (totalGear v)
                                 , onInput (UpdateGear v)
                                 , value <| toString v.gear.current
                                 ]
                                 []
                             ]
                         , label [ for "gearBox", class "col-form-label" ]
-                            [ text <| "of " ++ toString v.gear.max ]
+                            [ text <| "of " ++ toString (totalGear v) ]
                         ]
 
         hazardTokens =
@@ -134,7 +136,8 @@ render model currentView isPreview v =
         hullChecks =
             case ( isPreview, wipedOut ) of
                 ( True, _ ) ->
-                    div [] [ text <| "Hull Max: " ++ toString v.hull.max ]
+                    div []
+                        [ text <| "Hull Max: " ++ toString (totalHull v) ]
 
                 ( False, _ ) ->
                     div [ class "form-row" ]
@@ -148,12 +151,12 @@ render model currentView isPreview v =
                                 , onInput <| UpdateHull v
                                 , value <| toString v.hull.current
                                 , Html.Attributes.min "0"
-                                , Html.Attributes.max <| toString v.hull.max
+                                , Html.Attributes.max <| toString (totalHull v)
                                 ]
                                 []
                             ]
                         , label [ for "hullInput", class "col-form-label" ]
-                            [ text <| "of " ++ toString v.hull.max ]
+                            [ text <| "of " ++ toString (totalHull v) ]
                         ]
 
         notes =
@@ -193,7 +196,7 @@ render model currentView isPreview v =
                             , ( "badge-danger", not isCrewAvailable )
                             ]
                         ]
-                        [ text <| (toString <| View.Utils.crewUsed v) ++ "/" ++ (toString v.crew) ++ " crew used" ]
+                        [ text <| (toString <| View.Utils.crewUsed v) ++ "/" ++ (toString <| totalCrew v) ++ " crew used" ]
                     ]
                 , small [ class "ml-2" ]
                     [ span [ class "badge badge-dark" ]

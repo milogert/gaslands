@@ -80,7 +80,7 @@ renderSpecial isPreview ammoMsg ammoUsed s =
             text "The dropped template counts as a treacherous surface."
 
         SpecialRule s ->
-            text <| "Special: " ++ s
+            text <| s
 
         HandlingMod i ->
             text <| "Handling modification: " ++ (toString i)
