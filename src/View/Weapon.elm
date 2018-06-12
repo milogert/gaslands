@@ -7,6 +7,7 @@ import Model.Model exposing (..)
 import Model.Vehicles exposing (..)
 import Model.Weapons exposing (..)
 import View.Utils
+import View.EquipmentLayout
 
 
 render : Model -> Vehicle -> Weapon -> Html Msg
@@ -138,7 +139,8 @@ render model vehicle weapon =
 
         factsHolder =
             div []
-                [ slotsTakenBadge
+                [ mountPoint
+                , slotsTakenBadge
                 , typeBadge
                 , rangeBadge
                 , pointBadge
@@ -155,22 +157,20 @@ render model vehicle weapon =
                 _ ->
                     ul [] <| List.map renderSpecialFunc weapon.specials
     in
-        div [ class "pl-4" ]
+        View.EquipmentLayout.render
+            (not isPreview)
             [ h6
                 [ classList [ ( "form-inline", isPreview ) ] ]
-                [ mountPoint
-                , text <| weapon.name ++ " "
-                , button
-                    [ class "btn btn-sm btn-link"
-                    , classList [ ( "d-none", isPreview ) ]
-                    , onClick <| DeleteWeapon vehicle weapon
-                    ]
-                    [ text "Remove Weapon" ]
-                ]
-            , factsHolder
+                [ text <| weapon.name ++ " " ]
             , div []
                 [ fireButton
                 , text <| "Damage: " ++ View.Utils.renderDice weapon.attack
                 ]
-            , specials
+            , button
+                [ class "btn btn-sm btn-link"
+                , classList [ ( "d-none", isPreview ) ]
+                , onClick <| DeleteWeapon vehicle weapon
+                ]
+                [ text "Remove Weapon" ]
             ]
+            [ factsHolder, specials ]

@@ -256,9 +256,9 @@ render model currentView isPreview v =
                 , hazardTokens
                 , hullChecks
                 , div [ classList [ ( "d-none", wipedOut ) ] ]
-                    [ text "Handling: "
-                    , span [] [ text <| handling ]
-                    ]
+                    [ text <| "Handling: " ++ handling ]
+                , div [ classList [ ( "d-none", not isPreview ) ] ]
+                    [ text <| "Equipment slots: " ++ (toString v.equipment) ]
                 , notes
                 , weaponList
                 , upgradeList
