@@ -82,6 +82,18 @@ renderSpecial isPreview ammoMsg ammoUsed s =
         SpecialRule s ->
             text <| "Special: " ++ s
 
+        HandlingMod i ->
+            text <| "Handling modification: " ++ (toString i)
+
+        HullMod i ->
+            text <| "Hull modification: " ++ (toString i)
+
+        GearMod i ->
+            text <| "Gear modification: " ++ (toString i)
+
+        CrewMod i ->
+            text <| "Crew modification: " ++ (toString i)
+
         _ ->
             text <| toString s
 

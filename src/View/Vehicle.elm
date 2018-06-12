@@ -203,8 +203,6 @@ render model currentView isPreview v =
                     [ button
                         [ onClick <| ToNewWeapon v
                         , class "btn btn-sm btn-link"
-
-                        --, disabled <| totalSlotsUsed >= v.equipment
                         ]
                         [ text "New Weapon" ]
                     , button
@@ -229,12 +227,11 @@ render model currentView isPreview v =
                     [ button
                         [ onClick <| ToNewUpgrade v
                         , class "btn btn-sm btn-link ml-2"
-                        , disabled <| totalSlotsUsed >= v.equipment
                         ]
                         [ text "New Upgrade" ]
                     ]
                 ]
-                (List.map (View.Upgrade.render model) v.upgrades)
+                (List.map (View.Upgrade.render model v) v.upgrades)
 
         header =
             h4

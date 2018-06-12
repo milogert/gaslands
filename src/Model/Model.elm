@@ -98,7 +98,7 @@ type Msg
     | ToNewUpgrade Vehicle
     | AddVehicle
     | AddWeapon Vehicle Weapon
-    | AddUpgrade Vehicle
+    | AddUpgrade Vehicle Upgrade
     | DeleteVehicle Vehicle
     | DeleteWeapon Vehicle Weapon
     | DeleteUpgrade Vehicle Upgrade

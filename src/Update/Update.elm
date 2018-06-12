@@ -37,8 +37,8 @@ update msg model =
             AddWeapon v w ->
                 Update.Utils.addWeapon model v w
 
-            AddUpgrade v ->
-                Update.Utils.addUpgrade model v
+            AddUpgrade v u ->
+                Update.Utils.addUpgrade model v u
 
             -- DELETING.
             DeleteVehicle v ->
