@@ -13,28 +13,33 @@ import View.Utils
 view : Model -> Vehicle -> Html Msg
 view model v =
     let
-        slotsList =
-            List.map .slots v.upgrades
+        addButton =
+            case (model.tmpUpgrade) of
+                Just u ->
+                    button
+                        [ class "form-control btn btn-primary mb-3"
+                        , onClick (AddUpgrade v u)
+                        ]
+                        [ text "Add Upgrade" ]
 
-        slotsUsed =
-            List.sum slotsList
-
-        slotsLeft =
-            v.equipment - slotsUsed
+                Nothing ->
+                    button
+                        [ class "form-control btn btn-primary mb-3"
+                        , disabled True
+                        ]
+                        [ text "Select Upgrade" ]
 
         body =
             case model.tmpUpgrade of
                 Just tmpUpgrade ->
-                    View.Upgrade.render model tmpUpgrade
+                    View.Upgrade.render model v tmpUpgrade
 
                 Nothing ->
                     text "Select an upgrade."
     in
         View.Utils.row
             [ View.Utils.col "md-3"
-                [ button
-                    [ class "form-control btn btn-primary mb-3", onClick (AddUpgrade v) ]
-                    [ text "Add Upgrade" ]
+                [ addButton
                 , select
                     [ onInput TmpUpgradeUpdate
                     , class "form-control mb-3"
@@ -42,7 +47,8 @@ view model v =
                     , size 8
                     ]
                     (allUpgradesList
-                        |> List.filter (\x -> x.slots <= slotsLeft)
+                        |> List.filter
+                            (\x -> x.slots <= (slotsRemaining v))
                         |> List.map .name
                         |> List.map (\t -> option [ value t ] [ text t ])
                     )

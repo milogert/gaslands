@@ -62,35 +62,30 @@ addWeapon model v w =
                 { model | view = Details vehicleNew, error = [], vehicles = newvehicles } ! []
 
 
-addUpgrade : Model -> Vehicle -> ( Model, Cmd Msg )
-addUpgrade model v =
-    case model.tmpUpgrade of
-        Just upgradeTmp ->
-            let
-                upgradeList =
-                    v.upgrades ++ [ { upgradeTmp | id = List.length v.upgrades } ]
+addUpgrade : Model -> Vehicle -> Upgrade -> ( Model, Cmd Msg )
+addUpgrade model v u =
+    let
+        upgradeList =
+            v.upgrades ++ [ { u | id = List.length v.upgrades } ]
 
-                pre =
-                    List.take v.id model.vehicles
+        pre =
+            List.take v.id model.vehicles
 
-                post =
-                    List.drop (v.id + 1) model.vehicles
+        post =
+            List.drop (v.id + 1) model.vehicles
 
-                vehicleNew =
-                    { v | upgrades = upgradeList }
+        vehicleNew =
+            { v | upgrades = upgradeList }
 
-                newvehicles =
-                    pre ++ vehicleNew :: post
-            in
-                case upgradeTmp.name of
-                    "" ->
-                        { model | error = [ UpgradeTypeError ] } ! []
-
-                    _ ->
-                        { model | view = Details vehicleNew, error = [], vehicles = newvehicles } ! []
-
-        Nothing ->
-            model ! []
+        newvehicles =
+            pre ++ vehicleNew :: post
+    in
+        { model
+            | view = Details vehicleNew
+            , error = []
+            , vehicles = newvehicles
+        }
+            ! []
 
 
 setTmpVehicleType : Model -> String -> ( Model, Cmd Msg )

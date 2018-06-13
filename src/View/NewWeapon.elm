@@ -13,15 +13,6 @@ import View.Weapon
 view : Model -> Vehicle -> Html Msg
 view model v =
     let
-        slotsList =
-            List.map .slots v.weapons
-
-        slotsUsed =
-            List.sum slotsList
-
-        slotsLeft =
-            v.equipment - slotsUsed
-
         crewLeft =
             v.crew - View.Utils.crewUsed v
 
@@ -30,14 +21,14 @@ view model v =
 
         addButton =
             case (model.tmpWeapon) of
-                (Just w) ->
+                Just w ->
                     button
                         [ class "form-control btn btn-primary mb-3"
                         , onClick (AddWeapon v w)
                         ]
                         [ text "Add Weapon" ]
 
-                (Nothing) ->
+                Nothing ->
                     button
                         [ class "form-control btn btn-primary mb-3"
                         , disabled True
@@ -62,7 +53,8 @@ view model v =
                     , size 8
                     ]
                     (allWeaponsList
-                        |> List.filter (\x -> x.slots <= slotsLeft)
+                        |> List.filter
+                            (\x -> x.slots <= (slotsRemaining v))
                         |> List.filter (\x -> x.name /= handgun.name)
                         |> List.map .name
                         |> List.map (\t -> option [ value t ] [ text t ])

@@ -85,6 +85,17 @@ type alias HullHolder =
     }
 
 
+slotsUsed : Vehicle -> Int
+slotsUsed v =
+    List.sum <| (List.map .slots v.weapons) ++ (List.map .slots v.upgrades)
+
+
+slotsRemaining : Vehicle -> Int
+slotsRemaining v =
+    v.equipment - (slotsUsed v)
+
+
+
 -- Vehicle definitions.
 
 

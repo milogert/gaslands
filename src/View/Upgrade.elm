@@ -6,12 +6,12 @@ import Html.Events exposing (onClick, onInput)
 import Model.Model exposing (..)
 import Model.Upgrades exposing (..)
 import Model.Vehicles exposing (..)
-import Model.Weapons exposing (..)
+import View.EquipmentLayout
 import View.Utils
 
 
-render : Model -> Upgrade -> Html Msg
-render model upgrade =
+render : Model -> Vehicle -> Upgrade -> Html Msg
+render model vehicle upgrade =
     let
         isPreview =
             case model.view of
@@ -20,8 +20,63 @@ render model upgrade =
 
                 _ ->
                     False
+
+        slotsTakenBadge =
+            let
+                slotLabel =
+                    case upgrade.slots of
+                        1 ->
+                            "slot"
+
+                        _ ->
+                            "slots"
+            in
+                span [ class "badge badge-secondary mr-2" ]
+                    [ text <| toString upgrade.slots ++ " " ++ slotLabel ++ " used" ]
+
+        pointBadge =
+            let
+                pointLabel =
+                    case upgrade.cost of
+                        1 ->
+                            "point"
+
+                        _ ->
+                            "points"
+            in
+                span [ class "badge badge-secondary mr-2" ]
+                    [ text <| toString upgrade.cost ++ " " ++ pointLabel ]
+
+        factsHolder =
+            div []
+                [ slotsTakenBadge
+                , pointBadge
+                ]
+
+        renderSpecialFunc special =
+            li [] [ View.Utils.renderSpecial isPreview Nothing 0 special ]
+
+        specials =
+            case upgrade.specials of
+                [] ->
+                    text ""
+
+                _ ->
+                    ul [] <| List.map renderSpecialFunc upgrade.specials
     in
-    div [ class "ml-4" ]
-        [ h6 [] [ text upgrade.name ]
-        , div [] (List.map (View.Utils.renderSpecial isPreview Nothing 0) upgrade.specials)
-        ]
+        View.EquipmentLayout.render
+            (not isPreview)
+            [ h6
+                [ classList [ ( "form-inline", isPreview ) ] ]
+                [ text <| upgrade.name ++ " "
+                ]
+            , button
+                [ class "btn btn-sm btn-link"
+                , classList [ ( "d-none", isPreview ) ]
+                , onClick <| DeleteUpgrade vehicle upgrade
+                ]
+                [ text "Remove Upgrade" ]
+            ]
+            [ factsHolder
+            , specials
+            ]
