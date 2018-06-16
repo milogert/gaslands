@@ -29,14 +29,17 @@ render model currentView isPreview v =
         vtype =
             vTToStr v.vtype
 
-        vehicleType_ =
-            text <| vtype
+        vehicleTypeBadge =
+            span [ class "badge badge-secondary mr-2" ]
+                [ text <| vtype ]
 
-        weight =
-            toString v.weight
+        weightBadge =
+            span [ class "badge badge-secondary mr-2" ]
+                [ text <| (toString v.weight) ++ "-weight" ]
 
-        handling =
-            toString <| totalHandling v
+        handlingBadge =
+            span [ class "badge badge-secondary mr-2" ]
+                [ text <| (toString <| totalHandling v) ++ " handling" ]
 
         equipmentUsed =
             List.sum (List.map .slots v.weapons)
@@ -50,8 +53,8 @@ render model currentView isPreview v =
         crewRemaining =
             toString <| (totalCrew v) - View.Utils.crewUsed v
 
-        wipedOut =
-            v.hazards >= 6 || v.hull.current >= (totalHull v)
+        wrecked =
+            v.hull.current >= (totalHull v)
 
         canActivate =
             model.gearPhase <= v.gear.current
@@ -70,19 +73,21 @@ render model currentView isPreview v =
         activatedCheck =
             div
                 [ class "form-row mb-2"
-                , classList [ ( "d-none", isPreview || wipedOut ) ]
+                , classList [ ( "d-none", isPreview || wrecked ) ]
                 ]
-                [ button
-                    [ class "btn btn-sm btn-primary btn-block form-control"
-                    , onClick (UpdateActivated v (not v.activated))
-                    , checked v.activated
-                    , disabled <| not canActivate || v.activated
+                [ View.Utils.col ""
+                    [ button
+                        [ class "btn btn-sm btn-primary btn-block form-control"
+                        , onClick (UpdateActivated v (not v.activated))
+                        , checked v.activated
+                        , disabled <| not canActivate || v.activated
+                        ]
+                        [ text activatedText ]
                     ]
-                    [ text activatedText ]
                 ]
 
         gearBox =
-            case ( isPreview, wipedOut ) of
+            case ( isPreview, wrecked ) of
                 ( True, _ ) ->
                     div []
                         [ text <| "Gear Max: " ++ toString (totalGear v) ]
@@ -134,7 +139,7 @@ render model currentView isPreview v =
                 ]
 
         hullChecks =
-            case ( isPreview, wipedOut ) of
+            case ( isPreview, wrecked ) of
                 ( True, _ ) ->
                     div []
                         [ text <| "Hull Max: " ++ toString (totalHull v) ]
@@ -162,7 +167,7 @@ render model currentView isPreview v =
         notes =
             div
                 [ class "form-row"
-                , classList [ ( "d-none", wipedOut ) ]
+                , classList [ ( "d-none", isPreview ) ]
                 ]
                 [ View.Utils.col ""
                     [ textarea
@@ -186,7 +191,7 @@ render model currentView isPreview v =
         weaponList =
             View.Utils.detailSection
                 currentView
-                (isPreview || wipedOut)
+                (isPreview || wrecked)
                 [ text "Weapon List"
                 , small [ class "ml-2" ]
                     [ span
@@ -220,7 +225,7 @@ render model currentView isPreview v =
         upgradeList =
             View.Utils.detailSection
                 currentView
-                (isPreview || wipedOut)
+                (isPreview || wrecked)
                 [ text "Upgrade List"
                 , small [ class "ml-2" ]
                     [ span [ class "badge badge-dark" ]
@@ -243,22 +248,42 @@ render model currentView isPreview v =
                     , ( "card-title", currentView /= Details v )
                     ]
                 ]
-                [ name
-                , small []
-                    [ vehicleType_, text <| " - " ++ weight ++ " (" ++ (toString <| vehicleCost v) ++ ")" ]
+                [ name ]
+
+        pointsCostBadge =
+            span [ class "badge badge-secondary mr-2" ]
+                [ text <| (toString <| vehicleCost v) ++ " points" ]
+
+        equipmentSlotsBadge =
+            let
+                slots =
+                    case v.equipment of
+                        1 ->
+                            "slot"
+
+                        _ ->
+                            "slots"
+            in
+                span [ class "badge badge-secondary mr-2" ]
+                    [ text <| (toString v.equipment) ++ " build " ++ slots ]
+
+        factsHolder =
+            div [ class "mb-2" ]
+                [ vehicleTypeBadge
+                , pointsCostBadge
+                , weightBadge
+                , handlingBadge
+                , equipmentSlotsBadge
                 ]
 
         body =
             div [ classList [ ( "card-text", currentView /= Details v ) ] ]
                 [ header
                 , activatedCheck
+                , factsHolder
                 , gearBox
                 , hazardTokens
                 , hullChecks
-                , div [ classList [ ( "d-none", wipedOut ) ] ]
-                    [ text <| "Handling: " ++ handling ]
-                , div [ classList [ ( "d-none", not isPreview ) ] ]
-                    [ text <| "Equipment slots: " ++ (toString v.equipment) ]
                 , notes
                 , weaponList
                 , upgradeList
@@ -267,7 +292,7 @@ render model currentView isPreview v =
         footer =
             div
                 [ class "buttons"
-                , classList [ ( "d-none", wipedOut ) ]
+                , classList [ ( "d-none", wrecked ) ]
                 ]
                 [ button
                     [ class "btn btn-sm btn-danger"
@@ -288,4 +313,4 @@ render model currentView isPreview v =
                 div [] [ body ]
 
             _ ->
-                View.Utils.card [ ( "border-danger", wipedOut ) ] body footer isPreview
+                View.Utils.card [ ( "border-danger", wrecked ) ] body footer isPreview

@@ -56,11 +56,11 @@ view model =
     in
         div [ class "container" ]
             [ row
-                [ h2 [ class "col mt-3" ]
+                [ h2 [ class "col-md col-sm-12 mt-3" ]
                     [ backButton
                     , text <| viewToStr model.view
                     ]
-                , View.Utils.colPlus [ "lg-2", "md-3", "sm-12" ]
+                , View.Utils.colPlus [ "lg-2", "md-2", "sm-3", "xs-4" ]
                     [ "my-auto" ]
                     [ button
                         [ class "btn btn-sm btn-primary btn-block"
@@ -69,7 +69,7 @@ view model =
                         ]
                         [ icon "cogs", text gearPhaseText ]
                     ]
-                , View.Utils.colPlus [ "lg-2", "md-3", "sm-12" ]
+                , View.Utils.colPlus [ "lg-2", "md-3", "sm" ]
                     [ "my-auto" ]
                     [ div [ class "form-group form-row mb-0" ]
                         [ label
@@ -94,9 +94,11 @@ view model =
                             ]
                         ]
                     ]
-                , div [ class "col-2 my-auto" ]
+                , View.Utils.colPlus
+                    [ "lg-2", "md-2", "sm-3" ]
+                    [ "my-auto" ]
                     [ button
-                        [ class "btn btn-sm btn-block btn-primary", onClick ToExport ]
+                        [ class "btn btn-sm btn-block btn-secondary", onClick ToExport ]
                         [ icon "download", text " / ", icon "upload" ]
                     ]
                 ]

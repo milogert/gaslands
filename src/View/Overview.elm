@@ -12,15 +12,15 @@ view : Model -> Html Msg
 view model =
     View.Utils.row
         [ View.Utils.col "12"
+            [ div
+                [ class "card-columns" ]
+                (List.map (View.Vehicle.render model model.view False) model.vehicles)
+            ]
+        , View.Utils.col "12"
             [ button
                 [ onClick ToNewVehicle
                 , class "btn btn-primary btn-block mb-3"
                 ]
                 [ text "New Vehicle" ]
-            ]
-        , View.Utils.col "12"
-            [ div
-                [ class "card-columns" ]
-                (List.map (View.Vehicle.render model model.view False) model.vehicles)
             ]
         ]

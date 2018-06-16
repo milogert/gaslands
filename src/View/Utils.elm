@@ -127,14 +127,14 @@ renderCountDown msg start current =
         col "" [ input attr [] ]
 
 
-renderDice : Dice -> String
-renderDice { number, die } =
-    case ( number, die ) of
-        ( 0, 0 ) ->
-            "None"
+renderDice : Maybe Dice -> String
+renderDice maybeDice =
+    case maybeDice of
+        Nothing ->
+            ""
 
-        ( _, _ ) ->
-            toString number ++ "d" ++ toString die
+        Just dice ->
+            toString dice.number ++ "d" ++ toString dice.die
 
 
 crewUsed : Vehicle -> Int

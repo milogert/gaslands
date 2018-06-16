@@ -5,7 +5,7 @@ type alias Weapon =
     { name : String
     , wtype : WeaponType
     , mountPoint : Maybe WeaponMounting
-    , attack : Dice
+    , attack : Maybe Dice
     , attackRoll : List Int
     , range : Range
     , slots : Int
@@ -213,7 +213,7 @@ nameToWeapon s =
 
 defaultWeapon : Weapon
 defaultWeapon =
-    Weapon "" Shooting Nothing (Dice 0 0) [] Medium 0 [] 0 -1 WeaponReady 0
+    Weapon "" Shooting Nothing Nothing [] Medium 0 [] 0 -1 WeaponReady 0
 
 
 handgun : Weapon
@@ -226,7 +226,7 @@ handgun =
             | name = "Handgun"
             , wtype = Shooting
             , mountPoint = Just CrewFired
-            , attack = Dice 1 6
+            , attack = Just (Dice 1 6)
             , range = Medium
         }
 
@@ -240,7 +240,7 @@ machineGun =
         { def
             | name = "Machine Gun"
             , wtype = Shooting
-            , attack = (Dice 2 6)
+            , attack = Just (Dice 2 6)
             , range = Double
             , slots = 1
             , cost = 2
@@ -256,7 +256,7 @@ heavyMachineGun =
         { def
             | name = "Heavy Machine Gun"
             , wtype = Shooting
-            , attack = (Dice 3 6)
+            , attack = Just (Dice 3 6)
             , range = Double
             , slots = 1
             , cost = 4
@@ -272,7 +272,7 @@ miniGun =
         { def
             | name = "Mini-Gun"
             , wtype = Shooting
-            , attack = Dice 4 6
+            , attack = Just (Dice 4 6)
             , cost = 6
             , range = Double
             , slots = 1
@@ -289,7 +289,7 @@ oneTwentyFiveMMCannon =
         { def
             | name = "125mm Cannon"
             , wtype = Shooting
-            , attack = (Dice 8 6)
+            , attack = Just (Dice 8 6)
             , range = Double
             , slots = 3
             , specials =
@@ -309,7 +309,7 @@ rockets =
         { def
             | name = "Rockets"
             , wtype = Shooting
-            , attack = (Dice 6 6)
+            , attack = Just (Dice 6 6)
             , range = Double
             , slots = 2
             , specials = [ Ammo 3, Blast, HighlyExplosive ]
@@ -326,7 +326,7 @@ flamethrower =
         { def
             | name = "Flamethrower"
             , wtype = Shooting
-            , attack = (Dice 6 6)
+            , attack = Just (Dice 6 6)
             , range = TemplateLarge
             , slots = 2
             , specials = [ Ammo 3, Fire, Explosive ]
@@ -343,7 +343,7 @@ mortar =
         { def
             | name = "Mortar"
             , wtype = Shooting
-            , attack = (Dice 4 6)
+            , attack = Just (Dice 4 6)
             , range = Double
             , slots = 1
             , specials = [ Ammo 3, SpecialRule "When making a shooting attack with the Mortar, the vehicle may ignore terrain and cover during the attack." ]
@@ -361,7 +361,7 @@ grenades =
             | name = "Grenades"
             , wtype = Shooting
             , mountPoint = Just CrewFired
-            , attack = (Dice 1 6)
+            , attack = Just (Dice 1 6)
             , range = Medium
             , specials = [ Ammo 5, Blast, Explosive, Blitz ]
             , cost = 1
@@ -378,7 +378,7 @@ molotovCocktails =
             | name = "Molotov Cocktails"
             , wtype = Shooting
             , mountPoint = Just CrewFired
-            , attack = (Dice 1 6)
+            , attack = Just (Dice 1 6)
             , range = Medium
             , specials = [ Ammo 5, Fire, Blitz ]
             , cost = 1
@@ -449,7 +449,7 @@ mines =
         { def
             | name = "Mines"
             , wtype = Dropped
-            , attack = (Dice 1 6)
+            , attack = Just (Dice 1 6)
             , range = BurstSmall
             , slots = 1
             , specials = [ Ammo 1, Blast ]
@@ -481,7 +481,7 @@ ram =
         { def
             | name = "Ram"
             , wtype = SmashType
-            , attack = (Dice 1 6)
+            , attack = Just (Dice 1 6)
             , range = SmashRange
             , slots = 1
             , specials =
@@ -502,7 +502,7 @@ explodingRam =
         { def
             | name = "Exploding Ram"
             , wtype = SmashType
-            , attack = (Dice 1 6)
+            , attack = Just (Dice 1 6)
             , range = SmashRange
             , slots = 1
             , specials =
@@ -544,7 +544,7 @@ arcLightningProjector =
         { def
             | name = "Arc Lightning Projector"
             , wtype = Shooting
-            , attack = (Dice 1 6)
+            , attack = Just (Dice 1 6)
             , range = Double
             , slots = 2
             , specials =
@@ -565,7 +565,7 @@ kineticSuperBooster =
         { def
             | name = "Kinetic Super Booster"
             , wtype = Shooting
-            , attack = (Dice 1 6)
+            , attack = Just (Dice 1 6)
             , range = Double
             , slots = 2
             , specials =

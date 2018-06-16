@@ -6,7 +6,7 @@ import Html.Events exposing (onClick, onInput)
 import Model.Model exposing (..)
 import Model.Vehicles exposing (..)
 import Model.Weapons exposing (..)
-import View.Utils
+import View.Utils exposing (icon)
 import View.EquipmentLayout
 
 
@@ -43,14 +43,6 @@ render model vehicle weapon =
                 ( _, _ ) ->
                     False
 
-        firingText =
-            case weapon.status of
-                WeaponReady ->
-                    "Fire"
-
-                WeaponFired ->
-                    "Fired"
-
         fireButton =
             button
                 [ class "btn btn-sm mr-2"
@@ -62,7 +54,17 @@ render model vehicle weapon =
                 , disabled <| not canFire
                 , onClick firingToggle
                 ]
-                [ text firingText ]
+                [ icon "crosshairs"
+                , span [ classList [ ( "d-none", weapon.attack == Nothing ) ] ]
+                    [ text <| View.Utils.renderDice weapon.attack ]
+                ]
+
+        previewDamage =
+            span
+                [ class "badge badge-secondary mr-2"
+                , classList [ ( "d-none", weapon.attack == Nothing ) ]
+                ]
+                [ text <| View.Utils.renderDice weapon.attack ++ " damage" ]
 
         mountPointId =
             "mountPoint-" ++ (toString weapon.id)
@@ -138,9 +140,10 @@ render model vehicle weapon =
                     [ text <| toString finalCost ++ " " ++ pointLabel ]
 
         factsHolder =
-            div []
+            div [ class "mb-2" ]
                 [ mountPoint
                 , slotsTakenBadge
+                , previewDamage
                 , typeBadge
                 , rangeBadge
                 , pointBadge
@@ -159,18 +162,19 @@ render model vehicle weapon =
     in
         View.EquipmentLayout.render
             (not isPreview)
-            [ h6
-                [ classList [ ( "form-inline", isPreview ) ] ]
-                [ text <| weapon.name ++ " " ]
-            , div []
-                [ fireButton
-                , text <| "Damage: " ++ View.Utils.renderDice weapon.attack
+            [ View.Utils.row
+                [ div
+                    [ class "col-md-12 col" ]
+                    [ h6 [] [ text <| weapon.name ++ " " ] ]
+                , div [ class "col-md-12 col" ] [ fireButton ]
+                , div [ class "col-md-12 col" ]
+                    [ button
+                        [ class "btn btn-sm btn-danger"
+                        , classList [ ( "d-none", isPreview ) ]
+                        , onClick <| DeleteWeapon vehicle weapon
+                        ]
+                        [ icon "trash-alt" ]
+                    ]
                 ]
-            , button
-                [ class "btn btn-sm btn-link"
-                , classList [ ( "d-none", isPreview ) ]
-                , onClick <| DeleteWeapon vehicle weapon
-                ]
-                [ text "Remove Weapon" ]
             ]
             [ factsHolder, specials ]
