@@ -61,7 +61,7 @@ update msg model =
             NextGearPhase ->
                 let
                     weaponFunc =
-                        \w -> { w | status = WeaponReady }
+                        \w -> { w | status = WeaponReady, attackRoll = 0 }
 
                     vehicleFunc =
                         \v -> { v | weapons = v.weapons |> List.map weaponFunc }
@@ -165,31 +165,36 @@ update msg model =
 
             SetWeaponFired v w ->
                 Update.Utils.setWeaponFired model v w
-            
+
+            RollWeaponDie v w result ->
+                Update.Utils.rollWeaponDie model v w result
+
             -- IMPORT/EXPORT.
             Import ->
                 let
-                    decodeRes = 
+                    decodeRes =
                         Json.Decode.decodeString modelDecoder model.importValue
 
                     newModel : Model
-                    newModel = case decodeRes of
-                        Ok m ->
-                            m
+                    newModel =
+                        case decodeRes of
+                            Ok m ->
+                                m
 
-                        Err s ->
-                            { model | error = [ JsonDecodeError s ] }
+                            Err s ->
+                                { model | error = [ JsonDecodeError s ] }
                 in
                     { model
                         | view = newModel.view
-                        , pointsAllowed = newModel.pointsAllowed 
+                        , pointsAllowed = newModel.pointsAllowed
                         , vehicles = newModel.vehicles
                         , tmpVehicle = newModel.tmpVehicle
                         , tmpWeapon = newModel.tmpWeapon
                         , tmpUpgrade = newModel.tmpUpgrade
                         , error = newModel.error
                         , importValue = newModel.importValue
-                    } ! []
+                    }
+                        ! []
 
             SetImport json ->
                 { model | importValue = json } ! []

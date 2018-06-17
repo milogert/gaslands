@@ -1,9 +1,10 @@
-module Update.Utils exposing (addUpgrade, addVehicle, addWeapon, deleteVehicle, deleteWeapon, deleteUpgrade, setTmpVehicleType, setWeaponFired, updateActivated, updateGear, updateHazards, updateCrew, updateEquipment, updateHull, updateNotes, updateAmmoUsed, rollSkidDice, rollAttackDice)
+module Update.Utils exposing (addUpgrade, addVehicle, addWeapon, deleteVehicle, deleteWeapon, deleteUpgrade, setTmpVehicleType, setWeaponFired, updateActivated, updateGear, updateHazards, updateCrew, updateEquipment, updateHull, updateNotes, updateAmmoUsed, rollSkidDice, rollAttackDice, rollWeaponDie)
 
 import Model.Model exposing (..)
 import Model.Vehicles exposing (..)
 import Model.Weapons exposing (..)
 import Model.Upgrades exposing (..)
+import Random
 
 
 (!!) : Int -> List a -> Maybe a
@@ -355,8 +356,47 @@ setWeaponFired model v w =
 
         vehiclesNew =
             joinAround v.id vehicleUpdated model.vehicles
+
+        minRoll =
+            case weaponUpdated.attack of
+                Just dice ->
+                    dice.number
+
+                Nothing ->
+                    0
+
+        maxRoll =
+            case weaponUpdated.attack of
+                Just dice ->
+                    dice.number * dice.die
+
+                Nothing ->
+                    0
     in
-        { model | view = Details vehicleUpdated, vehicles = vehiclesNew } ! []
+        { model
+            | view = Details vehicleUpdated
+            , vehicles = vehiclesNew
+        }
+            ! [ Random.generate (RollWeaponDie v weaponUpdated) (Random.int minRoll maxRoll) ]
+
+
+rollWeaponDie : Model -> Vehicle -> Weapon -> Int -> ( Model, Cmd Msg )
+rollWeaponDie model v w result =
+    let
+        weaponUpdated =
+            { w | attackRoll = result }
+
+        vehicleUpdated =
+            replaceWeaponInVehicle v weaponUpdated
+
+        vehiclesNew =
+            joinAround v.id vehicleUpdated model.vehicles
+    in
+        { model
+            | view = Details vehicleUpdated
+            , vehicles = vehiclesNew
+        }
+            ! []
 
 
 deleteWeapon : Model -> Vehicle -> Weapon -> ( Model, Cmd Msg )
@@ -427,3 +467,12 @@ getItem i xs =
         |> List.take i
         |> List.reverse
         |> List.head
+
+
+replaceWeaponInVehicle : Vehicle -> Weapon -> Vehicle
+replaceWeaponInVehicle v w =
+    let
+        weaponsNew =
+            joinAround w.id w v.weapons |> correctIds
+    in
+        { v | weapons = weaponsNew }

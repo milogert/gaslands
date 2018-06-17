@@ -1,4 +1,4 @@
-module View.Utils exposing (icon, card, crewUsed, detailSection, renderCountDown, renderDice, renderSpecial, row, rowPlus, col, colPlus, factsHolder)
+module View.Utils exposing (icon, card, crewUsed, detailSection, renderCountDown, renderDice, renderSpecial, row, rowPlus, col, colPlus, factsHolder, factBadge)
 
 import Html exposing (Html, node, button, div, h1, h2, h3, h4, h5, h6, hr, img, input, label, li, node, option, p, select, small, span, text, textarea, ul, b)
 import Html.Attributes exposing (checked, class, classList, disabled, for, href, id, max, min, placeholder, rel, src, type_, value)
@@ -149,3 +149,8 @@ crewUsed v =
 factsHolder : List (Html Msg) -> Html Msg
 factsHolder facts =
     div [ class "text-center mb-2" ] facts
+
+
+factBadge : String -> Html Msg
+factBadge factString =
+    span [ class "badge badge-secondary mr-2" ] [ text factString ]

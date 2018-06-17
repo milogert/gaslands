@@ -43,6 +43,14 @@ render model vehicle weapon =
                 ( _, _ ) ->
                     False
 
+        attackResult =
+            case weapon.attackRoll of
+                0 ->
+                    text ""
+
+                i ->
+                    text <| " (rolled " ++ (toString i) ++ ")"
+
         fireButton =
             button
                 [ class "btn btn-sm mr-2 btn-block"
@@ -56,7 +64,9 @@ render model vehicle weapon =
                 ]
                 [ icon "crosshairs"
                 , span [ classList [ ( "d-none", weapon.attack == Nothing ) ] ]
-                    [ text <| View.Utils.renderDice weapon.attack ]
+                    [ text <| View.Utils.renderDice weapon.attack
+                    , attackResult
+                    ]
                 ]
 
         previewDamage =

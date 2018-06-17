@@ -131,6 +131,7 @@ type Msg
     | UpdatePointsAllowed String
     | SetWeaponsReady
     | SetWeaponFired Vehicle Weapon
+    | RollWeaponDie Vehicle Weapon Int
     | Import
     | SetImport String
     | Export

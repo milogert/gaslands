@@ -2,7 +2,6 @@ module Model.Decoders.Weapons exposing (..)
 
 import Json.Decode exposing (..)
 import Json.Decode.Pipeline exposing (..)
-import Model.Shared exposing (..)
 import Model.Weapons exposing (..)
 import Model.Decoders.Shared exposing (..)
 
@@ -14,7 +13,7 @@ weaponDecoder =
         |> required "wtype" wtypeDecoder
         |> optional "mountPoint" (map Just mountPointDecoder) Nothing
         |> optional "attack" (map Just diceDecoder) Nothing
-        |> hardcoded []
+        |> hardcoded 0
         |> required "range" rangeDecoder
         |> required "slots" int
         |> required "specials" (list specialDecoder)

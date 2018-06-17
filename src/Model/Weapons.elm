@@ -8,7 +8,7 @@ type alias Weapon =
     , wtype : WeaponType
     , mountPoint : Maybe WeaponMounting
     , attack : Maybe Dice
-    , attackRoll : List Int
+    , attackRoll : Int
     , range : Range
     , slots : Int
     , specials : List Special
@@ -199,7 +199,7 @@ nameToWeapon s =
 
 defaultWeapon : Weapon
 defaultWeapon =
-    Weapon "" Shooting Nothing Nothing [] Medium 0 [] 0 -1 WeaponReady 0
+    Weapon "" Shooting Nothing Nothing 0 Medium 0 [] 0 -1 WeaponReady 0
 
 
 handgun : Weapon

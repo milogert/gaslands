@@ -30,22 +30,26 @@ render model currentView isPreview v =
             vTToStr v.vtype
 
         vehicleTypeBadge =
-            span [ class "badge badge-secondary mr-2" ]
-                [ text <| vtype ]
+            View.Utils.factBadge vtype
 
         weightBadge =
-            span [ class "badge badge-secondary mr-2" ]
-                [ text <| (toString v.weight) ++ "-weight" ]
+            View.Utils.factBadge <|
+                (toString v.weight)
+                    ++ "-weight"
 
         handlingBadge =
-            span [ class "badge badge-secondary mr-2" ]
-                [ text <| (toString <| totalHandling v) ++ " handling" ]
+            View.Utils.factBadge <|
+                (toString <| totalHandling v)
+                    ++ " handling"
 
         equipmentUsed =
             List.sum (List.map .slots v.weapons)
 
         equipmentRemaining =
             toString <| v.equipment - equipmentUsed
+
+        crewBadge =
+            View.Utils.factBadge <| (toString <| totalCrew v) ++ " total crew"
 
         isCrewAvailable =
             (totalCrew v) > View.Utils.crewUsed v
@@ -263,8 +267,9 @@ render model currentView isPreview v =
                 [ name ]
 
         pointsCostBadge =
-            span [ class "badge badge-secondary mr-2" ]
-                [ text <| (toString <| vehicleCost v) ++ " points" ]
+            View.Utils.factBadge <|
+                (toString <| vehicleCost v)
+                    ++ " points"
 
         equipmentSlotsBadge =
             let
@@ -276,14 +281,17 @@ render model currentView isPreview v =
                         _ ->
                             "slots"
             in
-                span [ class "badge badge-secondary mr-2" ]
-                    [ text <| (toString v.equipment) ++ " build " ++ slots ]
+                View.Utils.factBadge <|
+                    (toString v.equipment)
+                        ++ " build "
+                        ++ slots
 
         factsHolder =
             View.Utils.factsHolder
                 [ vehicleTypeBadge
                 , pointsCostBadge
                 , weightBadge
+                , crewBadge
                 , handlingBadge
                 , equipmentSlotsBadge
                 ]
