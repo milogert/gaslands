@@ -164,10 +164,21 @@ render model currentView isPreview v =
                             [ text <| "of " ++ toString (totalHull v) ]
                         ]
 
+        renderSpecialFunc special =
+            li [] [ View.Utils.renderSpecial isPreview Nothing 0 special ]
+
+        specials =
+            case v.specials of
+                [] ->
+                    text ""
+
+                _ ->
+                    ul [] <| List.map renderSpecialFunc v.specials
+
         notes =
             div
                 [ class "form-row"
-                , classList [ ( "d-none", isPreview ) ]
+                , classList [ ( "d-none", isPreview || currentView == Overview ) ]
                 ]
                 [ View.Utils.col ""
                     [ textarea
@@ -284,6 +295,7 @@ render model currentView isPreview v =
                 , gearBox
                 , hazardTokens
                 , hullChecks
+                , specials
                 , notes
                 , weaponList
                 , upgradeList
@@ -301,7 +313,7 @@ render model currentView isPreview v =
                     ]
                     [ icon "trash-alt" ]
                 , button
-                    [ class "btn btn-sm btn-secondary float-right"
+                    [ class "btn btn-sm btn-info float-right"
                     , classList [ ( "d-none", currentView /= Overview || isPreview ) ]
                     , onClick <| ToDetails v
                     ]

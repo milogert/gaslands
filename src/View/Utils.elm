@@ -1,9 +1,10 @@
 module View.Utils exposing (icon, card, crewUsed, detailSection, renderCountDown, renderDice, renderSpecial, row, rowPlus, col, colPlus)
 
-import Html exposing (Html, node, button, div, h1, h2, h3, h4, h5, h6, hr, img, input, label, li, node, option, p, select, small, span, text, textarea, ul)
+import Html exposing (Html, node, button, div, h1, h2, h3, h4, h5, h6, hr, img, input, label, li, node, option, p, select, small, span, text, textarea, ul, b)
 import Html.Attributes exposing (checked, class, classList, disabled, for, href, id, max, min, placeholder, rel, src, type_, value)
 import Html.Events exposing (onInput)
 import Model.Model exposing (..)
+import Model.Shared exposing (..)
 import Model.Vehicles exposing (..)
 import Model.Weapons exposing (..)
 
@@ -88,6 +89,9 @@ renderSpecial isPreview ammoMsg ammoUsed s =
 
         SpecialRule s ->
             text <| s
+
+        NamedSpecialRule name rule ->
+            span [] [ b [] [ text <| name ++ ": " ], text rule ]
 
         HandlingMod i ->
             text <| "Handling modification: " ++ (toString i)

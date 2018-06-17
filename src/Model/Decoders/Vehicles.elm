@@ -3,6 +3,7 @@ module Model.Decoders.Vehicles exposing (..)
 import Json.Decode exposing (Decoder, string, int, bool, list, succeed, fail, andThen)
 import Json.Decode.Pipeline exposing (decode, required, hardcoded)
 import Model.Vehicles exposing (..)
+import Model.Decoders.Shared exposing (..)
 import Model.Decoders.Weapons exposing (..)
 import Model.Decoders.Upgrades exposing (..)
 
@@ -27,20 +28,25 @@ vehicleDecoder =
         |> required "notes" string
         |> required "cost" int
         |> required "id" int
+        |> required "specials" (list specialDecoder)
 
 
 vtypeDecoder : Decoder VehicleType
 vtypeDecoder =
     string
-        |> andThen (\str ->
-            let
-                vtype =
-                    strToVT str
-            in
-                case vtype of
-                    Just vt -> succeed vt
-                    Nothing -> fail <| str ++ " is not a valid vehicle type"
-        )
+        |> andThen
+            (\str ->
+                let
+                    vtype =
+                        strToVT str
+                in
+                    case vtype of
+                        Just vt ->
+                            succeed vt
+
+                        Nothing ->
+                            fail <| str ++ " is not a valid vehicle type"
+            )
 
 
 gearDecoder : Decoder GearTracker
@@ -53,14 +59,24 @@ gearDecoder =
 weightDecoder : Decoder WeightClass
 weightDecoder =
     string
-        |> andThen (\str ->
-            case str of
-                "Light" -> succeed Light
-                "Middle" -> succeed Middle
-                "Heavy" -> succeed Heavy
-                "Ariborne" -> succeed Airborne
-                _ -> fail <| str ++ " is not a valid weight."
-        )
+        |> andThen
+            (\str ->
+                case str of
+                    "Light" ->
+                        succeed Light
+
+                    "Middle" ->
+                        succeed Middle
+
+                    "Heavy" ->
+                        succeed Heavy
+
+                    "Ariborne" ->
+                        succeed Airborne
+
+                    _ ->
+                        fail <| str ++ " is not a valid weight."
+            )
 
 
 hullDecoder : Decoder HullHolder
@@ -72,15 +88,24 @@ hullDecoder =
 
 skidResultDecoder : Decoder SkidResult
 skidResultDecoder =
-    string |>
-        andThen skidResultHelper
+    string
+        |> andThen skidResultHelper
 
 
 skidResultHelper : String -> Decoder SkidResult
 skidResultHelper s =
     case s of
-        "Hazard" -> succeed Hazard
-        "Spin" -> succeed Spin
-        "Slide" -> succeed Slide
-        "Shift" -> succeed Shift
-        _ -> fail <| s ++ " is not a valid skid result."
+        "Hazard" ->
+            succeed Hazard
+
+        "Spin" ->
+            succeed Spin
+
+        "Slide" ->
+            succeed Slide
+
+        "Shift" ->
+            succeed Shift
+
+        _ ->
+            fail <| s ++ " is not a valid skid result."

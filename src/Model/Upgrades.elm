@@ -2,7 +2,7 @@ module Model.Upgrades exposing (Upgrade, allUpgradesList, armourPlating, extraCr
 
 import Json.Decode as D exposing (Decoder)
 import Json.Decode.Pipeline exposing (decode, required, hardcoded)
-import Model.Weapons exposing (..)
+import Model.Shared exposing (..)
 
 
 type alias Upgrade =

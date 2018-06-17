@@ -2,7 +2,9 @@ module Model.Decoders.Weapons exposing (..)
 
 import Json.Decode exposing (..)
 import Json.Decode.Pipeline exposing (..)
+import Model.Shared exposing (..)
 import Model.Weapons exposing (..)
+import Model.Decoders.Shared exposing (..)
 
 
 weaponDecoder : Decoder Weapon
@@ -51,116 +53,6 @@ mountPointDecoderHelper mountPointString =
 
         _ ->
             fail <| mountPointString ++ " is not a valid mount point type"
-
-
-specialDecoder : Decoder Special
-specialDecoder =
-    field "type" string
-        |> andThen
-            (\str ->
-                case str of
-                    "Ammo" ->
-                        ammoDecoder
-
-                    "SpecialRule" ->
-                        specialRuleDecoder
-
-                    "TrecherousSurface" ->
-                        succeed TreacherousSurface
-
-                    "Blast" ->
-                        blastDecoder
-
-                    "Fire" ->
-                        fireDecoder
-
-                    "Explosive" ->
-                        explosiveDecoder
-
-                    "Blitz" ->
-                        blitzDecoder
-
-                    "HighlyExplosive" ->
-                        highlyExplosiveDecoder
-
-                    "Electrical" ->
-                        electricalDecoder
-
-                    "HandlingMod" ->
-                        handlingModDecoder
-
-                    "HullMod" ->
-                        hullModDecoder
-
-                    "GearMod" ->
-                        gearModDecoder
-
-                    "CrewMod" ->
-                        crewModDecoder
-
-                    _ ->
-                        fail <| str ++ " is not a valid special type"
-            )
-
-
-ammoDecoder : Decoder Special
-ammoDecoder =
-    map Ammo (field "count" int)
-
-
-specialRuleDecoder : Decoder Special
-specialRuleDecoder =
-    map SpecialRule (field "text" string)
-
-
-blastDecoder : Decoder Special
-blastDecoder =
-    succeed Blast
-
-
-fireDecoder : Decoder Special
-fireDecoder =
-    succeed Fire
-
-
-explosiveDecoder : Decoder Special
-explosiveDecoder =
-    succeed Explosive
-
-
-blitzDecoder : Decoder Special
-blitzDecoder =
-    succeed Blitz
-
-
-highlyExplosiveDecoder : Decoder Special
-highlyExplosiveDecoder =
-    succeed HighlyExplosive
-
-
-electricalDecoder : Decoder Special
-electricalDecoder =
-    succeed Electrical
-
-
-handlingModDecoder : Decoder Special
-handlingModDecoder =
-    map HandlingMod (field "modifier" int)
-
-
-hullModDecoder : Decoder Special
-hullModDecoder =
-    map HullMod (field "modifier" int)
-
-
-gearModDecoder : Decoder Special
-gearModDecoder =
-    map GearMod (field "modifier" int)
-
-
-crewModDecoder : Decoder Special
-crewModDecoder =
-    map CrewMod (field "modifier" int)
 
 
 wtypeDecoder : Decoder WeaponType

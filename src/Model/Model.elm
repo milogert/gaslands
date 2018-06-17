@@ -65,7 +65,7 @@ viewToStr view =
             toString view
 
         Details v ->
-            "Details for " ++ v.name
+            v.name
 
         AddingVehicle ->
             "Adding Vehicle"

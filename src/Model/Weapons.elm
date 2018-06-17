@@ -1,5 +1,7 @@
 module Model.Weapons exposing (..)
 
+import Model.Shared exposing (..)
+
 
 type alias Weapon =
     { name : String
@@ -15,22 +17,6 @@ type alias Weapon =
     , status : WeaponStatus
     , ammoUsed : Int
     }
-
-
-type Special
-    = Ammo Int
-    | SpecialRule String
-    | TreacherousSurface
-    | Blast
-    | Fire
-    | Explosive
-    | Blitz
-    | HighlyExplosive
-    | Electrical
-    | HandlingMod Int
-    | HullMod Int
-    | GearMod Int
-    | CrewMod Int
 
 
 type WeaponType

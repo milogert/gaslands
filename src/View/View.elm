@@ -1,7 +1,7 @@
 module View.View exposing (view)
 
 import Html exposing (Html, button, div, h1, h2, h3, h4, h5, h6, hr, img, input, label, li, node, option, p, select, small, span, text, textarea, ul, form, a)
-import Html.Attributes exposing (checked, class, classList, disabled, for, href, id, max, min, placeholder, rel, src, type_, value, readonly)
+import Html.Attributes exposing (checked, class, classList, disabled, for, href, id, max, min, placeholder, rel, src, type_, value, readonly, style)
 import Html.Events exposing (onClick, onInput)
 import Model.Model exposing (..)
 import View.Details
@@ -40,7 +40,7 @@ view model =
             button
                 [ -- classList [ ( "d-none", model.view == Overview ) ]
                   disabled <| model.view == Overview
-                , class "btn btn-default mr-2 btn-sm"
+                , class "btn btn-light btn-sm btn-block"
                 , onClick viewToGoTo
                 ]
                 [ icon "arrow-left" ]
@@ -55,12 +55,15 @@ view model =
             (toString model.gearPhase)
     in
         div [ class "container" ]
-            [ row
-                [ h2 [ class "col-md col-sm-12 mt-3" ]
-                    [ backButton
-                    , text <| viewToStr model.view
+            [ View.Utils.rowPlus [ "mt-2" ]
+                [ View.Utils.colPlus [ "auto" ] [ "my-auto" ] [ backButton ]
+                , View.Utils.colPlus [ "md", "sm-12" ]
+                    []
+                    [ h2 [ style [ ( "margin-bottom", "0" ) ] ]
+                        [ text <| viewToStr model.view
+                        ]
                     ]
-                , View.Utils.colPlus [ "lg-2", "md-2", "sm-3", "xs-4" ]
+                , View.Utils.colPlus [ "auto" ]
                     [ "my-auto" ]
                     [ button
                         [ class "btn btn-sm btn-primary btn-block"
@@ -95,10 +98,10 @@ view model =
                         ]
                     ]
                 , View.Utils.colPlus
-                    [ "lg-2", "md-2", "sm-3" ]
+                    [ "auto" ]
                     [ "my-auto" ]
                     [ button
-                        [ class "btn btn-sm btn-block btn-secondary", onClick ToExport ]
+                        [ class "btn btn-sm btn-block btn-light", onClick ToExport ]
                         [ icon "download", text " / ", icon "upload" ]
                     ]
                 ]

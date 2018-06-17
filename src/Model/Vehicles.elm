@@ -1,5 +1,6 @@
 module Model.Vehicles exposing (..)
 
+import Model.Shared exposing (..)
 import Model.Upgrades exposing (..)
 import Model.Weapons exposing (..)
 
@@ -21,8 +22,9 @@ type alias Vehicle =
     , notes : String
     , cost : Int
     , id : Int
+    , specials : List Special
     }
-    
+
 
 type VehicleType
     = Bike
@@ -140,6 +142,7 @@ emptyVehicle vtype index =
             ""
             cost
             index
+            []
 
 
 typeToWeight : VehicleType -> WeightClass
@@ -476,3 +479,52 @@ strToVT s =
 
         _ ->
             Nothing
+
+
+typeToSpecials : VehicleType -> List Special
+typeToSpecials type_ =
+    case type_ of
+        Bike ->
+            [ NamedSpecialRule "Full Throttle" "This vehicle considers the long straight maneuver template to be permitted in any gear. The long straight is not considered either hazardous or trivial in any gear."
+            , NamedSpecialRule "Pivot" "At the start of this vehicle's activation, if this vehicle's current gar is 1, this vehicle may make a pivot about its centre to face any direction. This pivot cannot cause a collision, and cannot leave this vehicle touching an obstruction."
+            ]
+
+        Buggy ->
+            [ NamedSpecialRule "Roll Cage" "When this vehicle suffers a flip, this vehicle may choose to ignore the 2 hits received from the flip."
+            ]
+
+        PerformanceCar ->
+            [ NamedSpecialRule "Slip Away" "If this vehicle is targeted wtih a tailgate, T-bone or sideswipe smash attack, and this vehicle declares evade as its reaction, this vehicle may perform a free activation immediately after tha active vehicle completes its activation."
+            , SpecialRule "This free activation does not count as the vehicle's activation this gear phase."
+            ]
+
+        MonsterTruck ->
+            [ NamedSpecialRule "Big Tires" "This vehicle may ignore the penalty for being on a rough surface, and considers a treacherous surface to be a rough surface."
+            , NamedSpecialRule "Crush Attack" "After resolving a collision with a Bike, Buggy, Car, Pickup Truck, Performance Car, Lightweight Obstacle or Middleweight Obstacle during movement step 1.7, this vehicle may ignore the obstruction for the remainder of its movement step, as it drives right over the top of it."
+            ]
+
+        WarRig ->
+            [ SpecialRule "See Page 52 of the core rulebook." ]
+
+        Helicopter ->
+            [ NamedSpecialRule "Air Wolf" "At the start of this vehicle's activation, this vehicle may make a single pivot about its centre point, up to 90 degrees."
+            , NamedSpecialRule "Airborne" "This vehicle ignores obstructions, dropped weapons and terrain at all times, except that this vehicle may target other vehicles in its attack step."
+            , SpecialRule "Other vehicles ignore this vehicle at all times, except that other vehicles may target this vehicle during their attack steps. This vehicle cannot be involved in collisions."
+            , NamedSpecialRule "Bombs Away" "When purchasing weapons, this vehicle may count dropped weapons as requiring 0 build slots."
+            ]
+
+        Gyrocopter ->
+            [ NamedSpecialRule "Air Wolf" "At the start of this vehicle's activation, this vehicle may make a single pivot about its centre point, up to 90 degrees."
+            , NamedSpecialRule "Airborne" "This vehicle ignores obstructions, dropped weapons and terrain at all times, except that this vehicle may target other vehicles in its attack step."
+            , SpecialRule "Other vehicles ignore this vehicle at all times, except that other vehicles may target this vehicle during their attack steps. This vehicle cannot be involved in collisions."
+            , NamedSpecialRule "Bombs Away" "When purchasing weapons, this vehicle may count dropped weapons as requiring 0 build slots."
+            ]
+
+        Tank ->
+            [ NamedSpecialRule "Pivot" "At the start of this vehicle's activation, if this vehicle's current gar is 1, this vehicle may make a pivot about its centre to face any direction. This pivot cannot cause a collision, and cannot leave this vehicle touching an obstruction."
+            , NamedSpecialRule "Crush Attack" "After resolving a collision with a Bike, Buggy, Car, Pickup Truck, Performance Car, Lightweight Obstacle or Middleweight Obstacle during movement step 1.7, this vehicle may ignore the obstruction for the remainder of its movement step, as it drives right over the top of it."
+            , NamedSpecialRule "All Terrain" "This vehicle may ignore the penalties for rough and treacherous surfaces."
+            ]
+
+        _ ->
+            []

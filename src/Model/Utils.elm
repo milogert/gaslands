@@ -1,7 +1,7 @@
 module Model.Utils exposing (totalHandling, totalHull, totalGear, totalCrew)
 
+import Model.Shared exposing (..)
 import Model.Vehicles exposing (..)
-import Model.Weapons exposing (..)
 
 
 modToInt : Special -> Int

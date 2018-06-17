@@ -1,6 +1,8 @@
-module Model.Encoders.Weapons exposing (weaponEncoder, specialEncoder)
+module Model.Encoders.Weapons exposing (weaponEncoder)
 
 import Json.Encode exposing (..)
+import Model.Encoders.Shared exposing (..)
+import Model.Shared exposing (..)
 import Model.Weapons exposing (..)
 
 
@@ -29,69 +31,6 @@ mountPointEncoder maybePoint =
 
         Nothing ->
             null
-
-
-specialEncoder : Special -> Value
-specialEncoder s =
-    case s of
-        Ammo i ->
-            ammoEncoder i
-
-        SpecialRule t ->
-            specialRuleEncoder t
-
-        TreacherousSurface ->
-            genericEncoder s
-
-        Blast ->
-            genericEncoder s
-
-        Fire ->
-            genericEncoder s
-
-        Explosive ->
-            genericEncoder s
-
-        Blitz ->
-            genericEncoder s
-
-        HighlyExplosive ->
-            genericEncoder s
-
-        Electrical ->
-            genericEncoder s
-
-        HandlingMod i ->
-            modEncoder s i
-
-        HullMod i ->
-            modEncoder s i
-
-        GearMod i ->
-            modEncoder s i
-
-        CrewMod i ->
-            modEncoder s i
-
-
-ammoEncoder : Int -> Value
-ammoEncoder i =
-    object [ ( "type", string "Ammo" ), ( "count", int i ) ]
-
-
-specialRuleEncoder : String -> Value
-specialRuleEncoder t =
-    object [ ( "type", string "SpecialRule" ), ( "text", string t ) ]
-
-
-genericEncoder : Special -> Value
-genericEncoder s =
-    object [ ( "type", string <| toString s ) ]
-
-
-modEncoder : Special -> Int -> Value
-modEncoder s i =
-    object [ ( "type", string <| toString s ), ( "modifier", int i ) ]
 
 
 diceEncoder : Maybe Dice -> Value

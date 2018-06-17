@@ -22,16 +22,26 @@ view model =
 
         disabledButton =
             case model.tmpVehicle of
-                Just _ ->
-                    False
+                Just tmpVehicle ->
+                    case tmpVehicle.name of
+                        "" ->
+                            True
+
+                        _ ->
+                            False
 
                 Nothing ->
                     True
 
         buttonText =
             case model.tmpVehicle of
-                Just _ ->
-                    "Add Vehicle"
+                Just tmpVehicle ->
+                    case tmpVehicle.name of
+                        "" ->
+                            "Input Name"
+
+                        _ ->
+                            "Add " ++ tmpVehicle.name
 
                 Nothing ->
                     "Select Vehicle"

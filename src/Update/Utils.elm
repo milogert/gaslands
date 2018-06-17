@@ -147,6 +147,9 @@ setTmpVehicleType model vtstr =
         cost =
             typeToCost vtype
 
+        specials =
+            typeToSpecials vtype
+
         newtv =
             Vehicle
                 name
@@ -165,6 +168,7 @@ setTmpVehicleType model vtstr =
                 notes
                 cost
                 -1
+                specials
     in
         { model | tmpVehicle = Just newtv } ! []
 
