@@ -257,6 +257,7 @@ render model currentView isPreview v =
                 [ classList
                     [ ( "form-inline", isPreview )
                     , ( "card-title", currentView /= Details v )
+                    , ( "d-none", currentView == Details v )
                     ]
                 ]
                 [ name ]
@@ -279,7 +280,7 @@ render model currentView isPreview v =
                     [ text <| (toString v.equipment) ++ " build " ++ slots ]
 
         factsHolder =
-            div [ class "mb-2" ]
+            View.Utils.factsHolder
                 [ vehicleTypeBadge
                 , pointsCostBadge
                 , weightBadge

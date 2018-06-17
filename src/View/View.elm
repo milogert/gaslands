@@ -57,8 +57,7 @@ view model =
         div [ class "container" ]
             [ View.Utils.rowPlus [ "mt-2" ]
                 [ View.Utils.colPlus [ "auto" ] [ "my-auto" ] [ backButton ]
-                , View.Utils.colPlus [ "md", "sm-12" ]
-                    []
+                , div [ class "col" ]
                     [ h2 [ style [ ( "margin-bottom", "0" ) ] ]
                         [ text <| viewToStr model.view
                         ]
@@ -70,7 +69,7 @@ view model =
                         , value <| toString model.gearPhase
                         , onClick NextGearPhase
                         ]
-                        [ icon "cogs", text gearPhaseText ]
+                        [ icon "cogs", span [ class "badge badge-light" ] [ text gearPhaseText ] ]
                     ]
                 , View.Utils.colPlus [ "lg-2", "md-3", "sm" ]
                     [ "my-auto" ]

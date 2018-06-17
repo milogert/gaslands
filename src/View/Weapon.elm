@@ -45,7 +45,7 @@ render model vehicle weapon =
 
         fireButton =
             button
-                [ class "btn btn-sm mr-2"
+                [ class "btn btn-sm mr-2 btn-block"
                 , classList
                     [ ( "btn-secondary", weapon.status == WeaponFired )
                     , ( "btn-primary", weapon.status == WeaponReady )
@@ -140,7 +140,7 @@ render model vehicle weapon =
                     [ text <| toString finalCost ++ " " ++ pointLabel ]
 
         factsHolder =
-            div [ class "mb-2" ]
+            View.Utils.factsHolder
                 [ mountPoint
                 , slotsTakenBadge
                 , previewDamage
@@ -163,13 +163,13 @@ render model vehicle weapon =
         View.EquipmentLayout.render
             (not isPreview)
             [ View.Utils.row
-                [ div
-                    [ class "col-md-12 col" ]
+                [ div [ class "col-md-12 col mb-2" ]
                     [ h6 [] [ text <| weapon.name ++ " " ] ]
-                , div [ class "col-md-12 col" ] [ fireButton ]
-                , div [ class "col-md-12 col" ]
+                , View.Utils.colPlus [ "md-12", "auto" ] [ "mb-2" ] [ fireButton ]
+                , View.Utils.colPlus [ "md-12", "auto" ]
+                    [ "mb-2" ]
                     [ button
-                        [ class "btn btn-sm btn-danger"
+                        [ class "btn btn-sm btn-danger btn-block"
                         , classList [ ( "d-none", isPreview ) ]
                         , onClick <| DeleteWeapon vehicle weapon
                         ]
