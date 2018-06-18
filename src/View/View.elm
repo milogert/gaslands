@@ -56,7 +56,9 @@ view model =
     in
         div [ class "container" ]
             [ View.Utils.rowPlus [ "mt-2" ]
-                [ View.Utils.colPlus [ "auto" ] [ "my-auto" ] [ backButton ]
+                [ View.Utils.colPlus [ "auto" ]
+                    [ "my-auto" ]
+                    [ backButton ]
                 , div [ class "col" ]
                     [ h2 [ style [ ( "margin-bottom", "0" ) ] ]
                         [ text <| viewToStr model.view
@@ -71,7 +73,7 @@ view model =
                         ]
                         [ icon "cogs", span [ class "badge badge-light" ] [ text gearPhaseText ] ]
                     ]
-                , View.Utils.colPlus [ "lg-2", "md-3", "sm" ]
+                , View.Utils.colPlus [ "lg-2", "md-3", "" ]
                     [ "my-auto" ]
                     [ div [ class "form-group form-row mb-0" ]
                         [ label
@@ -96,8 +98,7 @@ view model =
                             ]
                         ]
                     ]
-                , View.Utils.colPlus
-                    [ "auto" ]
+                , View.Utils.colPlus [ "auto" ]
                     [ "my-auto" ]
                     [ button
                         [ class "btn btn-sm btn-block btn-light", onClick ToExport ]
@@ -107,6 +108,8 @@ view model =
             , hr [] []
             , displayAlert model
             , render model
+
+            --, sizeShower
             ]
 
 
@@ -150,3 +153,24 @@ render model =
 
         ImportExport ->
             View.ImportExport.view model
+
+
+sizeShower : Html Msg
+sizeShower =
+    div []
+        [ span
+            [ class "d-sm-none d-md-none d-lg-none d-xl-none" ]
+            [ text "xs" ]
+        , span
+            [ class "d-sm-inline d-md-none d-lg-none d-xl-none" ]
+            [ text "sm" ]
+        , span
+            [ class "d-sm-none d-md-inline d-lg-none d-xl-none" ]
+            [ text "md" ]
+        , span
+            [ class "d-sm-none d-md-none d-lg-inline d-xl-none" ]
+            [ text "lg" ]
+        , span
+            [ class "d-sm-none d-md-none d-lg-none d-xl-inline" ]
+            [ text "xl" ]
+        ]

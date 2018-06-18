@@ -1,26 +1,38 @@
 module View.ImportExport exposing (view)
 
 import Html exposing (Html, button, div, text, textarea)
-import Html.Attributes exposing (class)
+import Html.Attributes exposing (class, rows, style)
 import Html.Events exposing (onClick, onInput)
 import Model.Model exposing (..)
 import View.Utils exposing (icon)
 
+
 view : Model -> Html Msg
 view model =
     View.Utils.row
-        [ View.Utils.col "6"
+        [ View.Utils.colPlus [ "6" ]
+            [ "mb-2" ]
             [ button
-                [ class "btn btn-primary btn-block btn-lg"
+                [ class "btn btn-primary btn-block"
                 , onClick Export
                 ]
                 [ icon "download", text " Export" ]
             ]
-        , View.Utils.col "6"
-            [ button [ class "btn btn-primary btn-block btn-lg", onClick Import ]
+        , View.Utils.colPlus [ "6" ]
+            [ "mb-2" ]
+            [ button
+                [ class "btn btn-primary btn-block"
+                , onClick Import
+                ]
                 [ icon "upload", text " Import" ]
-            , div [] [ textarea [ class "form-control mt-2", onInput SetImport ] [] ]
+            ]
+        , View.Utils.col "12"
+            [ textarea
+                [ class "form-control mt-2"
+                , onInput SetImport
+                , rows 15
+                , style [ ( "font-family", "monospace" ) ]
+                ]
+                [ text model.importValue ]
             ]
         ]
-
-

@@ -200,4 +200,4 @@ update msg model =
                 { model | importValue = json } ! []
 
             Export ->
-                model ! [ exportModel <| Json.Encode.encode 4 <| modelEncoder model ]
+                { model | importValue = Json.Encode.encode 4 <| modelEncoder model } ! []
