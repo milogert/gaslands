@@ -43,7 +43,6 @@ view model v =
                 , select
                     [ onInput TmpUpgradeUpdate
                     , class "form-control mb-3"
-                    , multiple True
                     , size 8
                     ]
                     (allUpgradesList

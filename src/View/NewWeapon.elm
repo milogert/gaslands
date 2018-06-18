@@ -49,7 +49,6 @@ view model v =
                 , select
                     [ onInput TmpWeaponUpdate
                     , class "form-control mb-3"
-                    , multiple True
                     , size 8
                     ]
                     (allWeaponsList

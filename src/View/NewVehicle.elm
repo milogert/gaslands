@@ -56,14 +56,16 @@ view model =
                     [ text buttonText ]
                 , select
                     [ onInput TmpVehicleType
-                    , class "form-control"
-                    , multiple True
+                    , class "form-control mb-3"
                     , size 8
                     ]
-                    (List.map
-                        (\x -> option [ value <| vTToStr x ] [ text <| vTToStr x ])
-                        allVehicleTypes
-                    )
+                  <|
+                    List.map vehicleOption allVehicleTypes
                 ]
             , View.Utils.col "md-9" [ body ]
             ]
+
+
+vehicleOption : VehicleType -> Html Msg
+vehicleOption vt =
+    option [ value <| vTToStr vt ] [ text <| vTToStr vt ]
