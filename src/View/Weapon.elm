@@ -4,6 +4,7 @@ import Html exposing (Html, button, div, h1, h2, h3, h4, h5, h6, hr, img, input,
 import Html.Attributes exposing (checked, class, classList, disabled, for, href, id, max, min, placeholder, rel, src, type_, value)
 import Html.Events exposing (onClick, onInput)
 import Model.Model exposing (..)
+import Model.Utils exposing (..)
 import Model.Vehicles exposing (..)
 import Model.Weapons exposing (..)
 import View.Utils exposing (icon)
@@ -30,7 +31,7 @@ render model vehicle weapon =
                     SetWeaponFired vehicle weapon
 
         crewAvailable =
-            View.Utils.crewUsed vehicle < vehicle.crew
+            View.Utils.crewUsed vehicle < totalCrew vehicle
 
         canFire =
             case ( weapon.status, crewAvailable ) of
