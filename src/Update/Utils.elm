@@ -236,8 +236,8 @@ updateHazards model v newHazards =
         { model | view = newView, vehicles = vehiclesList } ! []
 
 
-updateHull : Model -> Vehicle -> String -> ( Model, Cmd Msg )
-updateHull model v strCurrent =
+updateHull : Model -> Vehicle -> Int -> ( Model, Cmd Msg )
+updateHull model v currentHull =
     let
         pre =
             List.take v.id model.vehicles
@@ -245,11 +245,8 @@ updateHull model v strCurrent =
         nhull =
             v.hull
 
-        current =
-            String.toInt strCurrent |> Result.toMaybe |> Maybe.withDefault 0
-
         nv =
-            { v | hull = { nhull | current = current } }
+            { v | hull = { nhull | current = currentHull } }
 
         post =
             List.drop (v.id + 1) model.vehicles

@@ -133,7 +133,7 @@ render model currentView isPreview v =
                         (iconClass "shield-alt" [ "mx-auto" ])
                         0
                         v.hull.max
-                        v.hull.max
+                        v.hull.current
                         (ShiftHull v -1)
                         (ShiftHull v 1)
                         (UpdateHull v)

@@ -119,10 +119,10 @@ update msg model =
                 Update.Utils.updateHazards model v <| clamp min max <| v.hazards + mod
 
             UpdateHull v strCurrent ->
-                Update.Utils.updateHull model v strCurrent
+                Update.Utils.updateHull model v (String.toInt strCurrent |> Result.withDefault 1)
 
             ShiftHull v mod min max ->
-                Update.Utils.updateHazards model v <| clamp min max <| v.hull.current + mod
+                Update.Utils.updateHull model v <| clamp min max <| v.hull.current + mod
 
             UpdateCrew v strCurrent ->
                 Update.Utils.updateCrew model v strCurrent
