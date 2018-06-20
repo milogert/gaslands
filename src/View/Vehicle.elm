@@ -1,14 +1,14 @@
 module View.Vehicle exposing (render)
 
 import Html exposing (Html, button, div, h1, h2, h3, h4, h5, h6, hr, img, input, label, li, node, option, p, select, small, span, text, textarea, ul)
-import Html.Attributes exposing (checked, class, classList, disabled, for, href, id, max, min, placeholder, rel, src, type_, value, max, attribute)
+import Html.Attributes exposing (checked, class, classList, disabled, for, href, id, max, min, placeholder, rel, src, type_, value, max, attribute, style)
 import Html.Events exposing (onClick, onInput)
 import Model.Model exposing (..)
 import Model.Utils exposing (..)
 import Model.Vehicles exposing (..)
 import Model.Weapons exposing (handgun)
 import View.Upgrade
-import View.Utils exposing (icon)
+import View.Utils exposing (icon, iconClass)
 import View.Weapon
 
 
@@ -100,46 +100,26 @@ render model currentView isPreview v =
                     text ""
 
                 ( False, False ) ->
-                    div [ class "form-row" ]
-                        [ label [ for "gearBox", class "col-form-label" ]
-                            [ icon "cogs" ]
-                        , View.Utils.col ""
-                            [ input
-                                [ class "form-control form-control-sm"
-                                , type_ "number"
-                                , id "gearBox"
-                                , Html.Attributes.min "1"
-                                , Html.Attributes.max <| toString (totalGear v)
-                                , onInput (UpdateGear v)
-                                , value <| toString v.gear.current
-                                ]
-                                []
-                            ]
-                        , label [ for "gearBox", class "col-form-label" ]
-                            [ text <| "of " ++ toString (totalGear v) ]
-                        ]
+                    counterElement
+                        (iconClass "cogs" [ "mx-auto" ])
+                        1
+                        v.gear.max
+                        v.gear.current
+                        (ShiftGear v -1)
+                        (ShiftGear v 1)
+                        (UpdateGear v)
 
         hazardTokens =
             div
-                [ class "form-row"
-                , classList [ ( "d-none", isPreview ) ]
-                ]
-                [ label [ for "hazardsGained", class "col-form-label" ]
-                    [ icon "exclamation-triangle" ]
-                , View.Utils.col ""
-                    [ input
-                        [ class "form-control form-control-sm"
-                        , type_ "number"
-                        , id "hazardsGained"
-                        , Html.Attributes.min "0"
-                        , Html.Attributes.max "6"
-                        , onInput (UpdateHazards v)
-                        , value <| toString v.hazards
-                        ]
-                        []
-                    ]
-                , label [ for "hazardsGained", class "col-form-label" ]
-                    [ text <| "of 6" ]
+                [ classList [ ( "d-none", isPreview ) ] ]
+                [ counterElement
+                    (iconClass "exclamation-triangle" [ "mx-auto" ])
+                    0
+                    6
+                    v.hazards
+                    (ShiftHazards v -1)
+                    (ShiftHazards v 1)
+                    (UpdateHazards v)
                 ]
 
         hullChecks =
@@ -149,24 +129,14 @@ render model currentView isPreview v =
                         [ text <| "Hull Max: " ++ toString (totalHull v) ]
 
                 ( False, _ ) ->
-                    div [ class "form-row" ]
-                        [ label [ for "hullInput", class "col-form-label" ]
-                            [ icon "shield-alt" ]
-                        , View.Utils.col ""
-                            [ input
-                                [ class "form-control form-control-sm"
-                                , id "hullInput"
-                                , type_ "number"
-                                , onInput <| UpdateHull v
-                                , value <| toString v.hull.current
-                                , Html.Attributes.min "0"
-                                , Html.Attributes.max <| toString (totalHull v)
-                                ]
-                                []
-                            ]
-                        , label [ for "hullInput", class "col-form-label" ]
-                            [ text <| "of " ++ toString (totalHull v) ]
-                        ]
+                    counterElement
+                        (iconClass "shield-alt" [ "mx-auto" ])
+                        0
+                        v.hull.max
+                        v.hull.max
+                        (ShiftHull v -1)
+                        (ShiftHull v 1)
+                        (UpdateHull v)
 
         renderSpecialFunc special =
             li [] [ View.Utils.renderSpecial isPreview Nothing 0 special ]
@@ -335,3 +305,56 @@ render model currentView isPreview v =
 
             _ ->
                 View.Utils.card [ ( "border-danger", wrecked ) ] body footer isPreview
+
+
+counterElement :
+    Html Msg
+    -> Int
+    -> Int
+    -> Int
+    -> (Int -> Int -> Msg)
+    -> (Int -> Int -> Msg)
+    -> (String -> Msg)
+    -> Html Msg
+counterElement icon_ min max counterValue decrementMsg incrementMsg inputMsg =
+    div [ class "mb-2 input-group" ]
+        [ div [ class "input-group-prepend" ]
+            [ span
+                [ class "input-group-text"
+                , style
+                    [ ( "min-width", "4rem" )
+                    , ( "text-align", "center" )
+                    ]
+                ]
+                [ icon_ ]
+            , button
+                [ class "btn btn-outline-secondary"
+                , onClick <| decrementMsg min max
+                ]
+                [ text "-" ]
+            ]
+        , input
+            [ class "form-control"
+            , type_ "number"
+            , onInput inputMsg
+            , value <| toString counterValue
+            , Html.Attributes.min <| toString min
+            , Html.Attributes.max <| toString max
+            , style [ ( "text-align", "center" ) ]
+            ]
+            []
+        , div [ class "input-group-append" ]
+            [ button
+                [ class "btn btn-outline-secondary"
+                , onClick <| incrementMsg min max
+                ]
+                [ text "+" ]
+            , span
+                [ class "input-group-text"
+                , style
+                    [ ( "min-width", "4rem" )
+                    ]
+                ]
+                [ span [ class "mx-auto" ] [ text <| "of " ++ (toString max) ] ]
+            ]
+        ]

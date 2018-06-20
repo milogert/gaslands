@@ -5,9 +5,9 @@ import Json.Decode
 import Model.Decoders.Model exposing (modelDecoder)
 import Model.Encoders.Model exposing (modelEncoder)
 import Model.Model exposing (..)
+import Ports.Ports exposing (..)
 import Model.Upgrades exposing (..)
 import Model.Weapons exposing (..)
-import Ports.Ports exposing (..)
 import Update.Utils
 
 
@@ -109,11 +109,20 @@ update msg model =
             UpdateGear v strCurrent ->
                 Update.Utils.updateGear model v (String.toInt strCurrent |> Result.withDefault 1)
 
+            ShiftGear v mod min max ->
+                Update.Utils.updateGear model v <| clamp min max <| v.gear.current + mod
+
             UpdateHazards v strCurrent ->
                 Update.Utils.updateHazards model v (String.toInt strCurrent |> Result.withDefault 1)
 
+            ShiftHazards v mod min max ->
+                Update.Utils.updateHazards model v <| clamp min max <| v.hazards + mod
+
             UpdateHull v strCurrent ->
                 Update.Utils.updateHull model v strCurrent
+
+            ShiftHull v mod min max ->
+                Update.Utils.updateHazards model v <| clamp min max <| v.hull.current + mod
 
             UpdateCrew v strCurrent ->
                 Update.Utils.updateCrew model v strCurrent

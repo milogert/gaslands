@@ -119,8 +119,11 @@ type Msg
     | NextGearPhase
     | UpdateActivated Vehicle Bool
     | UpdateGear Vehicle String
+    | ShiftGear Vehicle Int Int Int
     | UpdateHazards Vehicle String
+    | ShiftHazards Vehicle Int Int Int
     | UpdateHull Vehicle String
+    | ShiftHull Vehicle Int Int Int
     | UpdateCrew Vehicle String
     | UpdateEquipment Vehicle String
     | UpdateNotes Bool Vehicle String
