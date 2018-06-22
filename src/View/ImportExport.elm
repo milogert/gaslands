@@ -10,7 +10,7 @@ import View.Utils exposing (icon)
 view : Model -> Html Msg
 view model =
     View.Utils.row
-        [ View.Utils.colPlus [ "6" ]
+        [ View.Utils.colPlus [ "4" ]
             [ "mb-2" ]
             [ button
                 [ class "btn btn-primary btn-block"
@@ -18,7 +18,15 @@ view model =
                 ]
                 [ icon "download", text " Export" ]
             ]
-        , View.Utils.colPlus [ "6" ]
+        , View.Utils.colPlus [ "4" ]
+            [ "mb-2" ]
+            [ button
+                [ class "btn btn-primary btn-block"
+                , onClick Share
+                ]
+                [ icon "share", text " Share" ]
+            ]
+        , View.Utils.colPlus [ "4" ]
             [ "mb-2" ]
             [ button
                 [ class "btn btn-primary btn-block"

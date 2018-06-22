@@ -138,3 +138,4 @@ type Msg
     | Import
     | SetImport String
     | Export
+    | Share

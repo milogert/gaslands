@@ -210,3 +210,7 @@ update msg model =
 
             Export ->
                 { model | importValue = Json.Encode.encode 4 <| modelEncoder model } ! []
+
+            Share ->
+                model ! [ share model.importValue ]
+
