@@ -66,7 +66,7 @@ view model =
             case model.view of
                 Overview ->
                     input
-                        [ class "form-control form-control-sm"
+                        [ class "form-control form-control-lg"
                         , classList [ ( "d-none", not <| model.view == Overview ) ]
                         , type_ "text"
                         , onInput UpdateTeamName
