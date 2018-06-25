@@ -129,7 +129,8 @@ view model =
                 ]
             , displayAlert model
             , render model
-            , sizeShower
+
+            --, sizeShower
             ]
 
 

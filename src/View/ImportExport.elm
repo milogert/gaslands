@@ -20,7 +20,7 @@ view model =
     in
         div []
             [ View.Utils.row
-                [ View.Utils.colPlus [ "4", "sm-12" ]
+                [ View.Utils.colPlus [ "md-4", "12" ]
                     [ "mb-2" ]
                     [ button
                         [ class "btn btn-primary btn-block"
@@ -30,7 +30,7 @@ view model =
                         , text <| " Save Team \"" ++ teamName ++ "\""
                         ]
                     ]
-                , View.Utils.colPlus [ "4", "sm-6" ]
+                , View.Utils.colPlus [ "md-4", "6" ]
                     [ "mb-2" ]
                     [ button
                         [ class "btn btn-primary btn-block"
@@ -38,7 +38,7 @@ view model =
                         ]
                         [ icon "share", text " Share" ]
                     ]
-                , View.Utils.colPlus [ "4", "sm-6" ]
+                , View.Utils.colPlus [ "md-4", "6" ]
                     [ "mb-2" ]
                     [ button
                         [ class "btn btn-primary btn-block"
@@ -48,13 +48,13 @@ view model =
                     ]
                 ]
             , View.Utils.row
-                [ View.Utils.colPlus [ "4", "sm-12" ]
+                [ View.Utils.colPlus [ "md-4", "12" ]
                     []
                     [ ul
                         []
                         (List.map storageMapper model.storageKeys)
                     ]
-                , View.Utils.colPlus [ "8", "sm-12" ]
+                , View.Utils.colPlus [ "md-8", "12" ]
                     []
                     [ textarea
                         [ class "form-control mt-2"
