@@ -3,10 +3,12 @@ module Model.Model exposing (CurrentView(..), ErrorType(..), Model, Msg(..), ini
 import Model.Upgrades exposing (..)
 import Model.Vehicles exposing (..)
 import Model.Weapons exposing (..)
+import Ports.Storage exposing (StorageEntry)
 
 
 type alias Model =
     { view : CurrentView
+    , teamName : Maybe String
     , pointsAllowed : Int
     , gearPhase : Int
     , vehicles : List Vehicle
@@ -15,6 +17,7 @@ type alias Model =
     , tmpUpgrade : Maybe Upgrade
     , error : List ErrorType
     , importValue : String
+    , storageKeys : List String
     }
 
 
@@ -62,7 +65,7 @@ viewToStr : CurrentView -> String
 viewToStr view =
     case view of
         Overview ->
-            toString view
+            ""
 
         Details v ->
             v.name
@@ -89,6 +92,7 @@ init : ( Model, Cmd Msg )
 init =
     Model
         Overview
+        Nothing
         50
         1
         []
@@ -97,6 +101,7 @@ init =
         Nothing
         []
         ""
+        []
         ! []
 
 
@@ -132,10 +137,17 @@ type Msg
     | TmpWeaponMountPoint String
     | TmpUpgradeUpdate String
     | UpdatePointsAllowed String
+    | UpdateTeamName String
     | SetWeaponsReady
     | SetWeaponFired Vehicle Weapon
     | RollWeaponDie Vehicle Weapon Int
     | Import
     | SetImport String
-    | Export
     | Share
+    | GetStorage String
+    | GetStorageKeys (List String)
+    | SetStorageCallback StorageEntry
+    | SaveModel
+    | LoadModel String
+    | DeleteItem String
+    | DeleteItemCallback String

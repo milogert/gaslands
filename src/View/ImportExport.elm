@@ -1,7 +1,7 @@
 module View.ImportExport exposing (view)
 
-import Html exposing (Html, button, div, text, textarea)
-import Html.Attributes exposing (class, rows, style)
+import Html exposing (Html, button, div, text, textarea, ul, li, a)
+import Html.Attributes exposing (class, rows, style, href)
 import Html.Events exposing (onClick, onInput)
 import Model.Model exposing (..)
 import View.Utils exposing (icon)
@@ -9,38 +9,74 @@ import View.Utils exposing (icon)
 
 view : Model -> Html Msg
 view model =
-    View.Utils.row
-        [ View.Utils.colPlus [ "4" ]
-            [ "mb-2" ]
-            [ button
-                [ class "btn btn-primary btn-block"
-                , onClick Export
+    let
+        teamName =
+            case model.teamName of
+                Nothing ->
+                    "NoName"
+
+                Just s ->
+                    s
+    in
+        div []
+            [ View.Utils.row
+                [ View.Utils.colPlus [ "4", "sm-12" ]
+                    [ "mb-2" ]
+                    [ button
+                        [ class "btn btn-primary btn-block"
+                        , onClick SaveModel
+                        ]
+                        [ icon "download"
+                        , text <| " Save Team \"" ++ teamName ++ "\""
+                        ]
+                    ]
+                , View.Utils.colPlus [ "4", "sm-6" ]
+                    [ "mb-2" ]
+                    [ button
+                        [ class "btn btn-primary btn-block"
+                        , onClick Share
+                        ]
+                        [ icon "share", text " Share" ]
+                    ]
+                , View.Utils.colPlus [ "4", "sm-6" ]
+                    [ "mb-2" ]
+                    [ button
+                        [ class "btn btn-primary btn-block"
+                        , onClick Import
+                        ]
+                        [ icon "upload", text " Import" ]
+                    ]
                 ]
-                [ icon "download", text " Export" ]
-            ]
-        , View.Utils.colPlus [ "4" ]
-            [ "mb-2" ]
-            [ button
-                [ class "btn btn-primary btn-block"
-                , onClick Share
+            , View.Utils.row
+                [ View.Utils.colPlus [ "4", "sm-12" ]
+                    []
+                    [ ul
+                        []
+                        (List.map storageMapper model.storageKeys)
+                    ]
+                , View.Utils.colPlus [ "8", "sm-12" ]
+                    []
+                    [ textarea
+                        [ class "form-control mt-2"
+                        , onInput SetImport
+                        , rows 15
+                        , style [ ( "font-family", "monospace" ) ]
+                        ]
+                        [ text model.importValue ]
+                    ]
                 ]
-                [ icon "share", text " Share" ]
             ]
-        , View.Utils.colPlus [ "4" ]
-            [ "mb-2" ]
-            [ button
-                [ class "btn btn-primary btn-block"
-                , onClick Import
-                ]
-                [ icon "upload", text " Import" ]
+
+
+storageMapper : String -> Html Msg
+storageMapper s =
+    li []
+        [ button
+            [ class "btn btn-link", onClick <| LoadModel s ]
+            [ text s ]
+        , button
+            [ class "btn btn-sm btn-danger"
+            , onClick <| DeleteItem s
             ]
-        , View.Utils.col "12"
-            [ textarea
-                [ class "form-control mt-2"
-                , onInput SetImport
-                , rows 15
-                , style [ ( "font-family", "monospace" ) ]
-                ]
-                [ text model.importValue ]
-            ]
+            [ icon "trash-alt" ]
         ]

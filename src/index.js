@@ -20,3 +20,43 @@ app.ports.share.subscribe(function(str) {
     }
     window.navigator.share({text: str});
 });
+
+app.ports.get.subscribe(function(str) {
+    if (!("localStorage" in window))
+    {
+        alert("Local storage is not supported currently.");
+        return;
+    }
+    app.ports.getSub.send(window.localStorage.getItem(str));
+});
+
+app.ports.getKeys.subscribe(function(str) {
+    if (!("localStorage" in window))
+    {
+        alert("Local storage is not supported currently.");
+        return;
+    }
+    app.ports.getKeysSub.send(Object.keys(window.localStorage));
+});
+
+app.ports.set.subscribe(function(storageObj) {
+    if (!("localStorage" in window))
+    {
+        alert("Local storage is not supported currently.");
+        return;
+    }
+    window.localStorage.setItem(
+        storageObj.key, storageObj.value
+    );
+    app.ports.setSub.send(storageObj);
+});
+
+app.ports.delete.subscribe(function(key) {
+    if (!("localStorage" in window))
+    {
+        alert("Local storage is not supported currently.");
+        return;
+    }
+    window.localStorage.removeItem(key);
+    app.ports.deleteSub.send(key);
+});

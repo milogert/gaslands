@@ -1,13 +1,10 @@
 module Update.Update exposing (update)
 
-import Json.Encode
-import Json.Decode
-import Model.Decoders.Model exposing (modelDecoder)
-import Model.Encoders.Model exposing (modelEncoder)
 import Model.Model exposing (..)
-import Ports.Ports exposing (..)
 import Model.Upgrades exposing (..)
 import Model.Weapons exposing (..)
+import Ports.Storage
+import Task
 import Update.Utils
 
 
@@ -20,7 +17,13 @@ update msg model =
         case msg of
             -- ROUTING.
             ToOverview ->
-                { model | view = Overview, tmpVehicle = Nothing, tmpWeapon = Nothing, tmpUpgrade = Nothing } ! []
+                { model
+                    | view = Overview
+                    , tmpVehicle = Nothing
+                    , tmpWeapon = Nothing
+                    , tmpUpgrade = Nothing
+                }
+                    ! []
 
             ToDetails v ->
                 { model | view = Details v } ! []
@@ -35,7 +38,7 @@ update msg model =
                 { model | view = AddingUpgrade v, tmpUpgrade = Nothing } ! []
 
             ToExport ->
-                { model | view = ImportExport } ! []
+                { model | view = ImportExport } ! [ Ports.Storage.getKeys "" ]
 
             -- ADDING.
             AddVehicle ->
@@ -168,6 +171,9 @@ update msg model =
             UpdatePointsAllowed s ->
                 { model | pointsAllowed = Result.withDefault 0 (String.toInt s) } ! []
 
+            UpdateTeamName s ->
+                { model | teamName = Just s } ! []
+
             -- STATE MANAGEMENT.
             SetWeaponsReady ->
                 model ! []
@@ -180,37 +186,33 @@ update msg model =
 
             -- IMPORT/EXPORT.
             Import ->
-                let
-                    decodeRes =
-                        Json.Decode.decodeString modelDecoder model.importValue
-
-                    newModel : Model
-                    newModel =
-                        case decodeRes of
-                            Ok m ->
-                                m
-
-                            Err s ->
-                                { model | error = [ JsonDecodeError s ] }
-                in
-                    { model
-                        | view = newModel.view
-                        , pointsAllowed = newModel.pointsAllowed
-                        , vehicles = newModel.vehicles
-                        , tmpVehicle = newModel.tmpVehicle
-                        , tmpWeapon = newModel.tmpWeapon
-                        , tmpUpgrade = newModel.tmpUpgrade
-                        , error = newModel.error
-                        , importValue = newModel.importValue
-                    }
-                        ! []
+                Update.Utils.import_ model
 
             SetImport json ->
                 { model | importValue = json } ! []
 
-            Export ->
-                { model | importValue = Json.Encode.encode 4 <| modelEncoder model } ! []
-
             Share ->
-                model ! [ share model.importValue ]
+                Update.Utils.share model
 
+            -- STORAGE
+            GetStorage value ->
+                { model | importValue = value } ! []
+
+            GetStorageKeys keys ->
+                { model | storageKeys = keys } ! []
+
+            SetStorageCallback entry ->
+                model ! [ Ports.Storage.getKeys "", Task.perform SetImport (Task.succeed entry.value) ]
+
+            SaveModel ->
+                Update.Utils.saveModel model
+
+            LoadModel key ->
+                model
+                    ! [ Ports.Storage.get key ]
+
+            DeleteItem key ->
+                model ! [ Ports.Storage.delete key ]
+
+            DeleteItemCallback deletedKey ->
+                model ! [ Ports.Storage.getKeys "" ]

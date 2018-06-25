@@ -7,8 +7,18 @@ import Model.Model exposing (Model)
 
 modelEncoder : Model -> Value
 modelEncoder model =
-    object 
-        [ ("pointsAllowed", int model.pointsAllowed)
-        , ("vehicles", list <| List.map vehicleEncoder model.vehicles)
+    object
+        [ ( "pointsAllowed", int model.pointsAllowed )
+        , ( "teamName", teamNameEncoder model.teamName )
+        , ( "vehicles", list <| List.map vehicleEncoder model.vehicles )
         ]
 
+
+teamNameEncoder : Maybe String -> Value
+teamNameEncoder ms =
+    case ms of
+        Nothing ->
+            null
+
+        Just s ->
+            string s

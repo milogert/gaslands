@@ -53,63 +53,83 @@ view model =
 
         gearPhaseText =
             (toString model.gearPhase)
+
+        teamName =
+            case model.teamName of
+                Nothing ->
+                    ""
+
+                Just s ->
+                    s
+
+        viewDisplay =
+            case model.view of
+                Overview ->
+                    input
+                        [ class "form-control form-control-sm"
+                        , classList [ ( "d-none", not <| model.view == Overview ) ]
+                        , type_ "text"
+                        , onInput UpdateTeamName
+                        , value teamName
+                        , placeholder "Team Name"
+                        ]
+                        []
+
+                _ ->
+                    text <| viewToStr model.view
     in
         div [ class "container" ]
-            [ View.Utils.rowPlus [ "mt-2" ]
+            [ View.Utils.rowPlus [ "mt-2", "mb-2" ]
                 [ View.Utils.colPlus [ "auto" ]
                     [ "my-auto" ]
                     [ backButton ]
-                , div [ class "col" ]
+                , View.Utils.colPlus []
+                    [ "my-auto", "col" ]
                     [ h2 [ style [ ( "margin-bottom", "0" ) ] ]
-                        [ text <| viewToStr model.view
-                        ]
+                        [ viewDisplay ]
                     ]
-                , View.Utils.colPlus [ "auto" ]
-                    [ "my-auto" ]
+                , View.Utils.colPlus [ "12", "md-auto" ]
+                    [ "my-auto", "form-inline", "col" ]
                     [ button
-                        [ class "btn btn-sm btn-primary btn-block"
+                        [ class "btn btn-sm btn-primary mr-4"
                         , value <| toString model.gearPhase
                         , onClick NextGearPhase
                         ]
                         [ icon "cogs", span [ class "badge badge-light" ] [ text gearPhaseText ] ]
-                    ]
-                , View.Utils.colPlus [ "lg-2", "md-3", "" ]
-                    [ "my-auto" ]
-                    [ div [ class "form-group form-row mb-0" ]
-                        [ label
-                            [ for "squadPoints"
-                            , class "col-form-label"
-                            ]
-                            [ text <| (toString <| currentPoints) ++ " of" ]
-                        , col ""
-                            [ input
-                                [ type_ "number"
-                                , class "form-control form-control-sm my-1"
-                                , classList
-                                    [ ( "above-points", currentPoints > maxPoints )
-                                    , ( "at-points", currentPoints == maxPoints )
-                                    , ( "below-points", currentPoints < maxPoints )
-                                    ]
-                                , id "squadPoints"
-                                , value <| toString maxPoints
-                                , onInput UpdatePointsAllowed
-                                ]
-                                []
+                    , label
+                        [ for "squadPoints"
+                        , class "col-form-label mr-2"
+                        ]
+                        [ text <| (toString <| currentPoints) ++ " of" ]
+                    , div
+                        [ class "input-group mb-0 mr-4"
+                        , style
+                            [ ( "max-width", "8rem" )
+                            , ( "width", "auto" )
                             ]
                         ]
-                    ]
-                , View.Utils.colPlus [ "auto" ]
-                    [ "my-auto" ]
-                    [ button
-                        [ class "btn btn-sm btn-block btn-light", onClick ToExport ]
+                        [ input
+                            [ type_ "number"
+                            , class "form-control form-control-sm my-1"
+                            , classList
+                                [ ( "above-points", currentPoints > maxPoints )
+                                , ( "at-points", currentPoints == maxPoints )
+                                , ( "below-points", currentPoints < maxPoints )
+                                ]
+                            , id "squadPoints"
+                            , value <| toString maxPoints
+                            , onInput UpdatePointsAllowed
+                            ]
+                            []
+                        ]
+                    , button
+                        [ class "btn btn-sm btn-light", onClick ToExport ]
                         [ icon "download", text " / ", icon "upload" ]
                     ]
                 ]
-            , hr [] []
             , displayAlert model
             , render model
-
-            --, sizeShower
+            , sizeShower
             ]
 
 
