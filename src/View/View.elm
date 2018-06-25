@@ -76,7 +76,8 @@ view model =
                         []
 
                 _ ->
-                    text <| viewToStr model.view
+                    h2 [ style [ ( "margin-bottom", "0" ) ] ]
+                        [ text <| viewToStr model.view ]
     in
         div [ class "container" ]
             [ View.Utils.rowPlus [ "mt-2", "mb-2" ]
@@ -85,9 +86,7 @@ view model =
                     [ backButton ]
                 , View.Utils.colPlus []
                     [ "my-auto", "col" ]
-                    [ h2 [ style [ ( "margin-bottom", "0" ) ] ]
-                        [ viewDisplay ]
-                    ]
+                    [ viewDisplay ]
                 , View.Utils.colPlus [ "12", "md-auto" ]
                     [ "my-auto", "form-inline", "col" ]
                     [ button
