@@ -4,7 +4,7 @@ Or, *G*as*l*ands *O*ffline *M*anager, a fully offline Gaslands (https://gaslands
 
 # Dependecies
 
-This this needs (Elm)[http://elm-lang.org/] installed. Installing `create-elm-app` also helps.
+This this needs [Elm](http://elm-lang.org/) installed. Installing `create-elm-app` also helps.
 
 # Development
 
