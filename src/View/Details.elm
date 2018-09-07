@@ -12,6 +12,6 @@ view model v =
     View.Utils.row
         [ View.Utils.col "12"
             [ div []
-                [ View.Vehicle.render model (Details v) False v ]
+                [ View.Vehicle.render model (Details v) v ]
             ]
         ]

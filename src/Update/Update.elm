@@ -124,8 +124,8 @@ update msg model =
         UpdateEquipment v strCurrent ->
             Update.Vehicle.updateEquipment model v strCurrent
 
-        UpdateNotes isPreview v notes ->
-            Update.Vehicle.updateNotes model isPreview v notes
+        UpdateNotes v notes ->
+            Update.Vehicle.updateNotes model v notes
 
         -- WEAPON.
         AddWeapon v w ->

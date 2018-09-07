@@ -71,9 +71,9 @@ card cl body footer hideFooter =
         ]
 
 
-detailSection : CurrentView -> Bool -> List (Html Msg) -> List (Html Msg) -> Html Msg
-detailSection currentView isPreview headerContents bodyContents =
-    div [ classList [ ( "d-none", currentView == Overview || isPreview ) ] ]
+detailSection : CurrentView -> List (Html Msg) -> List (Html Msg) -> Html Msg
+detailSection currentView headerContents bodyContents =
+    div [ classList [ ( "d-none", currentView == Overview ) ] ]
         [ hr [] [], h5 [] headerContents, div [] bodyContents ]
 
 

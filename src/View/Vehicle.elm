@@ -1,4 +1,4 @@
-module View.Vehicle exposing (render)
+module View.Vehicle exposing (render, renderPreview)
 
 import Html exposing (Html, button, div, h1, h2, h3, h4, h5, h6, hr, img, input, label, li, node, option, p, select, small, span, text, textarea, ul)
 import Html.Attributes exposing (checked, class, classList, disabled, for, href, id, max, min, placeholder, rel, src, type_, value, max, attribute, style)
@@ -12,19 +12,11 @@ import View.Utils exposing (icon, iconClass)
 import View.Weapon
 
 
-render : Model -> CurrentView -> Bool -> Vehicle -> Html Msg
-render model currentView isPreview v =
+render : Model -> CurrentView -> Vehicle -> Html Msg
+render model currentView v =
     let
         name =
-            if isPreview then
-                input
-                    [ onInput TmpName
-                    , placeholder "Name"
-                    , class "form-control mr-2"
-                    ]
-                    [ text v.name ]
-            else
-                span [ class "mr-2" ] [ text v.name ]
+            span [ class "mr-2" ] [ text v.name ]
 
         vtype =
             vTToStr v.vtype
@@ -77,7 +69,7 @@ render model currentView isPreview v =
         activatedCheck =
             div
                 [ class "form-row mb-2"
-                , classList [ ( "d-none", isPreview || wrecked ) ]
+                , classList [ ( "d-none", wrecked ) ]
                 ]
                 [ View.Utils.col ""
                     [ button
@@ -91,15 +83,11 @@ render model currentView isPreview v =
                 ]
 
         gearBox =
-            case ( isPreview, wrecked ) of
-                ( True, _ ) ->
-                    div []
-                        [ text <| "Gear Max: " ++ toString (totalGear v) ]
-
-                ( _, True ) ->
+            case wrecked of
+                True ->
                     text ""
 
-                ( False, False ) ->
+                False ->
                     counterElement
                         (iconClass "cogs" [ "mx-auto" ])
                         1
@@ -110,8 +98,7 @@ render model currentView isPreview v =
                         (UpdateGear v)
 
         hazardTokens =
-            div
-                [ classList [ ( "d-none", isPreview ) ] ]
+            div []
                 [ counterElement
                     (iconClass "exclamation-triangle" [ "mx-auto" ])
                     0
@@ -123,23 +110,17 @@ render model currentView isPreview v =
                 ]
 
         hullChecks =
-            case ( isPreview, wrecked ) of
-                ( True, _ ) ->
-                    div []
-                        [ text <| "Hull Max: " ++ toString (totalHull v) ]
-
-                ( False, _ ) ->
-                    counterElement
-                        (iconClass "shield-alt" [ "mx-auto" ])
-                        0
-                        v.hull.max
-                        v.hull.current
-                        (ShiftHull v -1)
-                        (ShiftHull v 1)
-                        (UpdateHull v)
+            counterElement
+                (iconClass "shield-alt" [ "mx-auto" ])
+                0
+                v.hull.max
+                v.hull.current
+                (ShiftHull v -1)
+                (ShiftHull v 1)
+                (UpdateHull v)
 
         renderSpecialFunc special =
-            li [] [ View.Utils.renderSpecial isPreview Nothing 0 special ]
+            li [] [ View.Utils.renderSpecial False Nothing 0 special ]
 
         specials =
             case v.specials of
@@ -152,11 +133,11 @@ render model currentView isPreview v =
         notes =
             div
                 [ class "form-row"
-                , classList [ ( "d-none", isPreview || currentView == Overview ) ]
+                , classList [ ( "d-none", currentView == Overview ) ]
                 ]
                 [ View.Utils.col ""
                     [ textarea
-                        [ onInput (UpdateNotes isPreview v)
+                        [ onInput (UpdateNotes v)
                         , class "form-control"
                         , placeholder "Notes"
                         ]
@@ -176,7 +157,6 @@ render model currentView isPreview v =
         weaponList =
             View.Utils.detailSection
                 currentView
-                (isPreview || wrecked)
                 [ text "Weapon List"
                 , small [ class "ml-2" ]
                     [ span
@@ -210,7 +190,6 @@ render model currentView isPreview v =
         upgradeList =
             View.Utils.detailSection
                 currentView
-                (isPreview || wrecked)
                 [ text "Upgrade List"
                 , small [ class "ml-2" ]
                     [ span [ class "badge badge-dark" ]
@@ -229,8 +208,7 @@ render model currentView isPreview v =
         header =
             h4
                 [ classList
-                    [ ( "form-inline", isPreview )
-                    , ( "card-title", currentView /= Details v )
+                    [ ( "card-title", currentView /= Details v )
                     , ( "d-none", currentView == Details v )
                     ]
                 ]
@@ -276,8 +254,8 @@ render model currentView isPreview v =
                 , hullChecks
                 , specials
                 , notes
-                , weaponList
-                , upgradeList
+                , div [ classList [("d-none", wrecked)]] [weaponList]
+                , div [ classList [("d-none", wrecked)]] [upgradeList]
                 ]
 
         footer =
@@ -287,13 +265,12 @@ render model currentView isPreview v =
                 ]
                 [ button
                     [ class "btn btn-sm btn-danger"
-                    , classList [ ( "d-none", isPreview ) ]
                     , onClick <| DeleteVehicle v
                     ]
                     [ icon "trash-alt" ]
                 , button
                     [ class "btn btn-sm btn-info float-right"
-                    , classList [ ( "d-none", currentView /= Overview || isPreview ) ]
+                    , classList [ ( "d-none", currentView /= Overview ) ]
                     , onClick <| ToDetails v
                     ]
                     [ icon "info" ]
@@ -304,7 +281,125 @@ render model currentView isPreview v =
                 div [] [ body ]
 
             _ ->
-                View.Utils.card [ ( "border-danger", wrecked ) ] body footer isPreview
+                View.Utils.card [ ( "border-danger", wrecked ) ] body footer False
+
+
+renderPreview  : Model -> CurrentView -> Vehicle -> Html Msg
+renderPreview model currentView v =
+    let
+        name =
+            input
+                [ onInput TmpName
+                , placeholder "Name"
+                , class "form-control mr-2"
+                ]
+                [ text v.name ]
+
+        vtype =
+            vTToStr v.vtype
+
+        vehicleTypeBadge =
+            View.Utils.factBadge vtype
+
+        weightBadge =
+            View.Utils.factBadge <|
+                (toString v.weight)
+                    ++ "-weight"
+
+        handlingBadge =
+            View.Utils.factBadge <|
+                (toString <| totalHandling v)
+                    ++ " handling"
+
+        equipmentUsed =
+            List.sum (List.map .slots v.weapons)
+
+        equipmentRemaining =
+            toString <| v.equipment - equipmentUsed
+
+        crewBadge =
+            View.Utils.factBadge <| (toString <| totalCrew v) ++ " total crew"
+
+        isCrewAvailable =
+            (totalCrew v) > View.Utils.crewUsed v
+
+        crewRemaining =
+            toString <| (totalCrew v) - View.Utils.crewUsed v
+
+        gearBox =
+            div [] [ text <| "Gear Max: " ++ toString (totalGear v) ]
+
+        hullChecks =
+            div [] [ text <| "Hull Max: " ++ toString (totalHull v) ]
+
+        renderSpecialFunc special =
+            li [] [ View.Utils.renderSpecial True Nothing 0 special ]
+
+        specials =
+            case v.specials of
+                [] ->
+                    text ""
+
+                _ ->
+                    ul [] <| List.map renderSpecialFunc v.specials
+
+        weaponsUsingSlots =
+            List.sum <| List.map .slots v.weapons
+
+        upgradeUsingSlots =
+            List.sum <| List.map .slots v.upgrades
+
+        totalSlotsUsed =
+            weaponsUsingSlots + upgradeUsingSlots
+
+        header =
+            h4 [ class "form-inline card-title" ] [ name ]
+
+        pointsCostBadge =
+            View.Utils.factBadge <|
+                (toString <| vehicleCost v)
+                    ++ " points"
+
+        equipmentSlotsBadge =
+            let
+                slots =
+                    case v.equipment of
+                        1 ->
+                            "slot"
+
+                        _ ->
+                            "slots"
+            in
+                View.Utils.factBadge <|
+                    (toString v.equipment)
+                        ++ " build "
+                        ++ slots
+
+        factsHolder =
+            View.Utils.factsHolder
+                [ vehicleTypeBadge
+                , pointsCostBadge
+                , weightBadge
+                , crewBadge
+                , handlingBadge
+                , equipmentSlotsBadge
+                ]
+
+        body =
+            div [ classList [ ( "card-text", currentView /= Details v ) ] ]
+                [ header
+                , factsHolder
+                , gearBox
+                , hullChecks
+                , specials
+                ]
+    in
+        case currentView of
+            Details v ->
+                div [] [ body ]
+
+            _ ->
+                View.Utils.card [] body (text "") True
 
 
 counterElement :

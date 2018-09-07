@@ -236,18 +236,13 @@ updateEquipment model v strCurrent =
         { model | vehicles = pre ++ nv :: post } ! []
 
 
-updateNotes : Model -> Bool -> Vehicle -> String -> ( Model, Cmd Msg )
-updateNotes model isPreview v notes =
-    case isPreview of
-        True ->
-            { model | tmpVehicle = Just { v | notes = notes } } ! []
-
-        False ->
-            let
-                vehiclesNew =
-                    Update.Utils.joinAround v.id { v | notes = notes } model.vehicles
-            in
-                { model | vehicles = vehiclesNew } ! []
+updateNotes : Model -> Vehicle -> String -> ( Model, Cmd Msg )
+updateNotes model v notes =
+    let
+        vehiclesNew =
+            Update.Utils.joinAround v.id { v | notes = notes } model.vehicles
+    in
+        { model | vehicles = vehiclesNew } ! []
 
 
 updateAmmoUsed : Model -> Vehicle -> Weapon -> Int -> ( Model, Cmd Msg )

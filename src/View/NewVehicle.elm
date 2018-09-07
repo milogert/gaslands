@@ -15,7 +15,7 @@ view model =
         body =
             case model.tmpVehicle of
                 Just v ->
-                    View.Vehicle.render model model.view True v
+                    View.Vehicle.renderPreview model model.view v
 
                 Nothing ->
                     text "Select a vehicle type."

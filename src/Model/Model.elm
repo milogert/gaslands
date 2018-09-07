@@ -131,7 +131,7 @@ type Msg
     | ShiftHull Vehicle Int Int Int
     | UpdateCrew Vehicle String
     | UpdateEquipment Vehicle String
-    | UpdateNotes Bool Vehicle String
+    | UpdateNotes Vehicle String
     | UpdateAmmoUsed Vehicle Weapon Int String
     | TmpWeaponUpdate String
     | TmpWeaponMountPoint String
