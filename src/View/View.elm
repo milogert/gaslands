@@ -4,6 +4,7 @@ import Html exposing (Html, button, div, h1, h2, h3, h4, h5, h6, hr, img, input,
 import Html.Attributes exposing (checked, class, classList, disabled, for, href, id, max, min, placeholder, rel, src, type_, value, readonly, style)
 import Html.Events exposing (onClick, onInput)
 import Model.Model exposing (..)
+import View.About
 import View.Details
 import View.ImportExport
 import View.NewUpgrade
@@ -34,6 +35,9 @@ view model =
                     ToOverview
 
                 Overview ->
+                    ToOverview
+
+                About ->
                     ToOverview
 
         backButton =
@@ -130,6 +134,11 @@ view model =
             , render model
 
             --, sizeShower
+            , View.Utils.col "12"
+                [ a [ href "#", onClick ToAbout ] [ text "About GlOM" ]
+                , text " - "
+                , a [ href "https://github.com/milogert/glom" ] [ iconb "github" ]
+                ]
             ]
 
 
@@ -173,6 +182,9 @@ render model =
 
         ImportExport ->
             View.ImportExport.view model
+
+        About ->
+            View.About.view
 
 
 sizeShower : Html Msg

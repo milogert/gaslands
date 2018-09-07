@@ -89,7 +89,7 @@ render model currentView v =
 
                 False ->
                     counterElement
-                        (iconClass "cogs" [ "mx-auto" ])
+                        (iconClass "fas" "cogs" [ "mx-auto" ])
                         1
                         v.gear.max
                         v.gear.current
@@ -100,7 +100,7 @@ render model currentView v =
         hazardTokens =
             div []
                 [ counterElement
-                    (iconClass "exclamation-triangle" [ "mx-auto" ])
+                    (iconClass "fas" "exclamation-triangle" [ "mx-auto" ])
                     0
                     6
                     v.hazards
@@ -111,7 +111,7 @@ render model currentView v =
 
         hullChecks =
             counterElement
-                (iconClass "shield-alt" [ "mx-auto" ])
+                (iconClass "fas" "shield-alt" [ "mx-auto" ])
                 0
                 v.hull.max
                 v.hull.current

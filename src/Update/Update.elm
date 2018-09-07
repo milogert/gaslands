@@ -39,6 +39,9 @@ update msg model =
         ToExport ->
             { model | view = ImportExport } ! [ Ports.Storage.getKeys "" ]
 
+        ToAbout ->
+            { model | view = About } ! []
+
         UpdatePointsAllowed s ->
             { model | pointsAllowed = Result.withDefault 0 (String.toInt s) } ! []
 
