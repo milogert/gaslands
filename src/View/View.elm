@@ -38,7 +38,7 @@ view model =
                     ToOverview
 
                 About ->
-                    ToOverview
+                    ToExport
 
         backButton =
             button
@@ -127,18 +127,13 @@ view model =
                         ]
                     , button
                         [ class "btn btn-sm btn-light", onClick ToExport ]
-                        [ icon "download", text " / ", icon "upload" ]
+                        [ icon "wrench" ]
                     ]
                 ]
             , displayAlert model
             , render model
 
             --, sizeShower
-            , View.Utils.col "12"
-                [ a [ href "#", onClick ToAbout ] [ text "About GlOM" ]
-                , text " - "
-                , a [ href "https://github.com/milogert/glom" ] [ iconb "github" ]
-                ]
             ]
 
 

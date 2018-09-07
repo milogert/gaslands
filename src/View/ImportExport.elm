@@ -4,7 +4,7 @@ import Html exposing (Html, button, div, text, textarea, ul, li, a)
 import Html.Attributes exposing (class, rows, style, href)
 import Html.Events exposing (onClick, onInput)
 import Model.Model exposing (..)
-import View.Utils exposing (icon)
+import View.Utils exposing (icon, iconb)
 
 
 view : Model -> Html Msg
@@ -63,6 +63,13 @@ view model =
                         , style [ ( "font-family", "monospace" ) ]
                         ]
                         [ text model.importValue ]
+                    ]
+                ]
+            , View.Utils.row
+                [ View.Utils.col "12"
+                    [ a [ href "#", onClick ToAbout ] [ text "About GlOM" ]
+                    , text " - "
+                    , a [ href "https://github.com/milogert/glom" ] [ iconb "github" ]
                     ]
                 ]
             ]
