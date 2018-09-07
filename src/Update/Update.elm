@@ -5,214 +5,210 @@ import Model.Upgrades exposing (..)
 import Model.Weapons exposing (..)
 import Ports.Storage
 import Task
-import Update.Utils
+import Update.Vehicle
+import Update.Weapon
+import Update.Upgrade
+import Update.Data
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    let
-        tv =
-            model.tmpVehicle
-    in
-        case msg of
-            -- ROUTING.
-            ToOverview ->
+    case msg of
+        -- ROUTING.
+        ToOverview ->
+            { model
+                | view = Overview
+                , tmpVehicle = Nothing
+                , tmpWeapon = Nothing
+                , tmpUpgrade = Nothing
+            }
+                ! []
+
+        ToDetails v ->
+            { model | view = Details v } ! []
+
+        ToNewVehicle ->
+            { model | view = AddingVehicle, tmpVehicle = Nothing } ! []
+
+        ToNewWeapon v ->
+            { model | view = AddingWeapon v, tmpWeapon = Nothing } ! []
+
+        ToNewUpgrade v ->
+            { model | view = AddingUpgrade v, tmpUpgrade = Nothing } ! []
+
+        ToExport ->
+            { model | view = ImportExport } ! [ Ports.Storage.getKeys "" ]
+
+        UpdatePointsAllowed s ->
+            { model | pointsAllowed = Result.withDefault 0 (String.toInt s) } ! []
+
+        UpdateTeamName s ->
+            { model | teamName = Just s } ! []
+
+        -- Vehicle.
+        AddVehicle ->
+            Update.Vehicle.addVehicle model
+
+        DeleteVehicle v ->
+            Update.Vehicle.deleteVehicle model v
+
+        NextGearPhase ->
+            let
+                weaponFunc =
+                    \w -> { w | status = WeaponReady, attackRoll = 0 }
+
+                vehicleFunc =
+                    \v -> { v | weapons = v.weapons |> List.map weaponFunc }
+
+                vs =
+                    model.vehicles
+                        |> List.map vehicleFunc
+                        |> List.map (\v -> { v | activated = False })
+
+                gearPhase =
+                    if model.gearPhase < 6 then
+                        model.gearPhase + 1
+                    else
+                        1
+            in
                 { model
                     | view = Overview
-                    , tmpVehicle = Nothing
-                    , tmpWeapon = Nothing
-                    , tmpUpgrade = Nothing
+                    , gearPhase = gearPhase
+                    , vehicles = vs
                 }
                     ! []
 
-            ToDetails v ->
-                { model | view = Details v } ! []
+        TmpName name ->
+            case model.tmpVehicle of
+                Just v ->
+                    { model | tmpVehicle = Just { v | name = name } } ! []
 
-            ToNewVehicle ->
-                { model | view = AddingVehicle, tmpVehicle = Nothing } ! []
+                Nothing ->
+                    model ! []
 
-            ToNewWeapon v ->
-                { model | view = AddingWeapon v, tmpWeapon = Nothing } ! []
+        TmpVehicleType vtstr ->
+            Update.Vehicle.setTmpVehicleType model vtstr
 
-            ToNewUpgrade v ->
-                { model | view = AddingUpgrade v, tmpUpgrade = Nothing } ! []
+        TmpNotes notes ->
+            case model.tmpVehicle of
+                Just v ->
+                    { model | tmpVehicle = Just { v | notes = notes } } ! []
 
-            ToExport ->
-                { model | view = ImportExport } ! [ Ports.Storage.getKeys "" ]
+                Nothing ->
+                    model ! []
 
-            -- ADDING.
-            AddVehicle ->
-                Update.Utils.addVehicle model
+        UpdateActivated v activated ->
+            Update.Vehicle.updateActivated model v activated
 
-            AddWeapon v w ->
-                Update.Utils.addWeapon model v w
+        UpdateGear v strCurrent ->
+            Update.Vehicle.updateGear model v (String.toInt strCurrent |> Result.withDefault 1)
 
-            AddUpgrade v u ->
-                Update.Utils.addUpgrade model v u
+        ShiftGear v mod min max ->
+            Update.Vehicle.updateGear model v <| clamp min max <| v.gear.current + mod
 
-            -- DELETING.
-            DeleteVehicle v ->
-                Update.Utils.deleteVehicle model v
+        UpdateHazards v strCurrent ->
+            Update.Vehicle.updateHazards model v (String.toInt strCurrent |> Result.withDefault 1)
 
-            DeleteWeapon v w ->
-                Update.Utils.deleteWeapon model v w
+        ShiftHazards v mod min max ->
+            Update.Vehicle.updateHazards model v <| clamp min max <| v.hazards + mod
 
-            DeleteUpgrade v u ->
-                Update.Utils.deleteUpgrade model v u
+        UpdateHull v strCurrent ->
+            Update.Vehicle.updateHull model v (String.toInt strCurrent |> Result.withDefault 1)
 
-            -- UPDATING.
-            NextGearPhase ->
-                let
-                    weaponFunc =
-                        \w -> { w | status = WeaponReady, attackRoll = 0 }
+        ShiftHull v mod min max ->
+            Update.Vehicle.updateHull model v <| clamp min max <| v.hull.current + mod
 
-                    vehicleFunc =
-                        \v -> { v | weapons = v.weapons |> List.map weaponFunc }
+        UpdateCrew v strCurrent ->
+            Update.Vehicle.updateCrew model v strCurrent
 
-                    vs =
-                        model.vehicles
-                            |> List.map vehicleFunc
-                            |> List.map (\v -> { v | activated = False })
+        UpdateEquipment v strCurrent ->
+            Update.Vehicle.updateEquipment model v strCurrent
 
-                    gearPhase =
-                        if model.gearPhase < 6 then
-                            model.gearPhase + 1
-                        else
-                            1
-                in
-                    { model
-                        | view = Overview
-                        , gearPhase = gearPhase
-                        , vehicles = vs
-                    }
-                        ! []
+        UpdateNotes isPreview v notes ->
+            Update.Vehicle.updateNotes model isPreview v notes
 
-            TmpName name ->
-                case tv of
-                    Just v ->
-                        { model | tmpVehicle = Just { v | name = name } } ! []
+        -- WEAPON.
+        AddWeapon v w ->
+            Update.Weapon.addWeapon model v w
 
-                    Nothing ->
-                        model ! []
+        DeleteWeapon v w ->
+            Update.Weapon.deleteWeapon model v w
 
-            TmpVehicleType vtstr ->
-                Update.Utils.setTmpVehicleType model vtstr
+        UpdateAmmoUsed v w total strLeft ->
+            Update.Weapon.updateAmmoUsed model v w (total - (String.toInt strLeft |> Result.withDefault 1))
 
-            TmpNotes notes ->
-                case tv of
-                    Just v ->
-                        { model | tmpVehicle = Just { v | notes = notes } } ! []
+        TmpWeaponUpdate name ->
+            let
+                w =
+                    nameToWeapon name
+            in
+                { model | tmpWeapon = w } ! []
 
-                    Nothing ->
-                        model ! []
+        TmpWeaponMountPoint mountPointStr ->
+            let
+                mountPoint =
+                    strToMountPoint mountPointStr
 
-            UpdateActivated v activated ->
-                Update.Utils.updateActivated model v activated
+                w =
+                    case model.tmpWeapon of
+                        Nothing ->
+                            Nothing
 
-            UpdateGear v strCurrent ->
-                Update.Utils.updateGear model v (String.toInt strCurrent |> Result.withDefault 1)
+                        Just tmpWeapon ->
+                            Just { tmpWeapon | mountPoint = mountPoint }
+            in
+                { model | tmpWeapon = w } ! []
+                
+        SetWeaponsReady ->
+            model ! []
 
-            ShiftGear v mod min max ->
-                Update.Utils.updateGear model v <| clamp min max <| v.gear.current + mod
+        SetWeaponFired v w ->
+            Update.Weapon.setWeaponFired model v w
 
-            UpdateHazards v strCurrent ->
-                Update.Utils.updateHazards model v (String.toInt strCurrent |> Result.withDefault 1)
+        RollWeaponDie v w result ->
+            Update.Weapon.rollWeaponDie model v w result
 
-            ShiftHazards v mod min max ->
-                Update.Utils.updateHazards model v <| clamp min max <| v.hazards + mod
+        -- UPGRADE.
+        AddUpgrade v u ->
+            Update.Upgrade.addUpgrade model v u
 
-            UpdateHull v strCurrent ->
-                Update.Utils.updateHull model v (String.toInt strCurrent |> Result.withDefault 1)
+        DeleteUpgrade v u ->
+            Update.Upgrade.deleteUpgrade model v u
 
-            ShiftHull v mod min max ->
-                Update.Utils.updateHull model v <| clamp min max <| v.hull.current + mod
+        TmpUpgradeUpdate name ->
+            let
+                u =
+                    nameToUpgrade name
+            in
+                { model | tmpUpgrade = u } ! []
 
-            UpdateCrew v strCurrent ->
-                Update.Utils.updateCrew model v strCurrent
+        -- DATA.
+        Import ->
+            Update.Data.import_ model
 
-            UpdateEquipment v strCurrent ->
-                Update.Utils.updateEquipment model v strCurrent
+        SetImport json ->
+            { model | importValue = json } ! []
 
-            UpdateNotes isPreview v notes ->
-                Update.Utils.updateNotes model isPreview v notes
+        Share ->
+            Update.Data.share model
 
-            UpdateAmmoUsed v w total strLeft ->
-                Update.Utils.updateAmmoUsed model v w (total - (String.toInt strLeft |> Result.withDefault 1))
+        GetStorage value ->
+            { model | importValue = value } ! []
 
-            TmpWeaponUpdate name ->
-                let
-                    w =
-                        nameToWeapon name
-                in
-                    { model | tmpWeapon = w } ! []
+        GetStorageKeys keys ->
+            { model | storageKeys = keys } ! []
 
-            TmpWeaponMountPoint mountPointStr ->
-                let
-                    mountPoint =
-                        strToMountPoint mountPointStr
+        SetStorageCallback entry ->
+            model ! [ Ports.Storage.getKeys "", Task.perform SetImport (Task.succeed entry.value) ]
 
-                    w =
-                        case model.tmpWeapon of
-                            Nothing ->
-                                Nothing
+        SaveModel ->
+            Update.Data.saveModel model
 
-                            Just tmpWeapon ->
-                                Just { tmpWeapon | mountPoint = mountPoint }
-                in
-                    { model | tmpWeapon = w } ! []
+        LoadModel key ->
+            model ! [ Ports.Storage.get key ]
 
-            TmpUpgradeUpdate name ->
-                let
-                    u =
-                        nameToUpgrade name
-                in
-                    { model | tmpUpgrade = u } ! []
+        DeleteItem key ->
+            model ! [ Ports.Storage.delete key ]
 
-            UpdatePointsAllowed s ->
-                { model | pointsAllowed = Result.withDefault 0 (String.toInt s) } ! []
-
-            UpdateTeamName s ->
-                { model | teamName = Just s } ! []
-
-            -- STATE MANAGEMENT.
-            SetWeaponsReady ->
-                model ! []
-
-            SetWeaponFired v w ->
-                Update.Utils.setWeaponFired model v w
-
-            RollWeaponDie v w result ->
-                Update.Utils.rollWeaponDie model v w result
-
-            -- IMPORT/EXPORT.
-            Import ->
-                Update.Utils.import_ model
-
-            SetImport json ->
-                { model | importValue = json } ! []
-
-            Share ->
-                Update.Utils.share model
-
-            -- STORAGE
-            GetStorage value ->
-                { model | importValue = value } ! []
-
-            GetStorageKeys keys ->
-                { model | storageKeys = keys } ! []
-
-            SetStorageCallback entry ->
-                model ! [ Ports.Storage.getKeys "", Task.perform SetImport (Task.succeed entry.value) ]
-
-            SaveModel ->
-                Update.Utils.saveModel model
-
-            LoadModel key ->
-                model
-                    ! [ Ports.Storage.get key ]
-
-            DeleteItem key ->
-                model ! [ Ports.Storage.delete key ]
-
-            DeleteItemCallback deletedKey ->
-                model ! [ Ports.Storage.getKeys "" ]
+        DeleteItemCallback deletedKey ->
+            model ! [ Ports.Storage.getKeys "" ]
