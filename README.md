@@ -26,4 +26,4 @@ This this needs [Elm](http://elm-lang.org/) installed. Installing `create-elm-ap
 
 # Hosting
 
-A build of this application is located at https://milogert.com/gaslands. Since the application is written in Elm it has PWA support so you can install a totally offline version on your phone.
+A build of this application is located at https://milogert.github.io/glom/. Since the application is written in Elm it has PWA support so you can install a totally offline version on your phone.
