@@ -12,7 +12,7 @@ init:
 elmdeps: init
 	$(NPX) elm-github-install
 
-css: init
+css:
 	rm $(STYLESHEET)
 	$(NPX) node-sass --output-style compressed scss/custom.scss > $(STYLESHEET)
 	
