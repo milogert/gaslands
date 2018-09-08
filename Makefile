@@ -24,6 +24,6 @@ build: FORCE
 	$(NPX) elm-app build
 
 deploy: build
-	$(NPX) gh-pages -d build -b master
+	$(NPX) gh-pages -d build
 
 FORCE: ;
