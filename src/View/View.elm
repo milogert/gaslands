@@ -4,9 +4,8 @@ import Html exposing (Html, button, div, h1, h2, h3, h4, h5, h6, hr, img, input,
 import Html.Attributes exposing (checked, class, classList, disabled, for, href, id, max, min, placeholder, rel, src, type_, value, readonly, style)
 import Html.Events exposing (onClick, onInput)
 import Model.Model exposing (..)
-import View.About
 import View.Details
-import View.ImportExport
+import View.Settings
 import View.NewUpgrade
 import View.NewVehicle
 import View.NewWeapon
@@ -31,14 +30,11 @@ view model =
                 AddingUpgrade v ->
                     ToDetails v
 
-                ImportExport ->
+                Settings ->
                     ToOverview
 
                 Overview ->
                     ToOverview
-
-                About ->
-                    ToExport
 
         backButton =
             button
@@ -94,39 +90,23 @@ view model =
                 , View.Utils.colPlus [ "12", "md-auto" ]
                     [ "my-auto", "form-inline", "col" ]
                     [ button
-                        [ class "btn btn-sm btn-primary mr-4"
+                        [ class "btn btn-sm btn-primary mr-2"
                         , value <| toString model.gearPhase
                         , onClick NextGearPhase
                         ]
                         [ icon "cogs", span [ class "badge badge-light" ] [ text gearPhaseText ] ]
-                    , label
-                        [ for "squadPoints"
-                        , class "col-form-label mr-2"
-                        ]
-                        [ text <| (toString <| currentPoints) ++ " of" ]
-                    , div
-                        [ class "input-group mb-0 mr-4"
-                        , style
-                            [ ( "max-width", "8rem" )
-                            , ( "width", "auto" )
+                    , span
+                        [ class "badge mr-2"
+                        , classList
+                            [ ( "badge-danger", currentPoints > maxPoints )
+                            , ( "badge-success", currentPoints == maxPoints )
+                            , ( "badge-warning", currentPoints < maxPoints )
                             ]
                         ]
-                        [ input
-                            [ type_ "number"
-                            , class "form-control form-control-sm my-1"
-                            , classList
-                                [ ( "above-points", currentPoints > maxPoints )
-                                , ( "at-points", currentPoints == maxPoints )
-                                , ( "below-points", currentPoints < maxPoints )
-                                ]
-                            , id "squadPoints"
-                            , value <| toString maxPoints
-                            , onInput UpdatePointsAllowed
-                            ]
-                            []
+                        [ text <| (toString currentPoints) ++ " of " ++ toString maxPoints ++ " points"
                         ]
                     , button
-                        [ class "btn btn-sm btn-light", onClick ToExport ]
+                        [ class "btn btn-sm btn-light", onClick ToSettings ]
                         [ icon "wrench" ]
                     ]
                 ]
@@ -175,11 +155,8 @@ render model =
         AddingUpgrade v ->
             View.NewUpgrade.view model v
 
-        ImportExport ->
-            View.ImportExport.view model
-
-        About ->
-            View.About.view
+        Settings ->
+            View.Settings.view model
 
 
 sizeShower : Html Msg

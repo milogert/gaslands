@@ -7,7 +7,6 @@ import Model.Encoders.Model exposing (modelEncoder)
 import Model.Model exposing (..)
 import Ports.Ports
 import Ports.Storage
-import Random
 
 
 (!!) : Int -> List a -> Maybe a

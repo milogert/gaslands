@@ -36,11 +36,8 @@ update msg model =
         ToNewUpgrade v ->
             { model | view = AddingUpgrade v, tmpUpgrade = Nothing } ! []
 
-        ToExport ->
-            { model | view = ImportExport } ! [ Ports.Storage.getKeys "" ]
-
-        ToAbout ->
-            { model | view = About } ! []
+        ToSettings ->
+            { model | view = Settings } ! [ Ports.Storage.getKeys "" ]
 
         UpdatePointsAllowed s ->
             { model | pointsAllowed = Result.withDefault 0 (String.toInt s) } ! []
@@ -161,7 +158,7 @@ update msg model =
                             Just { tmpWeapon | mountPoint = mountPoint }
             in
                 { model | tmpWeapon = w } ! []
-                
+
         SetWeaponsReady ->
             model ! []
 

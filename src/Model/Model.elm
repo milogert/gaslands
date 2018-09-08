@@ -27,8 +27,7 @@ type CurrentView
     | AddingVehicle
     | AddingWeapon Vehicle
     | AddingUpgrade Vehicle
-    | ImportExport
-    | About
+    | Settings
 
 
 type ErrorType
@@ -80,11 +79,8 @@ viewToStr view =
         AddingUpgrade v ->
             "Adding Upgrade to " ++ v.name
 
-        ImportExport ->
-            "Import/Export"
-
-        About ->
-            "About"
+        Settings ->
+            "Settings"
 
 
 totalPoints : Model -> Int
@@ -115,8 +111,7 @@ type Msg
     | ToNewVehicle
     | ToNewWeapon Vehicle
     | ToNewUpgrade Vehicle
-    | ToExport
-    | ToAbout
+    | ToSettings
     | AddVehicle
     | AddWeapon Vehicle Weapon
     | AddUpgrade Vehicle Upgrade
