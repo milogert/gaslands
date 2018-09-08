@@ -14,7 +14,7 @@ elmdeps: init
 
 css: init
 	rm $(STYLESHEET)
-	$(NPX) node-sass --output-style compressed public/scss/custom.scss > $(STYLESHEET)
+	$(NPX) node-sass --output-style compressed scss/custom.scss > $(STYLESHEET)
 	
 start:
 	$(NPX) elm-app start
