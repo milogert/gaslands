@@ -4,6 +4,7 @@
     "elm": "^0.18.0-exp5",
     "elm-format": "^0.6.1-alpha",
     "elm-github-install": "^1.6.1",
+    "gh-pages": "^1.0.0",
     "node-sass": "^4.9.3",
     "sass": "^1.3.2"
   }
