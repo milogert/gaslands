@@ -1,7 +1,8 @@
 {
     "version": "1.0.0",
-    "summary": "Gaslands (gaslands.com) fully-local squad manager.",
-    "repository": "https://github.com/milogert/gaslands.git",
+    "summary": "Gaslands (gaslands.com) fully offline squad manager.",
+    "homepage": "https://milogert.github.io/glom",
+    "repository": "https://github.com/milogert/glom.git",
     "license": "MIT",
     "source-directories": [
         "src"

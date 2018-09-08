@@ -1,4 +1,4 @@
-PACKAGES=elm@0.18.0-exp5 create-elm-app@1.10.4 elm-github-install node-sass
+PACKAGES=elm@0.18.0-exp5 create-elm-app@1.10.4 elm-github-install node-sass gh-pages@1.0.0
 NPX=/usr/bin/env npx
 
 STYLESHEET=public/css/stylesheet.css
@@ -19,8 +19,11 @@ css: init
 start:
 	$(NPX) elm-app start
 
-build:
-	PUBLIC_URL=./ $(NPX) elm-app build
+build: FORCE
+	#PUBLIC_URL=./ $(NPX) elm-app build
+	$(NPX) elm-app build
 
 deploy: build
-	echo "deploying app"
+	$(NPX) gh-pages -d build -b master
+
+FORCE: ;
