@@ -108,12 +108,13 @@ renderAbout =
     View.Utils.row
         [ View.Utils.col "12"
             [ h3 [] [ text "About" ]
-            , p [] [ text "Built by Milo Gertjejansen" ]
+            , p [] [ text "Built by Milo Gertjejansen." ]
             , p [] [ text "Email: milo plus glom at milogert dot com" ]
             , p []
-                [ text "Build with "
+                [ text "Built with "
                 , a [ href "http://elm-lang.org" ]
                     [ text "Elm" ]
+                , text "."
                 ]
             , p []
                 [ text "Check out the "
