@@ -9,7 +9,7 @@
 );*/
 
 // Import the rest of bootstrap.
-@import "bootstrap/scss/bootstrap";
+@import "../node_modules/bootstrap/scss/bootstrap";
 
 .card-columns {
     @include media-breakpoint-only(md) {
