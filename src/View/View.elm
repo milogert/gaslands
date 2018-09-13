@@ -6,6 +6,8 @@ import Html.Events exposing (onClick, onInput)
 import Model.Model exposing (..)
 import View.Details
 import View.Settings
+import View.Sponsor
+import View.SponsorSelect
 import View.NewUpgrade
 import View.NewVehicle
 import View.NewWeapon
@@ -19,6 +21,9 @@ view model =
         viewToGoTo =
             case model.view of
                 Details _ ->
+                    ToOverview
+
+                SelectingSponsor ->
                     ToOverview
 
                 AddingVehicle ->
@@ -87,6 +92,9 @@ view model =
                 , View.Utils.colPlus []
                     [ "my-auto", "col" ]
                     [ viewDisplay ]
+                , View.Utils.colPlus [ "auto" ]
+                    [ "my-auto" ]
+                    [ View.Sponsor.renderBadge model.sponsor ]
                 , View.Utils.colPlus [ "12", "md-auto" ]
                     [ "my-auto", "form-inline", "col" ]
                     [ button
@@ -145,6 +153,9 @@ render model =
 
         Details v ->
             View.Details.view model v
+
+        SelectingSponsor ->
+            View.SponsorSelect.view model
 
         AddingVehicle ->
             View.NewVehicle.view model

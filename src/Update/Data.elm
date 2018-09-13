@@ -24,7 +24,7 @@ import_ model =
         newModel =
             case decodeRes of
                 Ok m ->
-                    m
+                    Debug.log "new model" m
 
                 Err s ->
                     { model | error = [ JsonDecodeError s ] }
@@ -39,6 +39,7 @@ import_ model =
             , tmpUpgrade = newModel.tmpUpgrade
             , error = newModel.error
             , importValue = newModel.importValue
+            , sponsor = newModel.sponsor
         }
             ! []
 

@@ -1,5 +1,6 @@
 module Model.Model exposing (CurrentView(..), ErrorType(..), Model, Msg(..), init, totalPoints, viewToStr, errorToStr)
 
+import Model.Sponsors exposing (..)
 import Model.Upgrades exposing (..)
 import Model.Vehicles exposing (..)
 import Model.Weapons exposing (..)
@@ -12,6 +13,7 @@ type alias Model =
     , pointsAllowed : Int
     , gearPhase : Int
     , vehicles : List Vehicle
+    , sponsor : Maybe Sponsor
     , tmpVehicle : Maybe Vehicle
     , tmpWeapon : Maybe Weapon
     , tmpUpgrade : Maybe Upgrade
@@ -24,6 +26,7 @@ type alias Model =
 type CurrentView
     = Overview
     | Details Vehicle
+    | SelectingSponsor
     | AddingVehicle
     | AddingWeapon Vehicle
     | AddingUpgrade Vehicle
@@ -70,6 +73,9 @@ viewToStr view =
         Details v ->
             v.name
 
+        SelectingSponsor ->
+            "Sponsor Select"
+
         AddingVehicle ->
             "Adding Vehicle"
 
@@ -99,25 +105,26 @@ init =
         Nothing
         Nothing
         Nothing
+        Nothing
         []
         ""
         []
         ! []
 
 
-type Msg
+type
+    Msg
+    -- ROUTES.
     = ToOverview
     | ToDetails Vehicle
+    | ToSponsorSelect
     | ToNewVehicle
     | ToNewWeapon Vehicle
     | ToNewUpgrade Vehicle
     | ToSettings
+      -- VEHICLE.
     | AddVehicle
-    | AddWeapon Vehicle Weapon
-    | AddUpgrade Vehicle Upgrade
     | DeleteVehicle Vehicle
-    | DeleteWeapon Vehicle Weapon
-    | DeleteUpgrade Vehicle Upgrade
     | TmpName String
     | TmpVehicleType String
     | TmpNotes String
@@ -132,15 +139,25 @@ type Msg
     | UpdateCrew Vehicle String
     | UpdateEquipment Vehicle String
     | UpdateNotes Vehicle String
+    | SetPerkInVehicle Vehicle VehiclePerk Bool
+      -- WEAPON.
+    | AddWeapon Vehicle Weapon
+    | DeleteWeapon Vehicle Weapon
     | UpdateAmmoUsed Vehicle Weapon Int String
     | TmpWeaponUpdate String
     | TmpWeaponMountPoint String
-    | TmpUpgradeUpdate String
-    | UpdatePointsAllowed String
-    | UpdateTeamName String
     | SetWeaponsReady
     | SetWeaponFired Vehicle Weapon
     | RollWeaponDie Vehicle Weapon Int
+      -- UPGRADE.
+    | AddUpgrade Vehicle Upgrade
+    | DeleteUpgrade Vehicle Upgrade
+    | TmpUpgradeUpdate String
+    | UpdatePointsAllowed String
+    | UpdateTeamName String
+      -- SPONSOR.
+    | SponsorUpdate String
+      -- DATA.
     | Import
     | SetImport String
     | Share

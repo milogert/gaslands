@@ -1,4 +1,11 @@
 {
+  "name": "Gaslands Offline Manager",
+  "description": "Fully offline Gaslands (https://gaslands.com/) vehicle squad manager.",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/milogert/glom.git"
+  },
+  "private": true,
   "dependencies": {
     "create-elm-app": "^1.10.4",
     "elm": "^0.18.0-exp5",

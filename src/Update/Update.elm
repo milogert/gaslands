@@ -1,10 +1,12 @@
 module Update.Update exposing (update)
 
 import Model.Model exposing (..)
+import Model.Sponsors exposing (..)
 import Model.Upgrades exposing (..)
 import Model.Weapons exposing (..)
 import Ports.Storage
 import Task
+import Update.Sponsor
 import Update.Vehicle
 import Update.Weapon
 import Update.Upgrade
@@ -26,6 +28,9 @@ update msg model =
 
         ToDetails v ->
             { model | view = Details v } ! []
+
+        ToSponsorSelect ->
+            { model | view = SelectingSponsor } ! []
 
         ToNewVehicle ->
             { model | view = AddingVehicle, tmpVehicle = Nothing } ! []
@@ -127,6 +132,13 @@ update msg model =
         UpdateNotes v notes ->
             Update.Vehicle.updateNotes model v notes
 
+        SetPerkInVehicle vehicle perk isSet ->
+            Update.Vehicle.setPerkInVehicle
+                model
+                vehicle
+                perk
+                isSet
+
         -- WEAPON.
         AddWeapon v w ->
             Update.Weapon.addWeapon model v w
@@ -181,6 +193,11 @@ update msg model =
                     nameToUpgrade name
             in
                 { model | tmpUpgrade = u } ! []
+
+        -- SPONSOR.
+        SponsorUpdate s ->
+            Update.Sponsor.set model <|
+                stringToSponsor s
 
         -- DATA.
         Import ->

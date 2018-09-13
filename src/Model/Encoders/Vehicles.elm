@@ -4,6 +4,7 @@ import Json.Encode exposing (..)
 import Model.Encoders.Shared exposing (..)
 import Model.Encoders.Upgrades exposing (upgradeEncoder)
 import Model.Encoders.Weapons exposing (weaponEncoder)
+import Model.Encoders.Sponsors exposing (vehiclePerkEncoder)
 import Model.Vehicles exposing (..)
 
 
@@ -25,6 +26,7 @@ vehicleEncoder v =
         , ( "cost", int v.cost )
         , ( "id", int v.id )
         , ( "specials", list <| List.map specialEncoder v.specials )
+        , ( "perks", list <| List.map vehiclePerkEncoder v.perks )
         ]
 
 

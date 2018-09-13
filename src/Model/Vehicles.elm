@@ -3,6 +3,7 @@ module Model.Vehicles exposing (..)
 import Model.Shared exposing (..)
 import Model.Upgrades exposing (..)
 import Model.Weapons exposing (..)
+import Model.Sponsors exposing (..)
 
 
 type alias Vehicle =
@@ -23,6 +24,7 @@ type alias Vehicle =
     , cost : Int
     , id : Int
     , specials : List Special
+    , perks : List VehiclePerk
     }
 
 
@@ -71,7 +73,12 @@ allVehicleTypes =
 
 vehicleCost : Vehicle -> Int
 vehicleCost v =
-    v.cost + (List.sum <| List.map weaponCost v.weapons) + (List.sum <| List.map .cost v.upgrades)
+    List.sum
+        [ v.cost
+        , List.sum <| List.map weaponCost v.weapons
+        , List.sum <| List.map .cost v.upgrades
+        , List.sum <| List.map .cost v.perks
+        ]
 
 
 type WeightClass
@@ -99,50 +106,6 @@ slotsRemaining v =
 
 
 -- Vehicle definitions.
-
-
-emptyVehicle : VehicleType -> Int -> Vehicle
-emptyVehicle vtype index =
-    let
-        gear =
-            GearTracker 1 <| typeToGearMax vtype
-
-        handling =
-            typeToHandling vtype
-
-        hull =
-            HullHolder 0 (typeToHullMax vtype)
-
-        crew =
-            typeToCrewMax vtype
-
-        equipment =
-            typeToEquipmentMax vtype
-
-        weight =
-            typeToWeight vtype
-
-        cost =
-            typeToCost vtype
-    in
-        Vehicle
-            ""
-            vtype
-            gear
-            0
-            handling
-            []
-            hull
-            crew
-            equipment
-            weight
-            False
-            []
-            []
-            ""
-            cost
-            index
-            []
 
 
 typeToWeight : VehicleType -> WeightClass

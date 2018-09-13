@@ -7,6 +7,7 @@ import Model.Model exposing (..)
 import Model.Utils exposing (..)
 import Model.Vehicles exposing (..)
 import Model.Weapons exposing (handgun)
+import View.Sponsor
 import View.Upgrade
 import View.Utils exposing (icon, iconClass)
 import View.Weapon
@@ -205,6 +206,19 @@ render model currentView v =
                 ]
                 (List.map (View.Upgrade.render model v) v.upgrades)
 
+        availablePerks =
+            case model.sponsor of
+                Nothing ->
+                    text ""
+
+                Just sponsor ->
+                    View.Utils.detailSection
+                        currentView
+                        [ text "Perks Available from "
+                        , text <| toString sponsor.name
+                        ]
+                        (List.map (View.Sponsor.renderPerkClass v) sponsor.grantedClasses)
+
         header =
             h4
                 [ classList
@@ -254,8 +268,11 @@ render model currentView v =
                 , hullChecks
                 , specials
                 , notes
-                , div [ classList [("d-none", wrecked)]] [weaponList]
-                , div [ classList [("d-none", wrecked)]] [upgradeList]
+                , div [ classList [ ( "d-none", wrecked ) ] ]
+                    [ weaponList
+                    , upgradeList
+                    , availablePerks
+                    ]
                 ]
 
         footer =
@@ -284,7 +301,7 @@ render model currentView v =
                 View.Utils.card [ ( "border-danger", wrecked ) ] body footer False
 
 
-renderPreview  : Model -> CurrentView -> Vehicle -> Html Msg
+renderPreview : Model -> CurrentView -> Vehicle -> Html Msg
 renderPreview model currentView v =
     let
         name =

@@ -1,8 +1,9 @@
-module Update.Vehicle exposing (addVehicle, deleteVehicle, setTmpVehicleType, updateActivated, updateGear, updateHazards, updateCrew, updateEquipment, updateHull, updateNotes, rollSkidDice)
+module Update.Vehicle exposing (addVehicle, deleteVehicle, setTmpVehicleType, updateActivated, updateGear, updateHazards, updateCrew, updateEquipment, updateHull, updateNotes, rollSkidDice, setPerkInVehicle)
 
 import Model.Model exposing (..)
 import Model.Vehicles exposing (..)
 import Model.Weapons exposing (..)
+import Model.Sponsors exposing (..)
 import Update.Utils
 
 
@@ -112,6 +113,7 @@ setTmpVehicleType model vtstr =
                 cost
                 -1
                 specials
+                []
     in
         { model | tmpVehicle = Just newtv } ! []
 
@@ -291,3 +293,26 @@ replaceWeaponInVehicle v w =
             Update.Utils.joinAround w.id w v.weapons |> Update.Utils.correctIds
     in
         { v | weapons = weaponsNew }
+
+
+setPerkInVehicle : Model -> Vehicle -> VehiclePerk -> Bool -> ( Model, Cmd Msg )
+setPerkInVehicle model v perk isSet =
+    let
+        perkList =
+            case ( isSet, List.member perk v.perks ) of
+                ( True, False ) ->
+                    perk :: v.perks
+
+                ( False, _ ) ->
+                    List.filter (\s -> s /= perk) v.perks
+
+                _ ->
+                    v.perks
+
+        vehicleUpdated =
+            { v | perks = perkList }
+
+        vehiclesNew =
+            Update.Utils.joinAround v.id vehicleUpdated model.vehicles
+    in
+        { model | view = Details vehicleUpdated, vehicles = vehiclesNew } ! []

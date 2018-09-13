@@ -2,7 +2,6 @@ module Model.Encoders.Weapons exposing (weaponEncoder)
 
 import Json.Encode exposing (..)
 import Model.Encoders.Shared exposing (..)
-import Model.Shared exposing (..)
 import Model.Weapons exposing (..)
 
 
