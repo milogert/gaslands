@@ -16,7 +16,8 @@ var photo = {
         }
           
         var constraints = {
-            video: true,
+            video: { facingMode: "environment" },
+
             //width: 1600,
             //height: 900,
         };
