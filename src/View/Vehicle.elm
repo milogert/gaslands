@@ -1,13 +1,14 @@
 module View.Vehicle exposing (render, renderPreview)
 
-import Html exposing (Html, button, div, h1, h2, h3, h4, h5, h6, hr, img, input, label, li, node, option, p, select, small, span, text, textarea, ul)
-import Html.Attributes exposing (checked, class, classList, disabled, for, href, id, max, min, placeholder, rel, src, type_, value, max, attribute, style)
+import Html exposing (Html, button, div, h1, h2, h3, h4, h5, h6, hr, img, input, label, li, node, option, p, select, small, span, text, textarea, ul, video)
+import Html.Attributes exposing (checked, class, classList, disabled, for, href, id, max, min, placeholder, rel, src, type_, value, max, attribute, style, autoplay)
 import Html.Events exposing (onClick, onInput)
 import Model.Model exposing (..)
 import Model.Utils exposing (..)
 import Model.Vehicles exposing (..)
 import Model.Weapons exposing (handgun)
 import View.Sponsor
+import View.Photo
 import View.Upgrade
 import View.Utils exposing (icon, iconClass)
 import View.Weapon
@@ -16,9 +17,6 @@ import View.Weapon
 render : Model -> CurrentView -> Vehicle -> Html Msg
 render model currentView v =
     let
-        name =
-            span [ class "mr-2" ] [ text v.name ]
-
         vtype =
             vTToStr v.vtype
 
@@ -56,6 +54,13 @@ render model currentView v =
         canActivate =
             model.gearPhase <= v.gear.current
 
+        name =
+            div [ class "vehicle-name-holder" ]
+                [ h3
+                    [ class "vehicle-name" ]
+                    [ text v.name ]
+                ]
+
         activatedText =
             case ( v.activated, canActivate ) of
                 ( True, False ) ->
@@ -67,23 +72,51 @@ render model currentView v =
                 ( _, _ ) ->
                     "Activate"
 
-        activatedCheck =
+        activateButton =
             div
-                [ class "form-row mb-2"
+                [ class "vehicle-activate-button-holder mb-2"
                 , classList [ ( "d-none", wrecked ) ]
                 ]
-                [ View.Utils.col ""
-                    [ button
-                        [ class "btn btn-sm btn-primary btn-block form-control"
-                        , onClick (UpdateActivated v (not v.activated))
-                        , checked v.activated
-                        , disabled <| not canActivate || v.activated
+                [ button
+                    [ class "btn btn-sm btn-primary btn-block form-control"
+                    , onClick (UpdateActivated v (not v.activated))
+                    , checked v.activated
+                    , disabled <| not canActivate || v.activated
+                    ]
+                    [ text activatedText ]
+                ]
+
+        factsHolder =
+            View.Utils.factsHolder
+                [ vehicleTypeBadge
+                , pointsCostBadge
+                , weightBadge
+                , crewBadge
+                , handlingBadge
+                , equipmentSlotsBadge
+                ]
+
+        header =
+            div [ class "vehicle-header col-12 mb-2" ]
+                [ View.Utils.row
+                    [ div
+                        [ class "col-6 col-md-3"
+                        , classList [ ( "d-none", currentView /= Details v ) ]
                         ]
-                        [ text activatedText ]
+                        [ View.Photo.view model v
+                        ]
+                    , div
+                        [ class "col-6 col-md-9"
+                        , classList
+                            [ ( "col-12", currentView /= Details v )
+                            , ( "col-md-12", currentView /= Details v )
+                            ]
+                        ]
+                        [ name, activateButton, factsHolder ]
                     ]
                 ]
 
-        gearBox =
+        gearCounter =
             case wrecked of
                 True ->
                     text ""
@@ -98,7 +131,7 @@ render model currentView v =
                         (ShiftGear v 1)
                         (UpdateGear v)
 
-        hazardTokens =
+        hazardCounter =
             div []
                 [ counterElement
                     (iconClass "fas" "exclamation-triangle" [ "mx-auto" ])
@@ -110,7 +143,7 @@ render model currentView v =
                     (UpdateHazards v)
                 ]
 
-        hullChecks =
+        hullCounter =
             counterElement
                 (iconClass "fas" "shield-alt" [ "mx-auto" ])
                 0
@@ -119,6 +152,10 @@ render model currentView v =
                 (ShiftHull v -1)
                 (ShiftHull v 1)
                 (UpdateHull v)
+
+        counterHolder =
+            div [ class "counter-holder col-12" ]
+                [ gearCounter, hazardCounter, hullCounter ]
 
         renderSpecialFunc special =
             li [] [ View.Utils.renderSpecial False Nothing 0 special ]
@@ -133,17 +170,15 @@ render model currentView v =
 
         notes =
             div
-                [ class "form-row"
+                [ class "vehicle-notes-holder col-12"
                 , classList [ ( "d-none", currentView == Overview ) ]
                 ]
-                [ View.Utils.col ""
-                    [ textarea
-                        [ onInput (UpdateNotes v)
-                        , class "form-control"
-                        , placeholder "Notes"
-                        ]
-                        [ text v.notes ]
+                [ textarea
+                    [ onInput (UpdateNotes v)
+                    , class "form-control"
+                    , placeholder "Notes"
                     ]
+                    [ text v.notes ]
                 ]
 
         weaponsUsingSlots =
@@ -223,15 +258,6 @@ render model currentView v =
                             )
                         ]
 
-        header =
-            h4
-                [ classList
-                    [ ( "card-title", currentView /= Details v )
-                    , ( "d-none", currentView == Details v )
-                    ]
-                ]
-                [ name ]
-
         pointsCostBadge =
             View.Utils.factBadge <|
                 (toString <| vehicleCost v)
@@ -252,24 +278,13 @@ render model currentView v =
                         ++ " build "
                         ++ slots
 
-        factsHolder =
-            View.Utils.factsHolder
-                [ vehicleTypeBadge
-                , pointsCostBadge
-                , weightBadge
-                , crewBadge
-                , handlingBadge
-                , equipmentSlotsBadge
-                ]
-
         body =
-            div [ classList [ ( "card-text", currentView /= Details v ) ] ]
+            div
+                [ class "vehicle-body row"
+                , classList [ ( "card-text", currentView /= Details v ) ]
+                ]
                 [ header
-                , activatedCheck
-                , factsHolder
-                , gearBox
-                , hazardTokens
-                , hullChecks
+                , counterHolder
                 , specials
                 , notes
                 , div [ classList [ ( "d-none", wrecked ) ] ]
@@ -277,6 +292,10 @@ render model currentView v =
                     , upgradeList
                     , availablePerks
                     ]
+                , div [ class "col-12", classList [ ( "d-none", wrecked ) ] ]
+                    [ weaponList ]
+                , div [ class "col-12", classList [ ( "d-none", wrecked ) ] ]
+                    [ upgradeList ]
                 ]
 
         footer =
@@ -299,7 +318,7 @@ render model currentView v =
     in
         case currentView of
             Details v ->
-                div [] [ body ]
+                body
 
             _ ->
                 View.Utils.card [ ( "border-danger", wrecked ) ] body footer False

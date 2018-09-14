@@ -43,8 +43,7 @@ view model =
 
         backButton =
             button
-                [ -- classList [ ( "d-none", model.view == Overview ) ]
-                  disabled <| model.view == Overview
+                [ disabled <| model.view == Overview
                 , class "btn btn-light btn-sm btn-block"
                 , onClick viewToGoTo
                 ]
@@ -68,21 +67,8 @@ view model =
                     s
 
         viewDisplay =
-            case model.view of
-                Overview ->
-                    input
-                        [ class "form-control" -- form-control-lg"
-                        , classList [ ( "d-none", not <| model.view == Overview ) ]
-                        , type_ "text"
-                        , onInput UpdateTeamName
-                        , value teamName
-                        , placeholder "Team Name"
-                        ]
-                        []
-
-                _ ->
-                    h2 [ style [ ( "margin-bottom", "0" ) ] ]
-                        [ text <| viewToStr model.view ]
+            h2 [ style [ ( "margin-bottom", "0" ) ] ]
+                [ text <| viewToStr model ]
     in
         div [ class "container" ]
             [ View.Utils.rowPlus [ "mt-2", "mb-2" ]
@@ -116,6 +102,7 @@ view model =
                         [ icon "wrench" ]
                     ]
                 ]
+            , hr [] []
             , displayAlert model
             , render model
 

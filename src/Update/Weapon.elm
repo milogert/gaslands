@@ -40,13 +40,13 @@ updateAmmoUsed model v w used =
             { w | ammoUsed = used }
 
         weaponsNew =
-            Update.Utils.joinAround w.id weaponUpdated v.weapons |> Update.Utils.correctIds
+            Update.Utils.replaceAtIndex w.id weaponUpdated v.weapons |> Update.Utils.correctIds
 
         vehicleUpdated =
             { v | weapons = weaponsNew }
 
         vehiclesNew =
-            Update.Utils.joinAround v.id vehicleUpdated model.vehicles
+            Update.Utils.replaceAtIndex v.id vehicleUpdated model.vehicles
     in
         { model | view = Details vehicleUpdated, vehicles = vehiclesNew } ! []
 
@@ -58,13 +58,13 @@ setWeaponFired model v w =
             { w | status = WeaponFired }
 
         weaponsNew =
-            Update.Utils.joinAround w.id weaponUpdated v.weapons |> Update.Utils.correctIds
+            Update.Utils.replaceAtIndex w.id weaponUpdated v.weapons |> Update.Utils.correctIds
 
         vehicleUpdated =
             { v | weapons = weaponsNew }
 
         vehiclesNew =
-            Update.Utils.joinAround v.id vehicleUpdated model.vehicles
+            Update.Utils.replaceAtIndex v.id vehicleUpdated model.vehicles
 
         minRoll =
             case weaponUpdated.attack of
@@ -99,7 +99,7 @@ rollWeaponDie model v w result =
             Update.Utils.replaceWeaponInVehicle v weaponUpdated
 
         vehiclesNew =
-            Update.Utils.joinAround v.id vehicleUpdated model.vehicles
+            Update.Utils.replaceAtIndex v.id vehicleUpdated model.vehicles
     in
         { model
             | view = Details vehicleUpdated
@@ -118,7 +118,7 @@ deleteWeapon model v w =
             { v | weapons = weaponsNew }
 
         vehiclesNew =
-            Update.Utils.joinAround v.id vehicleUpdated model.vehicles
+            Update.Utils.replaceAtIndex v.id vehicleUpdated model.vehicles
     in
         { model | view = Details vehicleUpdated, vehicles = vehiclesNew } ! []
 

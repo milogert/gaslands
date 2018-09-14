@@ -11,6 +11,7 @@ import Update.Vehicle
 import Update.Weapon
 import Update.Upgrade
 import Update.Data
+import Ports.Photo
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -27,7 +28,7 @@ update msg model =
                 ! []
 
         ToDetails v ->
-            { model | view = Details v } ! []
+            { model | view = Details v } ! [ Ports.Photo.destroyStream "" ]
 
         ToSponsorSelect ->
             { model | view = SelectingSponsor } ! []
@@ -48,9 +49,14 @@ update msg model =
             { model | pointsAllowed = Result.withDefault 0 (String.toInt s) } ! []
 
         UpdateTeamName s ->
-            { model | teamName = Just s } ! []
+            case s of
+                "" ->
+                    { model | teamName = Nothing } ! []
 
-        -- Vehicle.
+                _ ->
+                    { model | teamName = Just s } ! []
+
+        -- VEHICLE.
         AddVehicle ->
             Update.Vehicle.addVehicle model
 
@@ -138,6 +144,23 @@ update msg model =
                 vehicle
                 perk
                 isSet
+
+        GetStream v ->
+            Update.Vehicle.getStream model v
+
+        TakePhoto v ->
+            Update.Vehicle.takePhoto model v
+
+        SetPhotoUrlCallback url ->
+            case model.view of
+                Details vehicle ->
+                    Update.Vehicle.setUrlForVehicle model vehicle url
+
+                _ ->
+                    model ! []
+
+        DiscardPhoto vehicle ->
+            Update.Vehicle.discardPhoto model vehicle
 
         -- WEAPON.
         AddWeapon v w ->

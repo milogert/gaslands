@@ -8,6 +8,7 @@ import Model.Sponsors exposing (..)
 
 type alias Vehicle =
     { name : String
+    , photo : Maybe String
     , vtype : VehicleType
     , gear : GearTracker
     , hazards : Int
@@ -370,15 +371,6 @@ typeToHullMax t =
 vTToStr : VehicleType -> String
 vTToStr t =
     case t of
-        Bike ->
-            "Bike"
-
-        Buggy ->
-            "Buggy"
-
-        Car ->
-            "Car"
-
         PerformanceCar ->
             "Performance Car"
 
@@ -388,20 +380,11 @@ vTToStr t =
         MonsterTruck ->
             "Monster Truck"
 
-        Bus ->
-            "Bus"
-
         WarRig ->
             "War Rig"
 
-        Tank ->
-            "Tank"
-
-        Gyrocopter ->
-            "Gyrocopter"
-
-        Helicopter ->
-            "Helicopter"
+        _ ->
+            toString t
 
 
 strToVT : String -> Maybe VehicleType

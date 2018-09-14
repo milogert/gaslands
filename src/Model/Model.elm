@@ -64,14 +64,14 @@ errorToStr e =
             "Json decode error: " ++ s
 
 
-viewToStr : CurrentView -> String
-viewToStr view =
-    case view of
+viewToStr : Model -> String
+viewToStr model =
+    case model.view of
         Overview ->
-            ""
+            "Team " ++ (Maybe.withDefault "NoName" model.teamName)
 
         Details v ->
-            v.name
+            (Maybe.withDefault "NoName" model.teamName) ++ "'s Vehicle"
 
         SelectingSponsor ->
             "Sponsor Select"
@@ -168,3 +168,7 @@ type
     | LoadModel String
     | DeleteItem String
     | DeleteItemCallback String
+    | GetStream Vehicle
+    | TakePhoto Vehicle
+    | SetPhotoUrlCallback String
+    | DiscardPhoto Vehicle

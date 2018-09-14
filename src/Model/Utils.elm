@@ -2,6 +2,7 @@ module Model.Utils exposing (totalHandling, totalHull, totalGear, totalCrew)
 
 import Model.Shared exposing (..)
 import Model.Vehicles exposing (..)
+import Model.Upgrades exposing (..)
 
 
 modToInt : Special -> Int
@@ -23,89 +24,69 @@ modToInt s =
             0
 
 
+totalForModType : List Upgrade -> (Special -> Bool) -> Int
+totalForModType upgradeList modFilter =
+    upgradeList
+    |> List.map .specials
+    |> List.concat
+    |> List.filter modFilter
+    |> List.map modToInt
+    |> List.sum
+
+
 totalHandling : Vehicle -> Int
 totalHandling v =
     let
-        mod =
-            List.sum <|
-                List.map modToInt <|
-                    List.filter
-                        (\m ->
-                            case m of
-                                HandlingMod _ ->
-                                    True
+        handlingFilter : Special -> Bool
+        handlingFilter m =
+            case m of
+                HandlingMod _ ->
+                    True
 
-                                _ ->
-                                    False
-                        )
-                    <|
-                        List.concat <|
-                            List.map .specials v.upgrades
+                _ ->
+                    False
     in
-        v.handling + mod
+        v.handling + (totalForModType v.upgrades handlingFilter)
 
 
 totalHull : Vehicle -> Int
 totalHull v =
     let
-        mod =
-            List.sum <|
-                List.map modToInt <|
-                    List.filter
-                        (\m ->
-                            case m of
-                                HullMod _ ->
-                                    True
+        hullFilter m =
+            case m of
+                HullMod _ ->
+                    True
 
-                                _ ->
-                                    False
-                        )
-                    <|
-                        List.concat <|
-                            List.map .specials v.upgrades
+                _ ->
+                    False
     in
-        v.hull.max + mod
+        v.hull.max + (totalForModType v.upgrades hullFilter)
 
 
 totalGear : Vehicle -> Int
 totalGear v =
     let
-        mod =
-            List.sum <|
-                List.map modToInt <|
-                    List.filter
-                        (\m ->
-                            case m of
-                                GearMod _ ->
-                                    True
+        gearFilter m =
+            case m of
+                GearMod _ ->
+                    True
 
-                                _ ->
-                                    False
-                        )
-                    <|
-                        List.concat <|
-                            List.map .specials v.upgrades
+                _ ->
+                    False
     in
-        v.gear.max + mod |> clamp 1 6
+        v.gear.max + (totalForModType v.upgrades gearFilter)
+            |> clamp 1 6
 
 
 totalCrew : Vehicle -> Int
 totalCrew v =
     let
-        mod =
-            List.sum <|
-                List.map modToInt <|
-                    List.filter
-                        (\m ->
-                            case m of
-                                CrewMod _ ->
-                                    True
+        crewFilter m =
+            case m of
+                CrewMod _ ->
+                    True
 
-                                _ ->
-                                    False
-                        )
-                    <|
-                        List.concat <|
-                            List.map .specials v.upgrades
+                _ ->
+                    False
     in
-        v.crew + mod
+        v.crew + (totalForModType v.upgrades crewFilter)

@@ -19,16 +19,15 @@ correctIds xs =
     List.indexedMap (\i x -> { x | id = i }) xs
 
 
-joinAround : Int -> a -> List a -> List a
-joinAround i item xs =
+replaceAtIndex : Int -> a -> List a -> List a
+replaceAtIndex  i item xs =
     (List.take i xs) ++ item :: (List.drop (i + 1) xs)
 
 
 getItem : Int -> List a -> Maybe a
 getItem i xs =
     xs
-        |> List.take i
-        |> List.reverse
+        |> List.drop i
         |> List.head
 
 
@@ -36,6 +35,6 @@ replaceWeaponInVehicle : Vehicle -> Weapon -> Vehicle
 replaceWeaponInVehicle v w =
     let
         weaponsNew =
-            joinAround w.id w v.weapons |> correctIds
+            replaceAtIndex w.id w v.weapons |> correctIds
     in
         { v | weapons = weaponsNew }

@@ -1,4 +1,4 @@
-PACKAGES=elm@0.18.0-exp5 create-elm-app@1.10.4 elm-github-install node-sass gh-pages@1.0.0
+PACKAGES=elm@0.18.0-exp5 create-elm-app@1.10.4 elm-github-install node-sass gh-pages@1.0.0 elm-test
 NPX=/usr/bin/env npx
 
 STYLESHEET=public/css/stylesheet.css
@@ -25,5 +25,8 @@ build: FORCE
 
 deploy: build
 	$(NPX) gh-pages -d build
+
+test:
+	$(NPX) elm-test
 
 FORCE: ;

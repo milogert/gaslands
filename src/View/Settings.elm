@@ -1,7 +1,7 @@
 module View.Settings exposing (view)
 
 import Html exposing (Html, button, div, h3, text, textarea, ul, li, a, label, input, hr, p)
-import Html.Attributes exposing (class, rows, style, href, for, classList, type_, id, value)
+import Html.Attributes exposing (class, rows, style, href, for, classList, type_, id, value, placeholder)
 import Html.Events exposing (onClick, onInput)
 import Model.Model exposing (..)
 import View.Utils exposing (icon, iconb)
@@ -12,17 +12,36 @@ view model =
     div [] <|
         List.intersperse
             (hr [] [])
-            [ renderGameSettings model.pointsAllowed
+            [ renderGameSettings model
             , renderImportExport model
             , renderAbout
             ]
 
 
-renderGameSettings : Int -> Html Msg
-renderGameSettings pointsAllowed =
+renderGameSettings : Model -> Html Msg
+renderGameSettings model =
     View.Utils.row
         [ View.Utils.col "12"
             [ h3 [] [ text "Game Settings" ]
+            , div [ class "form-group" ]
+                [ label
+                    [ for "teamName"
+                    , class "col-form-label mr-2"
+                    ]
+                    [ text "Team Name" ]
+                , div
+                    [ class "input-group mb-0 mr-4" ]
+                    [ input
+                        [ class "form-control"
+                        , id "teamName"
+                        , type_ "text"
+                        , onInput UpdateTeamName
+                        , value <| Maybe.withDefault "" model.teamName
+                        , placeholder "Team Name"
+                        ]
+                        []
+                    ]
+                ]
             , div [ class "form-group" ]
                 [ label
                     [ for "squadPoints"
@@ -35,7 +54,7 @@ renderGameSettings pointsAllowed =
                         [ type_ "number"
                         , class "form-control my-1"
                         , id "squadPoints"
-                        , value <| toString pointsAllowed
+                        , value <| toString model.pointsAllowed
                         , onInput UpdatePointsAllowed
                         ]
                         []

@@ -1,7 +1,7 @@
 module Model.Decoders.Vehicles exposing (..)
 
-import Json.Decode exposing (Decoder, string, int, bool, list, succeed, fail, andThen)
-import Json.Decode.Pipeline exposing (decode, required, hardcoded)
+import Json.Decode exposing (Decoder, string, int, bool, list, succeed, fail, andThen, nullable)
+import Json.Decode.Pipeline exposing (decode, required, hardcoded, optional)
 import Model.Vehicles exposing (..)
 import Model.Decoders.Shared exposing (..)
 import Model.Decoders.Weapons exposing (..)
@@ -13,6 +13,7 @@ vehicleDecoder : Decoder Vehicle
 vehicleDecoder =
     decode Vehicle
         |> required "name" string
+        |> optional "photo" (nullable string) Nothing
         |> required "vtype" vtypeDecoder
         |> required "gear" gearDecoder
         |> hardcoded 0

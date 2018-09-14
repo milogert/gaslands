@@ -1,10 +1,11 @@
-module Update.Vehicle exposing (addVehicle, deleteVehicle, setTmpVehicleType, updateActivated, updateGear, updateHazards, updateCrew, updateEquipment, updateHull, updateNotes, rollSkidDice, setPerkInVehicle)
+module Update.Vehicle exposing (addVehicle, deleteVehicle, setTmpVehicleType, updateActivated, updateGear, updateHazards, updateCrew, updateEquipment, updateHull, updateNotes, rollSkidDice, setPerkInVehicle, getStream, takePhoto, setUrlForVehicle, discardPhoto)
 
 import Model.Model exposing (..)
 import Model.Vehicles exposing (..)
 import Model.Weapons exposing (..)
 import Model.Sponsors exposing (..)
 import Update.Utils
+import Ports.Photo
 
 
 addVehicle : Model -> ( Model, Cmd Msg )
@@ -97,6 +98,7 @@ setTmpVehicleType model vtstr =
         newtv =
             Vehicle
                 name
+                Nothing
                 vtype
                 gear
                 0
@@ -151,7 +153,7 @@ updateGear model v newGear =
                     model.view
 
         vehiclesList =
-            Update.Utils.joinAround v.id vehicleUpdated model.vehicles
+            Update.Utils.replaceAtIndex v.id vehicleUpdated model.vehicles
     in
         { model | view = newView, vehicles = vehiclesList } ! []
 
@@ -171,7 +173,7 @@ updateHazards model v newHazards =
                     model.view
 
         vehiclesList =
-            Update.Utils.joinAround v.id vehicleUpdated model.vehicles
+            Update.Utils.replaceAtIndex v.id vehicleUpdated model.vehicles
     in
         { model | view = newView, vehicles = vehiclesList } ! []
 
@@ -242,7 +244,7 @@ updateNotes : Model -> Vehicle -> String -> ( Model, Cmd Msg )
 updateNotes model v notes =
     let
         vehiclesNew =
-            Update.Utils.joinAround v.id { v | notes = notes } model.vehicles
+            Update.Utils.replaceAtIndex v.id { v | notes = notes } model.vehicles
     in
         { model | vehicles = vehiclesNew } ! []
 
@@ -254,13 +256,13 @@ updateAmmoUsed model v w used =
             { w | ammoUsed = used }
 
         weaponsNew =
-            Update.Utils.joinAround w.id weaponUpdated v.weapons |> Update.Utils.correctIds
+            Update.Utils.replaceAtIndex w.id weaponUpdated v.weapons |> Update.Utils.correctIds
 
         vehicleUpdated =
             { v | weapons = weaponsNew }
 
         vehiclesNew =
-            Update.Utils.joinAround v.id vehicleUpdated model.vehicles
+            Update.Utils.replaceAtIndex v.id vehicleUpdated model.vehicles
     in
         { model | view = Details vehicleUpdated, vehicles = vehiclesNew } ! []
 
@@ -281,7 +283,7 @@ rollSkidDice model v skidResults =
             { v | skidResults = skidResults }
 
         vehiclesNew =
-            Update.Utils.joinAround v.id vehicleUpdated model.vehicles
+            Update.Utils.replaceAtIndex v.id vehicleUpdated model.vehicles
     in
         { model | view = Details vehicleUpdated, vehicles = vehiclesNew } ! []
 
@@ -290,7 +292,7 @@ replaceWeaponInVehicle : Vehicle -> Weapon -> Vehicle
 replaceWeaponInVehicle v w =
     let
         weaponsNew =
-            Update.Utils.joinAround w.id w v.weapons |> Update.Utils.correctIds
+            Update.Utils.replaceAtIndex w.id w v.weapons |> Update.Utils.correctIds
     in
         { v | weapons = weaponsNew }
 
@@ -313,6 +315,40 @@ setPerkInVehicle model v perk isSet =
             { v | perks = perkList }
 
         vehiclesNew =
-            Update.Utils.joinAround v.id vehicleUpdated model.vehicles
+            Update.Utils.replaceAtIndex v.id vehicleUpdated model.vehicles
     in
         { model | view = Details vehicleUpdated, vehicles = vehiclesNew } ! []
+
+
+getStream : Model -> Vehicle -> ( Model, Cmd Msg )
+getStream model v =
+    model ! [ Ports.Photo.getStream "" ]
+
+
+takePhoto : Model -> Vehicle -> ( Model, Cmd Msg )
+takePhoto model v =
+    model ! [ Ports.Photo.takePhoto "" ]
+
+
+setUrlForVehicle : Model -> Vehicle -> String -> ( Model, Cmd Msg )
+setUrlForVehicle model v url =
+    let
+        vehicleUpdated =
+            { v | photo = Just url }
+
+        vehiclesNew =
+            Update.Utils.replaceAtIndex v.id vehicleUpdated model.vehicles
+    in
+        { model | view = Details vehicleUpdated, vehicles = vehiclesNew } ! [ Ports.Photo.destroyStream "" ]
+
+
+discardPhoto : Model -> Vehicle -> ( Model, Cmd Msg )
+discardPhoto model v =
+    let
+        vehicleUpdated =
+            { v | photo = Nothing }
+
+        vehiclesNew =
+            Update.Utils.replaceAtIndex v.id vehicleUpdated model.vehicles
+    in
+        { model | view = Details vehicleUpdated, vehicles = vehiclesNew } ! [ Ports.Photo.getStream "" ]
