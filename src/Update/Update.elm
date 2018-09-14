@@ -26,10 +26,19 @@ update msg model =
                 ! []
 
         ToDetails v ->
-            { model | view = Details v } ! []
+            { model | view = Details v } ! [ Ports.Photo.destroyStream "" ]
 
         ToPhoto v ->
-            { model | view = Photo v } ! [ Ports.Photo.getStream "" ]
+            let
+                cmds =
+                    case v.photo of
+                        Nothing ->
+                            [ Ports.Photo.getStream "" ]
+
+                        Just _ ->
+                            []
+            in
+            { model | view = Photo v } ! cmds
 
         ToNewVehicle ->
             { model | view = AddingVehicle, tmpVehicle = Nothing } ! []

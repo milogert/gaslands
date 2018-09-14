@@ -1,4 +1,4 @@
-module View.Photo exposing (view)
+module View.Photo exposing (view, renderPhoto)
 
 
 import Html exposing (Html, text, div, button, video, img)
@@ -21,10 +21,10 @@ view model v =
         (displayStream, displayPhoto) =
             case v.photo of
                 Nothing ->
-                    Debug.log "stream, photo" (True, False)
+                    (True, False)
 
                 Just p ->
-                    Debug.log "stream, photo" (False, True)
+                    (False, True)
 
         videoDisplay =
             video
@@ -34,26 +34,28 @@ view model v =
                 , classList [ ( "d-none", not displayStream) ]
                 ]
                 []
-
-        imageDisplay url =
-            img
-                [ src url
-                , class "card-img-top"
-                , classList [ ( "d-none", not displayPhoto) ]
-                ]
-                []
-
     in
     View.Utils.row
         [ div
-            [ class "col-3"
+            [ class "col-12 offset-md-3 col-md-6"
             ]
             [ div
                 [ class "card" ]
                 [ videoDisplay
-                , imageDisplay <| Maybe.withDefault "" v.photo
+                , renderPhoto v.photo displayPhoto
                 , div [ class "card-body" ]
                     [ discardButton ]
                 ]
             ]
         ]
+
+
+renderPhoto : Maybe String -> Bool -> Html Msg
+renderPhoto murl shouldDisplay =
+    img
+        [ src <| Maybe.withDefault "" murl
+        , class "card-img-top"
+        , classList [ ( "d-none", not shouldDisplay) ]
+        ]
+        []
+

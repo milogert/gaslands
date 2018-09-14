@@ -314,7 +314,7 @@ setUrlForVehicle model v url =
         vehiclesNew =
             Update.Utils.replaceAtIndex v.id vehicleUpdated model.vehicles
     in
-        { model | view = Photo vehicleUpdated, vehicles = vehiclesNew } ! []
+        { model | view = Photo vehicleUpdated, vehicles = vehiclesNew } ! [ Ports.Photo.destroyStream "" ]
 
 
 discardPhoto : Model -> Vehicle -> (Model, Cmd Msg)

@@ -7,6 +7,7 @@ import Model.Model exposing (..)
 import Model.Utils exposing (..)
 import Model.Vehicles exposing (..)
 import Model.Weapons exposing (handgun)
+import View.Photo
 import View.Upgrade
 import View.Utils exposing (icon, iconClass)
 import View.Weapon
@@ -254,13 +255,9 @@ render model currentView v =
                 , equipmentSlotsBadge
                 ]
 
-        photo =
-            case v.photo of
-                Nothing -> text ""
-                Just p -> div []
-                    [ img [ src p ] []
-                    , text p
-                    ]
+        belowNotesPhoto =
+            div [ class "d-md-none" ]
+                [ View.Photo.renderPhoto v.photo True ]
 
         body =
             div [ classList [ ( "card-text", currentView /= Details v ) ] ]
@@ -273,7 +270,7 @@ render model currentView v =
                 , hullChecks
                 , specials
                 , notes
-                , photo
+                , belowNotesPhoto 
                 , div [ classList [("d-none", wrecked)]] [weaponList]
                 , div [ classList [("d-none", wrecked)]] [upgradeList]
                 ]

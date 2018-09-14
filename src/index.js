@@ -79,3 +79,4 @@ app.ports.takePhoto.subscribe(function(nothing) {
         .catch(err => alert('Error: ' + err));
 });
 
+app.ports.destroyStream.subscribe(nothing => photo.stopStream());
