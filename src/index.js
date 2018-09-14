@@ -60,3 +60,22 @@ app.ports.delete.subscribe(function(key) {
     window.localStorage.removeItem(key);
     app.ports.deleteSub.send(key);
 });
+
+// Photo capabilities.
+import { photo } from './photo.js';
+app.ports.getStream.subscribe(function(nothing) {
+    photo.getStream();
+});
+
+app.ports.takePhoto.subscribe(function(nothing) {
+    photo
+        .takePhoto()
+        .then(blob => {
+            var url = URL.createObjectURL(blob);
+            console.log("url", url);
+            app.ports.getPhotoUrl.send(url);
+            photo.stopStream();
+        })
+        .catch(err => alert('Error: ' + err));
+});
+

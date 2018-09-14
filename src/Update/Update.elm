@@ -9,6 +9,7 @@ import Update.Vehicle
 import Update.Weapon
 import Update.Upgrade
 import Update.Data
+import Ports.Photo
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -26,6 +27,9 @@ update msg model =
 
         ToDetails v ->
             { model | view = Details v } ! []
+
+        ToPhoto v ->
+            { model | view = Photo v } ! [ Ports.Photo.getStream "" ]
 
         ToNewVehicle ->
             { model | view = AddingVehicle, tmpVehicle = Nothing } ! []
@@ -45,7 +49,7 @@ update msg model =
         UpdateTeamName s ->
             { model | teamName = Just s } ! []
 
-        -- Vehicle.
+        -- VEHICLE.
         AddVehicle ->
             Update.Vehicle.addVehicle model
 
@@ -126,6 +130,22 @@ update msg model =
 
         UpdateNotes v notes ->
             Update.Vehicle.updateNotes model v notes
+
+        GetStream v ->
+            Update.Vehicle.getStream model v
+
+        TakePhoto v ->
+            Update.Vehicle.takePhoto model v
+
+        SetPhotoUrlCallback url ->
+            case model.view of
+                Photo vehicle ->
+                    Update.Vehicle.setUrlForVehicle model vehicle url
+                _ ->
+                    model ! []
+
+        DiscardPhoto vehicle ->
+            Update.Vehicle.discardPhoto model vehicle
 
         -- WEAPON.
         AddWeapon v w ->

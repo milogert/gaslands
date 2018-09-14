@@ -5,6 +5,7 @@ import Html.Attributes exposing (checked, class, classList, disabled, for, href,
 import Html.Events exposing (onClick, onInput)
 import Model.Model exposing (..)
 import View.Details
+import View.Photo
 import View.Settings
 import View.NewUpgrade
 import View.NewVehicle
@@ -20,6 +21,9 @@ view model =
             case model.view of
                 Details _ ->
                     ToOverview
+
+                Photo v ->
+                    ToDetails v
 
                 AddingVehicle ->
                     ToOverview
@@ -145,6 +149,9 @@ render model =
 
         Details v ->
             View.Details.view model v
+
+        Photo v ->
+            View.Photo.view model v
 
         AddingVehicle ->
             View.NewVehicle.view model

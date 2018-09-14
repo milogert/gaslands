@@ -1,7 +1,7 @@
 module View.Vehicle exposing (render, renderPreview)
 
-import Html exposing (Html, button, div, h1, h2, h3, h4, h5, h6, hr, img, input, label, li, node, option, p, select, small, span, text, textarea, ul)
-import Html.Attributes exposing (checked, class, classList, disabled, for, href, id, max, min, placeholder, rel, src, type_, value, max, attribute, style)
+import Html exposing (Html, button, div, h1, h2, h3, h4, h5, h6, hr, img, input, label, li, node, option, p, select, small, span, text, textarea, ul, video)
+import Html.Attributes exposing (checked, class, classList, disabled, for, href, id, max, min, placeholder, rel, src, type_, value, max, attribute, style, autoplay)
 import Html.Events exposing (onClick, onInput)
 import Model.Model exposing (..)
 import Model.Utils exposing (..)
@@ -214,6 +214,16 @@ render model currentView v =
                 ]
                 [ name ]
 
+        photoHolder =
+            div
+                []
+                [ button
+                    [ class "btn btn-sm btn-secondary"
+                    , onClick <| ToPhoto v
+                    ]
+                    [ icon "camera" ]
+                ]
+
         pointsCostBadge =
             View.Utils.factBadge <|
                 (toString <| vehicleCost v)
@@ -244,9 +254,18 @@ render model currentView v =
                 , equipmentSlotsBadge
                 ]
 
+        photo =
+            case v.photo of
+                Nothing -> text ""
+                Just p -> div []
+                    [ img [ src p ] []
+                    , text p
+                    ]
+
         body =
             div [ classList [ ( "card-text", currentView /= Details v ) ] ]
                 [ header
+                , photoHolder
                 , activatedCheck
                 , factsHolder
                 , gearBox
@@ -254,6 +273,7 @@ render model currentView v =
                 , hullChecks
                 , specials
                 , notes
+                , photo
                 , div [ classList [("d-none", wrecked)]] [weaponList]
                 , div [ classList [("d-none", wrecked)]] [upgradeList]
                 ]

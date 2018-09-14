@@ -11,6 +11,7 @@ vehicleEncoder : Vehicle -> Value
 vehicleEncoder v =
     object
         [ ( "name", string v.name )
+        , ( "photo", photoEncoder v.photo )
         , ( "vtype", string <| vTToStr v.vtype )
         , ( "gear", gearEncoder v.gear )
         , ( "handling", int v.handling )
@@ -27,6 +28,12 @@ vehicleEncoder v =
         , ( "specials", list <| List.map specialEncoder v.specials )
         ]
 
+
+photoEncoder : Maybe String -> Value
+photoEncoder ms =
+    case ms of
+        Nothing -> null
+        Just s -> string s
 
 gearEncoder : GearTracker -> Value
 gearEncoder gear =

@@ -42,6 +42,6 @@ deleteUpgrade model v u =
             { v | upgrades = upgradesNew }
 
         vehiclesNew =
-            Update.Utils.joinAround v.id vehicleUpdated model.vehicles
+            Update.Utils.replaceAtIndex v.id vehicleUpdated model.vehicles
     in
         { model | view = Details vehicleUpdated, vehicles = vehiclesNew } ! []

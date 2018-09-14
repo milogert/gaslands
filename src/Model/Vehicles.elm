@@ -7,6 +7,7 @@ import Model.Weapons exposing (..)
 
 type alias Vehicle =
     { name : String
+    , photo : Maybe String
     , vtype : VehicleType
     , gear : GearTracker
     , hazards : Int
@@ -99,50 +100,6 @@ slotsRemaining v =
 
 
 -- Vehicle definitions.
-
-
-emptyVehicle : VehicleType -> Int -> Vehicle
-emptyVehicle vtype index =
-    let
-        gear =
-            GearTracker 1 <| typeToGearMax vtype
-
-        handling =
-            typeToHandling vtype
-
-        hull =
-            HullHolder 0 (typeToHullMax vtype)
-
-        crew =
-            typeToCrewMax vtype
-
-        equipment =
-            typeToEquipmentMax vtype
-
-        weight =
-            typeToWeight vtype
-
-        cost =
-            typeToCost vtype
-    in
-        Vehicle
-            ""
-            vtype
-            gear
-            0
-            handling
-            []
-            hull
-            crew
-            equipment
-            weight
-            False
-            []
-            []
-            ""
-            cost
-            index
-            []
 
 
 typeToWeight : VehicleType -> WeightClass
@@ -407,15 +364,6 @@ typeToHullMax t =
 vTToStr : VehicleType -> String
 vTToStr t =
     case t of
-        Bike ->
-            "Bike"
-
-        Buggy ->
-            "Buggy"
-
-        Car ->
-            "Car"
-
         PerformanceCar ->
             "Performance Car"
 
@@ -425,20 +373,11 @@ vTToStr t =
         MonsterTruck ->
             "Monster Truck"
 
-        Bus ->
-            "Bus"
-
         WarRig ->
             "War Rig"
 
-        Tank ->
-            "Tank"
-
-        Gyrocopter ->
-            "Gyrocopter"
-
-        Helicopter ->
-            "Helicopter"
+        _ ->
+            toString t
 
 
 strToVT : String -> Maybe VehicleType

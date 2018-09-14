@@ -24,6 +24,7 @@ type alias Model =
 type CurrentView
     = Overview
     | Details Vehicle
+    | Photo Vehicle
     | AddingVehicle
     | AddingWeapon Vehicle
     | AddingUpgrade Vehicle
@@ -70,6 +71,9 @@ viewToStr view =
         Details v ->
             v.name
 
+        Photo v ->
+            "Photo for " ++ v.name
+
         AddingVehicle ->
             "Adding Vehicle"
 
@@ -108,6 +112,7 @@ init =
 type Msg
     = ToOverview
     | ToDetails Vehicle
+    | ToPhoto Vehicle
     | ToNewVehicle
     | ToNewWeapon Vehicle
     | ToNewUpgrade Vehicle
@@ -151,3 +156,7 @@ type Msg
     | LoadModel String
     | DeleteItem String
     | DeleteItemCallback String
+    | GetStream Vehicle
+    | TakePhoto Vehicle
+    | SetPhotoUrlCallback String
+    | DiscardPhoto Vehicle
