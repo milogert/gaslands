@@ -71,7 +71,7 @@ view model =
             case model.view of
                 Overview ->
                     input
-                        [ class "form-control form-control-lg"
+                        [ class "form-control" -- form-control-lg"
                         , classList [ ( "d-none", not <| model.view == Overview ) ]
                         , type_ "text"
                         , onInput UpdateTeamName
@@ -92,12 +92,10 @@ view model =
                 , View.Utils.colPlus []
                     [ "my-auto", "col" ]
                     [ viewDisplay ]
-                , View.Utils.colPlus [ "auto" ]
-                    [ "my-auto" ]
-                    [ View.Sponsor.renderBadge model.sponsor ]
                 , View.Utils.colPlus [ "12", "md-auto" ]
-                    [ "my-auto", "form-inline", "col" ]
-                    [ button
+                    [ "form-inline", "col", "mb-auto", "mt-1", "mt-md-auto" ]
+                    [ span [ class "mr-2" ] [ View.Sponsor.renderBadge model.sponsor ]
+                    , button
                         [ class "btn btn-sm btn-primary mr-2"
                         , value <| toString model.gearPhase
                         , onClick NextGearPhase

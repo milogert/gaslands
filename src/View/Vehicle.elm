@@ -217,7 +217,11 @@ render model currentView v =
                         [ text "Perks Available from "
                         , text <| toString sponsor.name
                         ]
-                        (List.map (View.Sponsor.renderPerkClass v) sponsor.grantedClasses)
+                        [ div [ class "row" ]
+                            (sponsor.grantedClasses
+                                |> List.map (View.Sponsor.renderPerkClass v)
+                            )
+                        ]
 
         header =
             h4

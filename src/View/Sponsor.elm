@@ -69,7 +69,7 @@ renderBadge ms =
 
 renderPerkClass : Vehicle -> PerkClass -> Html Msg
 renderPerkClass vehicle perkClass =
-    div [] <|
+    div [ class "col-md-6" ] <|
         [ h6 [] [ text <| toString perkClass ] ]
             ++ (getClassPerks perkClass
                     |> List.map (renderVehiclePerk vehicle)

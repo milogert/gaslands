@@ -1,7 +1,7 @@
 module View.SponsorSelect exposing (view)
 
 import Html exposing (Html, button, div, h1, h2, h3, h4, h5, h6, img, input, label, li, node, option, p, select, small, span, text, textarea, ul)
-import Html.Attributes exposing (checked, class, disabled, for, href, id, max, min, placeholder, rel, src, type_, value, multiple, size)
+import Html.Attributes exposing (checked, class, disabled, for, href, id, max, min, placeholder, rel, src, type_, value, multiple, size, selected)
 import Html.Events exposing (onClick, onInput)
 import Model.Model exposing (..)
 import Model.Sponsors exposing (..)
@@ -19,6 +19,21 @@ view model =
 
                 Nothing ->
                     text "Select a sponsor."
+
+        currentSponsorName =
+            case (Debug.log "sponsor" model.sponsor) of
+                Nothing ->
+                    ""
+
+                Just s ->
+                    toString s.name
+
+        optionFunc t =
+            option
+                [ value t
+                , selected <| (Debug.log "name found" currentSponsorName) == t
+                ]
+                [ text t ]
     in
         View.Utils.row
             [ View.Utils.col "md-3"
@@ -32,7 +47,7 @@ view model =
                         :: (allSponsors
                                 |> List.map .name
                                 |> List.map toString
-                                |> List.map (\t -> option [ value t ] [ text t ])
+                                |> List.map optionFunc
                            )
                 ]
             , View.Utils.col "md-9" [ body ]
