@@ -16,7 +16,9 @@ var photo = {
         }
           
         var constraints = {
-            video: true
+            video: true,
+            //width: 1600,
+            //height: 900,
         };
 
         navigator.mediaDevices.getUserMedia(constraints)
@@ -47,7 +49,10 @@ var photo = {
         }
 
         var theImageCapturer = new ImageCapture(streamObj.getVideoTracks()[0])
-        var photo = theImageCapturer.takePhoto();
+        var photo = theImageCapturer.takePhoto({
+            //imageHeight: 1600,
+            //imageWidth: 900,
+        });
         console.log("taking photo", photo);
  
         return photo;

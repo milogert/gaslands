@@ -71,12 +71,18 @@ app.ports.takePhoto.subscribe(function(nothing) {
     photo
         .takePhoto()
         .then(blob => {
-            var url = URL.createObjectURL(blob);
-            console.log("url", url);
-            app.ports.getPhotoUrl.send(url);
-            photo.stopStream();
+            let reader = new FileReader();
+            reader.onload = function() {
+                console.log(reader.result);
+
+                var url = URL.createObjectURL(blob);
+                console.log("url", url);
+                app.ports.getPhotoUrl.send(reader.result);
+                photo.stopStream();
+            };
+            reader.readAsDataURL(blob);
         })
-        .catch(err => alert('Error: ' + err));
+        .catch(err => console.error('Error: ' + err));
 });
 
 app.ports.destroyStream.subscribe(nothing => photo.stopStream());
