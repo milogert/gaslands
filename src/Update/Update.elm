@@ -28,18 +28,6 @@ update msg model =
         ToDetails v ->
             { model | view = Details v } ! [ Ports.Photo.destroyStream "" ]
 
-        ToPhoto v ->
-            let
-                cmds =
-                    case v.photo of
-                        Nothing ->
-                            [ Ports.Photo.getStream "" ]
-
-                        Just _ ->
-                            []
-            in
-            { model | view = Photo v } ! cmds
-
         ToNewVehicle ->
             { model | view = AddingVehicle, tmpVehicle = Nothing } ! []
 
@@ -56,7 +44,12 @@ update msg model =
             { model | pointsAllowed = Result.withDefault 0 (String.toInt s) } ! []
 
         UpdateTeamName s ->
-            { model | teamName = Just s } ! []
+            case s of
+                "" ->
+                    { model | teamName = Nothing } ! []
+
+                _ ->
+                    { model | teamName = Just s } ! []
 
         -- VEHICLE.
         AddVehicle ->
@@ -148,8 +141,9 @@ update msg model =
 
         SetPhotoUrlCallback url ->
             case model.view of
-                Photo vehicle ->
+                Details vehicle ->
                     Update.Vehicle.setUrlForVehicle model vehicle url
+
                 _ ->
                     model ! []
 

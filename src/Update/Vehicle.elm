@@ -295,17 +295,17 @@ replaceWeaponInVehicle v w =
         { v | weapons = weaponsNew }
 
 
-getStream : Model -> Vehicle -> (Model, Cmd Msg)
+getStream : Model -> Vehicle -> ( Model, Cmd Msg )
 getStream model v =
     model ! [ Ports.Photo.getStream "" ]
 
 
-takePhoto : Model -> Vehicle -> (Model, Cmd Msg)
+takePhoto : Model -> Vehicle -> ( Model, Cmd Msg )
 takePhoto model v =
     model ! [ Ports.Photo.takePhoto "" ]
 
 
-setUrlForVehicle : Model -> Vehicle -> String -> (Model, Cmd Msg)
+setUrlForVehicle : Model -> Vehicle -> String -> ( Model, Cmd Msg )
 setUrlForVehicle model v url =
     let
         vehicleUpdated =
@@ -314,10 +314,10 @@ setUrlForVehicle model v url =
         vehiclesNew =
             Update.Utils.replaceAtIndex v.id vehicleUpdated model.vehicles
     in
-        { model | view = Photo vehicleUpdated, vehicles = vehiclesNew } ! [ Ports.Photo.destroyStream "" ]
+        { model | view = Details vehicleUpdated, vehicles = vehiclesNew } ! [ Ports.Photo.destroyStream "" ]
 
 
-discardPhoto : Model -> Vehicle -> (Model, Cmd Msg)
+discardPhoto : Model -> Vehicle -> ( Model, Cmd Msg )
 discardPhoto model v =
     let
         vehicleUpdated =
@@ -326,4 +326,4 @@ discardPhoto model v =
         vehiclesNew =
             Update.Utils.replaceAtIndex v.id vehicleUpdated model.vehicles
     in
-        { model | view = Photo vehicleUpdated, vehicles = vehiclesNew } ! [ Ports.Photo.getStream "" ]
+        { model | view = Details vehicleUpdated, vehicles = vehiclesNew } ! [ Ports.Photo.getStream "" ]

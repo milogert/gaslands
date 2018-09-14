@@ -58,9 +58,6 @@ var photo = {
         if (!streamObj) return;
         console.log("killing stream");
         streamObj.getTracks()[0].stop();
-
-        var mediaControl = document.querySelector('video');
-        delete mediaControl.src;
     }
 }
 

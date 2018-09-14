@@ -24,7 +24,6 @@ type alias Model =
 type CurrentView
     = Overview
     | Details Vehicle
-    | Photo Vehicle
     | AddingVehicle
     | AddingWeapon Vehicle
     | AddingUpgrade Vehicle
@@ -62,17 +61,14 @@ errorToStr e =
             "Json decode error: " ++ s
 
 
-viewToStr : CurrentView -> String
-viewToStr view =
-    case view of
+viewToStr : Model -> String
+viewToStr model =
+    case model.view of
         Overview ->
-            ""
+            (Maybe.withDefault "NoName" model.teamName) ++ "'s Overview"
 
         Details v ->
-            v.name
-
-        Photo v ->
-            "Photo for " ++ v.name
+            (Maybe.withDefault "NoName" model.teamName) ++ "'s Vehicle"
 
         AddingVehicle ->
             "Adding Vehicle"
@@ -112,7 +108,6 @@ init =
 type Msg
     = ToOverview
     | ToDetails Vehicle
-    | ToPhoto Vehicle
     | ToNewVehicle
     | ToNewWeapon Vehicle
     | ToNewUpgrade Vehicle
