@@ -5,13 +5,18 @@ import Model.Sponsors exposing (..)
 import Model.Upgrades exposing (..)
 import Model.Weapons exposing (..)
 import Ports.Storage
+import Ports.Photo
 import Task
 import Update.Sponsor
 import Update.Vehicle
 import Update.Weapon
 import Update.Upgrade
 import Update.Data
-import Ports.Photo
+
+
+doSaveModel : Cmd Msg
+doSaveModel =
+    Task.perform (\_ -> SaveModel) (Task.succeed SaveModel)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -25,10 +30,13 @@ update msg model =
                 , tmpWeapon = Nothing
                 , tmpUpgrade = Nothing
             }
-                ! []
+                ! [ doSaveModel ]
 
         ToDetails v ->
-            { model | view = Details v } ! [ Ports.Photo.destroyStream "" ]
+            { model | view = Details v }
+                ! [ Ports.Photo.destroyStream ""
+                  , doSaveModel
+                  ]
 
         ToSponsorSelect ->
             { model | view = SelectingSponsor } ! []
@@ -46,15 +54,18 @@ update msg model =
             { model | view = Settings } ! [ Ports.Storage.getKeys "" ]
 
         UpdatePointsAllowed s ->
-            { model | pointsAllowed = Result.withDefault 0 (String.toInt s) } ! []
+            { model
+                | pointsAllowed = Result.withDefault 0 (String.toInt s)
+            }
+                ! [ doSaveModel ]
 
         UpdateTeamName s ->
             case s of
                 "" ->
-                    { model | teamName = Nothing } ! []
+                    { model | teamName = Nothing } ! [ doSaveModel ]
 
                 _ ->
-                    { model | teamName = Just s } ! []
+                    { model | teamName = Just s } ! [ doSaveModel ]
 
         -- VEHICLE.
         AddVehicle ->
