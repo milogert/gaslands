@@ -1,7 +1,7 @@
 module View.View exposing (view)
 
 import Html exposing (Html, button, div, h1, h2, h3, h4, h5, h6, hr, img, input, label, li, node, option, p, select, small, span, text, textarea, ul, form, a)
-import Html.Attributes exposing (checked, class, classList, disabled, for, href, id, max, min, placeholder, rel, src, type_, value, readonly, style)
+import Html.Attributes exposing (attribute, checked, class, classList, disabled, for, href, id, max, min, placeholder, rel, src, type_, value, readonly, style)
 import Html.Events exposing (onClick, onInput)
 import Model.Model exposing (..)
 import View.Details
@@ -46,6 +46,7 @@ view model =
                 [ disabled <| model.view == Overview
                 , class "btn btn-light btn-sm btn-block"
                 , onClick viewToGoTo
+                , attribute "aria-label" "Back Button"
                 ]
                 [ icon "arrow-left" ]
 
@@ -98,7 +99,10 @@ view model =
                         [ text <| (toString currentPoints) ++ " of " ++ toString maxPoints ++ " points"
                         ]
                     , button
-                        [ class "btn btn-sm btn-light", onClick ToSettings ]
+                        [ class "btn btn-sm btn-light"
+                        , onClick ToSettings
+                        , attribute "aria-label" "Back Button"
+                        ]
                         [ icon "wrench" ]
                     ]
                 ]

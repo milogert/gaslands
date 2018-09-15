@@ -77,7 +77,8 @@ app.ports.takePhoto.subscribe(function(nothing) {
 
                 var url = URL.createObjectURL(blob);
                 console.log("url", url);
-                app.ports.getPhotoUrl.send(reader.result);
+                //app.ports.getPhotoUrl.send(reader.result);
+                app.ports.getPhotoUrl.send(url);
                 photo.stopStream();
             };
             reader.readAsDataURL(blob);
