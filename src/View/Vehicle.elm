@@ -168,6 +168,10 @@ render model currentView v =
                 _ ->
                     ul [] <| List.map renderSpecialFunc v.specials
 
+        specialHolder =
+            div [ class "special-holder col-12" ]
+                [ specials ]
+
         notes =
             div
                 [ class "vehicle-notes-holder col-12"
@@ -285,17 +289,13 @@ render model currentView v =
                 ]
                 [ header
                 , counterHolder
-                , specials
+                , specialHolder
                 , notes
-                , div [ classList [ ( "d-none", wrecked ) ] ]
+                , div [ class "list-holder col-12", classList [ ( "d-none", wrecked ) ] ]
                     [ weaponList
                     , upgradeList
                     , availablePerks
                     ]
-                , div [ class "col-12", classList [ ( "d-none", wrecked ) ] ]
-                    [ weaponList ]
-                , div [ class "col-12", classList [ ( "d-none", wrecked ) ] ]
-                    [ upgradeList ]
                 ]
 
         footer =

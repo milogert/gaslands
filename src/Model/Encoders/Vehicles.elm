@@ -28,14 +28,19 @@ vehicleEncoder v =
         , ( "id", int v.id )
         , ( "specials", list <| List.map specialEncoder v.specials )
         , ( "perks", list <| List.map vehiclePerkEncoder v.perks )
+        , ( "requiredSponsor", requiredSponsorEncoder v.requiredSponsor )
         ]
 
 
 photoEncoder : Maybe String -> Value
 photoEncoder ms =
     case ms of
-        Nothing -> null
-        Just s -> string s
+        Nothing ->
+            null
+
+        Just s ->
+            string s
+
 
 gearEncoder : GearTracker -> Value
 gearEncoder gear =

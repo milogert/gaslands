@@ -1,6 +1,7 @@
-module Model.Encoders.Shared exposing (specialEncoder)
+module Model.Encoders.Shared exposing (specialEncoder, requiredSponsorEncoder)
 
 import Json.Encode exposing (..)
+import Model.Sponsors exposing (SponsorType)
 import Model.Shared exposing (..)
 
 
@@ -96,3 +97,13 @@ modEncoderHelper s =
 
         _ ->
             ""
+
+
+requiredSponsorEncoder : Maybe SponsorType -> Value
+requiredSponsorEncoder mst =
+    case mst of
+        Nothing ->
+            null
+
+        Just st ->
+            string <| toString st

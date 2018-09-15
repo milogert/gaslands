@@ -26,6 +26,7 @@ type alias Vehicle =
     , id : Int
     , specials : List Special
     , perks : List VehiclePerk
+    , requiredSponsor : Maybe SponsorType
     }
 
 
@@ -474,3 +475,16 @@ typeToSpecials type_ =
 
         _ ->
             []
+
+
+typeToSponsorReq : VehicleType -> Maybe SponsorType
+typeToSponsorReq type_ =
+    case type_ of
+        Tank ->
+            Just Rutherford
+
+        Helicopter ->
+            Just Rutherford
+
+        _ ->
+            Nothing

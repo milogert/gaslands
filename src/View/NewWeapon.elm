@@ -42,22 +42,28 @@ view model v =
 
                 Nothing ->
                     text "Select a weapon."
+
+        options =
+            allWeaponsList
+                |> List.filter
+                    (\x -> x.slots <= (slotsRemaining v))
+                |> List.filter (\x -> x.name /= handgun.name)
+                |> List.filter (View.Utils.weaponSponsorFilter model)
+                |> List.map .name
+                |> List.map (\t -> option [ value t ] [ text t ])
+
+        selectList =
+            select
+                [ onInput TmpWeaponUpdate
+                , class "form-control mb-3"
+                , size 8
+                ]
+                options
     in
         View.Utils.row
             [ View.Utils.col "md-3"
                 [ addButton
-                , select
-                    [ onInput TmpWeaponUpdate
-                    , class "form-control mb-3"
-                    , size 8
-                    ]
-                    (allWeaponsList
-                        |> List.filter
-                            (\x -> x.slots <= (slotsRemaining v))
-                        |> List.filter (\x -> x.name /= handgun.name)
-                        |> List.map .name
-                        |> List.map (\t -> option [ value t ] [ text t ])
-                    )
+                , selectList
                 ]
             , View.Utils.col "md-9" [ body ]
             ]

@@ -21,6 +21,7 @@ weaponDecoder =
         |> required "id" int
         |> hardcoded WeaponReady
         |> hardcoded 0
+        |> required "requiredSponsor" (string |> andThen requiredSponsorDecoderHelper)
 
 
 mountPointDecoder : Decoder WeaponMounting

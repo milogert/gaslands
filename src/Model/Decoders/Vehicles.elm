@@ -32,6 +32,7 @@ vehicleDecoder =
         |> required "id" int
         |> required "specials" (list specialDecoder)
         |> required "perks" (list vehiclePerkDecoder)
+        |> required "requiredSponsor" (string |> andThen requiredSponsorDecoderHelper)
 
 
 vtypeDecoder : Decoder VehicleType

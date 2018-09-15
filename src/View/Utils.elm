@@ -1,4 +1,4 @@
-module View.Utils exposing (icon, iconb, iconClass, card, crewUsed, detailSection, renderCountDown, renderDice, renderSpecial, row, rowPlus, col, colPlus, factsHolder, factBadge)
+module View.Utils exposing (icon, iconb, iconClass, card, crewUsed, detailSection, renderCountDown, renderDice, renderSpecial, row, rowPlus, col, colPlus, factsHolder, factBadge, vehicleSponsorFilter, weaponSponsorFilter)
 
 import Html exposing (Html, node, button, div, h1, h2, h3, h4, h5, h6, hr, img, input, label, li, node, option, p, select, small, span, text, textarea, ul, b)
 import Html.Attributes exposing (checked, class, classList, disabled, for, href, id, max, min, placeholder, rel, src, type_, value)
@@ -7,6 +7,7 @@ import Model.Model exposing (..)
 import Model.Shared exposing (..)
 import Model.Vehicles exposing (..)
 import Model.Weapons exposing (..)
+import Model.Sponsors exposing (..)
 
 
 icon : String -> Html Msg
@@ -169,3 +170,26 @@ factsHolder facts =
 factBadge : String -> Html Msg
 factBadge factString =
     span [ class "badge badge-secondary mr-2" ] [ text factString ]
+
+
+vehicleSponsorFilter : Model -> VehicleType -> Bool
+vehicleSponsorFilter model vt =
+    sponsorFilter_ model (typeToSponsorReq vt)
+
+
+weaponSponsorFilter : Model -> Weapon -> Bool
+weaponSponsorFilter model weapon =
+    sponsorFilter_ model weapon.requiredSponsor
+
+
+sponsorFilter_ : Model -> Maybe SponsorType -> Bool
+sponsorFilter_ model mst =
+    case ( model.sponsor, mst ) of
+        ( _, Nothing ) ->
+            True
+
+        ( Nothing, _ ) ->
+            Nothing == mst
+
+        ( Just modelSponsor, Just vehicleSponsor ) ->
+            modelSponsor.name == vehicleSponsor

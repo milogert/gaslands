@@ -45,22 +45,32 @@ view model =
 
                 Nothing ->
                     "Select Vehicle"
+
+        addButton =
+            button
+                [ onClick AddVehicle
+                , class "btn btn-primary btn-block mb-3"
+                , disabled disabledButton
+                ]
+                [ text buttonText ]
+
+        options =
+            allVehicleTypes
+                |> List.filter (View.Utils.vehicleSponsorFilter model)
+                |> List.map vehicleOption
+
+        selectList =
+            select
+                [ onInput TmpVehicleType
+                , class "form-control mb-3"
+                , size 8
+                ]
+                options
     in
         View.Utils.row
             [ View.Utils.col "md-3"
-                [ button
-                    [ onClick AddVehicle
-                    , class "btn btn-primary btn-block mb-3"
-                    , disabled disabledButton
-                    ]
-                    [ text buttonText ]
-                , select
-                    [ onInput TmpVehicleType
-                    , class "form-control mb-3"
-                    , size 8
-                    ]
-                  <|
-                    List.map vehicleOption allVehicleTypes
+                [ addButton
+                , selectList
                 ]
             , View.Utils.col "md-9" [ body ]
             ]

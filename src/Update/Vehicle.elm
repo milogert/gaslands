@@ -95,6 +95,9 @@ setTmpVehicleType model vtstr =
         specials =
             typeToSpecials vtype
 
+        requiredSponsor =
+            typeToSponsorReq vtype
+
         newtv =
             Vehicle
                 name
@@ -116,6 +119,7 @@ setTmpVehicleType model vtstr =
                 -1
                 specials
                 []
+                requiredSponsor
     in
         { model | tmpVehicle = Just newtv } ! []
 
