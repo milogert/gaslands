@@ -135,8 +135,16 @@ updateActivated model v activated =
 
         post =
             List.drop (v.id + 1) model.vehicles
+
+        newView =
+            case model.view of
+                Details currentVehicle ->
+                    Details nv
+
+                _ ->
+                    model.view
     in
-        { model | vehicles = pre ++ nv :: post } ! []
+        { model | view = newView, vehicles = pre ++ nv :: post } ! []
 
 
 updateGear : Model -> Vehicle -> Int -> ( Model, Cmd Msg )

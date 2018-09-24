@@ -68,7 +68,7 @@ render model currentView v =
                     "Activated"
 
                 ( _, False ) ->
-                    "Cannot Activated"
+                    "Cannot be Activated"
 
                 ( _, _ ) ->
                     "Activate"
