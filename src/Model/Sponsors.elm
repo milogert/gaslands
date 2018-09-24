@@ -81,6 +81,28 @@ getClassPerks perkClass =
             prisonCars
 
 
+typeToSponsor : SponsorType -> Sponsor
+typeToSponsor type_ =
+    case type_ of
+        Rutherford ->
+            rutherford
+
+        Miyazaki ->
+            miyazaki
+
+        Mishkin ->
+            mishkin
+
+        Idris ->
+            idris
+
+        Slime ->
+            slime
+
+        Warden ->
+            warden
+
+
 stringToSponsor : String -> Maybe Sponsor
 stringToSponsor str =
     case str of

@@ -81,7 +81,8 @@ view model =
                     [ viewDisplay ]
                 , View.Utils.colPlus [ "12", "md-auto" ]
                     [ "form-inline", "col", "mb-auto", "mt-1", "mt-md-auto" ]
-                    [ span [ class "mr-2" ] [ View.Sponsor.renderBadge model.sponsor ]
+                    [ span [ class "mr-2" ]
+                        [ View.Sponsor.renderBadge model.sponsor ]
                     , button
                         [ class "btn btn-sm btn-primary mr-2"
                         , value <| toString model.gearPhase

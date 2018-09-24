@@ -230,8 +230,19 @@ update msg model =
 
         -- SPONSOR.
         SponsorUpdate s ->
-            Update.Sponsor.set model <|
-                stringToSponsor s
+            let
+                sponsor =
+                    stringToSponsor s
+
+                name =
+                    case sponsor of
+                        Nothing ->
+                            Nothing
+
+                        Just s ->
+                            Just s.name
+            in
+                Update.Sponsor.set model name
 
         -- DATA.
         Import ->

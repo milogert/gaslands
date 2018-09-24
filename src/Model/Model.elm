@@ -13,7 +13,7 @@ type alias Model =
     , pointsAllowed : Int
     , gearPhase : Int
     , vehicles : List Vehicle
-    , sponsor : Maybe Sponsor
+    , sponsor : Maybe SponsorType
     , tmpVehicle : Maybe Vehicle
     , tmpWeapon : Maybe Weapon
     , tmpUpgrade : Maybe Upgrade

@@ -5,6 +5,7 @@ import Html.Attributes exposing (checked, class, classList, disabled, for, href,
 import Html.Events exposing (onClick, onInput)
 import Model.Model exposing (..)
 import Model.Utils exposing (..)
+import Model.Sponsors
 import Model.Vehicles exposing (..)
 import Model.Weapons exposing (handgun)
 import View.Sponsor
@@ -254,10 +255,12 @@ render model currentView v =
                     View.Utils.detailSection
                         currentView
                         [ text "Perks Available from "
-                        , text <| toString sponsor.name
+                        , text <| toString sponsor
                         ]
                         [ div [ class "row" ]
-                            (sponsor.grantedClasses
+                            (sponsor
+                                |> Model.Sponsors.typeToSponsor
+                                |> .grantedClasses
                                 |> List.map (View.Sponsor.renderPerkClass v)
                             )
                         ]

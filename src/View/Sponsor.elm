@@ -5,7 +5,7 @@ import Html.Attributes exposing (attribute, class, href, title, type_, id, for, 
 import Html.Events exposing (onClick, onCheck)
 import Model.Model exposing (Msg(..))
 import Model.Vehicles exposing (Vehicle)
-import Model.Sponsors exposing (Sponsor, TeamPerk, PerkClass, getClassPerks, VehiclePerk)
+import Model.Sponsors exposing (Sponsor, SponsorType, TeamPerk, PerkClass, getClassPerks, VehiclePerk, typeToSponsor)
 import View.Utils exposing (icon)
 
 
@@ -40,7 +40,7 @@ renderTeamPerk { name, description } =
         ]
 
 
-renderBadge : Maybe Sponsor -> Html Msg
+renderBadge : Maybe SponsorType -> Html Msg
 renderBadge ms =
     let
         ( name, description ) =
@@ -49,7 +49,7 @@ renderBadge ms =
                     ( "No Sponsor", "" )
 
                 Just s ->
-                    ( s.name |> toString, s.description )
+                    ( toString s, s |> typeToSponsor |> .description )
     in
         div [ class "sponsor-badge" ]
             [ span

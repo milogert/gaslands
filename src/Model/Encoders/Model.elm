@@ -2,18 +2,27 @@ module Model.Encoders.Model exposing (modelEncoder)
 
 import Json.Encode exposing (..)
 import Model.Encoders.Vehicles exposing (vehicleEncoder)
-import Model.Encoders.Sponsors exposing (sponsorEncoder)
+import Model.Encoders.Sponsors exposing (sponsorEncoder, sponsorTypeEncoder)
 import Model.Model exposing (Model)
 
 
 modelEncoder : Model -> Value
 modelEncoder model =
-    object
-        [ ( "pointsAllowed", int model.pointsAllowed )
-        , ( "teamName", teamNameEncoder model.teamName )
-        , ( "vehicles", list <| List.map vehicleEncoder model.vehicles )
-        , ( "sponsor", sponsorEncoder model.sponsor )
-        ]
+    let
+        sponsor =
+            case model.sponsor of
+                Nothing ->
+                    null
+
+                Just s ->
+                    sponsorTypeEncoder s
+    in
+        object
+            [ ( "pointsAllowed", int model.pointsAllowed )
+            , ( "teamName", teamNameEncoder model.teamName )
+            , ( "vehicles", list <| List.map vehicleEncoder model.vehicles )
+            , ( "sponsor", sponsor )
+            ]
 
 
 teamNameEncoder : Maybe String -> Value

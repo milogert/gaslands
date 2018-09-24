@@ -15,7 +15,7 @@ view model =
         body =
             case model.sponsor of
                 Just s ->
-                    View.Sponsor.render s
+                    View.Sponsor.render <| Model.Sponsors.typeToSponsor s
 
                 Nothing ->
                     text "Select a sponsor."
@@ -26,7 +26,7 @@ view model =
                     ""
 
                 Just s ->
-                    toString s.name
+                    toString s
 
         optionFunc t =
             option

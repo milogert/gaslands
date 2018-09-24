@@ -1,4 +1,4 @@
-module Model.Encoders.Sponsors exposing (sponsorEncoder, vehiclePerkEncoder)
+module Model.Encoders.Sponsors exposing (sponsorEncoder, vehiclePerkEncoder, sponsorTypeEncoder)
 
 import Json.Encode exposing (..)
 import Model.Sponsors exposing (..)
@@ -17,6 +17,11 @@ sponsorEncoder msponsor =
                 , ( "perks", list <| List.map teamPerkEncoder sponsor.perks )
                 , ( "grantedClasses", list <| List.map (\s -> s |> toString |> string) sponsor.grantedClasses )
                 ]
+
+
+sponsorTypeEncoder : SponsorType -> Value
+sponsorTypeEncoder sponsorType =
+    string <| toString sponsorType
 
 
 teamPerkEncoder : TeamPerk -> Value

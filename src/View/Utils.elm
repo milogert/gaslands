@@ -191,5 +191,5 @@ sponsorFilter_ model mst =
         ( Nothing, _ ) ->
             Nothing == mst
 
-        ( Just modelSponsor, Just vehicleSponsor ) ->
-            modelSponsor.name == vehicleSponsor
+        ( Just sponsor, Just vehicleSponsor ) ->
+            sponsor == vehicleSponsor

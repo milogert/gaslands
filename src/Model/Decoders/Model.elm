@@ -3,7 +3,7 @@ module Model.Decoders.Model exposing (modelDecoder)
 import Json.Decode exposing (..)
 import Json.Decode.Pipeline exposing (decode, required, optional, hardcoded)
 import Model.Decoders.Vehicles exposing (vehicleDecoder)
-import Model.Decoders.Sponsors exposing (sponsorDecoder)
+import Model.Decoders.Sponsors exposing (sponsorTypeDecoderHelper, sponsorDecoder)
 import Model.Model exposing (..)
 
 
@@ -15,7 +15,7 @@ modelDecoder =
         |> required "pointsAllowed" int
         |> hardcoded 0
         |> required "vehicles" (list vehicleDecoder)
-        |> optional "sponsor" (nullable sponsorDecoder) Nothing
+        |> optional "sponsor" (nullable (string |> andThen sponsorTypeDecoderHelper)) Nothing
         |> hardcoded Nothing
         |> hardcoded Nothing
         |> hardcoded Nothing
