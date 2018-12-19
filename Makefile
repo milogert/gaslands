@@ -1,5 +1,5 @@
-PACKAGES=elm@0.18.0-exp5 create-elm-app@1.10.4 elm-github-install node-sass gh-pages@1.0.0 elm-test
-NPX=/usr/bin/env npx
+PACKAGES=yarn elm@0.19.0-bugfix2 create-elm-app@3.0.2 elm-github-install node-sass gh-pages@1.0.0 elm-test
+YARN=/usr/bin/env yarn
 
 STYLESHEET=public/css/stylesheet.css
 
@@ -10,23 +10,23 @@ init:
 	/usr/bin/env npm install $(PACKAGES)
 
 elmdeps: init
-	$(NPX) elm-github-install
+	$(YARN) elm-github-install
 
 css:
 	rm $(STYLESHEET)
-	$(NPX) node-sass --output-style compressed scss/custom.scss > $(STYLESHEET)
+	$(YARN) node-sass --output-style compressed scss/custom.scss > $(STYLESHEET)
 	
 start:
-	$(NPX) elm-app start
+	$(YARN) elm-app start
 
 build: FORCE
-	#PUBLIC_URL=./ $(NPX) elm-app build
-	$(NPX) elm-app build
+	#PUBLIC_URL=./ $(YARN) elm-app build
+	$(YARN) elm-app build
 
 deploy: build
-	$(NPX) gh-pages -d build
+	$(YARN) gh-pages -d build
 
 test:
-	$(NPX) elm-test
+	$(YARN) elm-test
 
 FORCE: ;
