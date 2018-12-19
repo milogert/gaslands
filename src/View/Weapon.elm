@@ -1,5 +1,7 @@
 module View.Weapon exposing (render)
 
+import Bootstrap.Grid as Grid
+import Bootstrap.Grid.Col as Col
 import Html exposing (Html, button, div, h1, h2, h3, h4, h5, h6, hr, img, input, label, li, node, option, p, select, small, span, text, textarea, ul)
 import Html.Attributes exposing (checked, class, classList, disabled, for, href, id, max, min, placeholder, rel, src, type_, value)
 import Html.Events exposing (onClick, onInput)
@@ -172,12 +174,11 @@ render model vehicle weapon =
     in
     View.EquipmentLayout.render
         (not isPreview)
-        [ View.Utils.row
-            [ div [ class "col-md-12 col mb-2" ]
+        [ Grid.row []
+            [ Grid.col [ Col.xs, Col.md12 ]
                 [ h6 [] [ text <| weapon.name ++ " " ] ]
-            , View.Utils.colPlus [ "md-12", "auto" ] [ "mb-2" ] [ fireButton ]
-            , View.Utils.colPlus [ "md-12", "auto" ]
-                [ "mb-2" ]
+            , Grid.col [ Col.xsAuto, Col.md12 ] [ fireButton ]
+            , Grid.col [ Col.xsAuto, Col.md12 ]
                 [ button
                     [ class "btn btn-sm btn-danger btn-block"
                     , classList [ ( "d-none", isPreview ) ]

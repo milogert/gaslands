@@ -1,5 +1,8 @@
 module View.Vehicle exposing (render, renderPreview)
 
+import Bootstrap.Grid as Grid
+import Bootstrap.Grid.Col as Col
+import Bootstrap.Grid.Row as Row
 import Html exposing (Html, button, div, h1, h2, h3, h4, h5, h6, hr, img, input, label, li, node, option, p, select, small, span, text, textarea, ul, video)
 import Html.Attributes exposing (attribute, autoplay, checked, class, classList, disabled, for, href, id, max, min, placeholder, rel, src, style, type_, value)
 import Html.Events exposing (onClick, onInput)
@@ -98,19 +101,23 @@ render model currentView v =
                 ]
 
         header =
-            div [ class "vehicle-header col-12 mb-2" ]
-                [ View.Utils.row
-                    [ div
-                        [ class "col-6 col-md-3"
-                        , classList [ ( "d-none", currentView /= Details v ) ]
+            Grid.col [ Col.xs12 ]
+                [ Grid.row []
+                    [ Grid.col
+                        [ Col.xs6
+                        , Col.md3
+                        , Col.attrs
+                            [ classList [ ( "d-none", currentView /= Details v ) ] ]
                         ]
-                        [ View.Photo.view model v
-                        ]
-                    , div
-                        [ class "col-6 col-md-9"
-                        , classList
-                            [ ( "col-12", currentView /= Details v )
-                            , ( "col-md-12", currentView /= Details v )
+                        [ View.Photo.view model v ]
+                    , Grid.col
+                        [ Col.xs6
+                        , Col.md9
+                        , Col.attrs
+                            [ classList
+                                [ ( "col-12", currentView /= Details v )
+                                , ( "col-md-12", currentView /= Details v )
+                                ]
                             ]
                         ]
                         [ name, activateButton, factsHolder ]
@@ -155,7 +162,7 @@ render model currentView v =
                 (UpdateHull v)
 
         counterHolder =
-            div [ class "counter-holder col-12" ]
+            Grid.col [ Col.xs12 ]
                 [ gearCounter, hazardCounter, hullCounter ]
 
         renderSpecialFunc special =
@@ -170,13 +177,15 @@ render model currentView v =
                     ul [] <| List.map renderSpecialFunc v.specials
 
         specialHolder =
-            div [ class "special-holder col-12" ]
-                [ specials ]
+            Grid.col [ Col.xs12 ] [ specials ]
 
         notes =
-            div
-                [ class "vehicle-notes-holder col-12"
-                , classList [ ( "d-none", currentView == Overview ) ]
+            Grid.col
+                [ Col.xs12
+                , Col.attrs
+                    [ class "vehicle-notes-holder"
+                    , classList [ ( "d-none", currentView == Overview ) ]
+                    ]
                 ]
                 [ textarea
                     [ onInput (UpdateNotes v)
@@ -286,15 +295,21 @@ render model currentView v =
                     ++ slots
 
         body =
-            div
-                [ class "vehicle-body row"
-                , classList [ ( "card-text", currentView /= Details v ) ]
+            Grid.row
+                [ Row.attrs
+                    [ class "vehicle-body row"
+                    , classList [ ( "card-text", currentView /= Details v ) ]
+                    ]
                 ]
                 [ header
                 , counterHolder
                 , specialHolder
                 , notes
-                , div [ class "list-holder col-12", classList [ ( "d-none", wrecked ) ] ]
+                , Grid.col
+                    [ Col.xs12
+                    , Col.attrs
+                        [ class "list-holder", classList [ ( "d-none", wrecked ) ] ]
+                    ]
                     [ weaponList
                     , upgradeList
                     , availablePerks

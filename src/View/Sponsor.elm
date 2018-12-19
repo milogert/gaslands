@@ -51,20 +51,15 @@ renderBadge ms =
                 Just sponsor ->
                     ( fromSponsorType sponsor, sponsor |> typeToSponsor |> .description )
     in
-    div [ class "sponsor-badge" ]
-        [ span
+    span [ class "sponsor-badge" ]
+        [ a
             [ class "badge badge-secondary"
+            , onClick ToSponsorSelect
+            , href "#"
             , title description
-            , attribute "data-toggle" "tooltip"
-            , attribute "data-html" "true"
             ]
             [ text name
-            , a
-                [ class "text-white"
-                , onClick ToSponsorSelect
-                , href "#"
-                ]
-                [ icon "exchange-alt" ]
+            , icon "exchange-alt"
             ]
         ]
 

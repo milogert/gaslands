@@ -1,5 +1,15 @@
-module Model.Model exposing (CurrentView(..), ErrorType(..), Model, Msg(..), errorToStr, init, totalPoints, viewToStr)
+module Model.Model exposing
+    ( CurrentView(..)
+    , ErrorType(..)
+    , Model
+    , Msg(..)
+    , errorToStr
+    , init
+    , totalPoints
+    , viewToStr
+    )
 
+import Model.Settings exposing (..)
 import Model.Sponsors exposing (..)
 import Model.Upgrades exposing (..)
 import Model.Vehicles exposing (..)
@@ -20,6 +30,7 @@ type alias Model =
     , error : List ErrorType
     , importValue : String
     , storageKeys : List String
+    , settings : Settings
     }
 
 
@@ -109,6 +120,7 @@ init _ =
         []
         ""
         []
+        Model.Settings.init
     , Cmd.none
     )
 

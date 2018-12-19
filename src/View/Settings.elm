@@ -1,9 +1,29 @@
 module View.Settings exposing (view)
 
-import Html exposing (Html, a, button, div, h3, hr, input, label, li, p, text, textarea, ul)
+import Bootstrap.Button as Btn
+import Bootstrap.Form as Form
+import Bootstrap.Form.Input as Input
+import Bootstrap.Form.Textarea as Textarea
+import Bootstrap.Grid as Grid
+import Bootstrap.Grid.Col as Col
+import Html
+    exposing
+        ( Html
+        , a
+        , div
+        , h3
+        , h4
+        , hr
+        , li
+        , p
+        , text
+        , ul
+        )
 import Html.Attributes exposing (class, classList, for, href, id, placeholder, rows, style, type_, value)
 import Html.Events exposing (onClick, onInput)
 import Model.Model exposing (..)
+import Model.Settings exposing (..)
+import View.Settings.SquadGeneration
 import View.Utils exposing (icon, iconb)
 
 
@@ -13,6 +33,7 @@ view model =
         List.intersperse
             (hr [] [])
             [ renderGameSettings model
+            , renderAppSettings model.settings
             , renderImportExport model
             , renderAbout
             ]
@@ -20,47 +41,36 @@ view model =
 
 renderGameSettings : Model -> Html Msg
 renderGameSettings model =
-    View.Utils.row
-        [ View.Utils.col "12"
+    Grid.row []
+        [ Grid.col []
             [ h3 [] [ text "Game Settings" ]
-            , div [ class "form-group" ]
-                [ label
-                    [ for "teamName"
-                    , class "col-form-label mr-2"
-                    ]
-                    [ text "Team Name" ]
-                , div
-                    [ class "input-group mb-0 mr-4" ]
-                    [ input
-                        [ class "form-control"
-                        , id "teamName"
-                        , type_ "text"
-                        , onInput UpdateTeamName
-                        , value <| Maybe.withDefault "" model.teamName
-                        , placeholder "Team Name"
-                        ]
-                        []
+            , Form.group []
+                [ Form.label [ for "teamName" ] [ text "Team Name" ]
+                , Input.text
+                    [ Input.id "teamName"
+                    , Input.onInput UpdateTeamName
+                    , Input.value <| Maybe.withDefault "" model.teamName
+                    , Input.placeholder "Team Name"
                     ]
                 ]
-            , div [ class "form-group" ]
-                [ label
-                    [ for "squadPoints"
-                    , class "col-form-label mr-2"
-                    ]
-                    [ text "Maxiumum Points Allowed" ]
-                , div
-                    [ class "input-group mb-0 mr-4" ]
-                    [ input
-                        [ type_ "number"
-                        , class "form-control my-1"
-                        , id "squadPoints"
-                        , value <| String.fromInt model.pointsAllowed
-                        , onInput UpdatePointsAllowed
-                        ]
-                        []
+            , Form.group []
+                [ Form.label [ for "squadPoints" ] [ text "Maxiumum Points Allowed" ]
+                , Input.number
+                    [ Input.id "squadPoints"
+                    , Input.value <| String.fromInt model.pointsAllowed
+                    , Input.onInput UpdatePointsAllowed
                     ]
                 ]
             ]
+        ]
+
+
+renderAppSettings : Settings -> Html Msg
+renderAppSettings settings =
+    Grid.row []
+        [ Grid.col [ Col.xs12 ] [ h3 [] [ text "App Settings" ] ]
+        , Grid.col [ Col.xs12 ]
+            [ View.Settings.SquadGeneration.render settings ]
         ]
 
 
@@ -75,57 +85,57 @@ renderImportExport model =
                 Just s ->
                     s
     in
-    View.Utils.row
-        [ View.Utils.col "12" [ h3 [] [ text "Import/Export" ] ]
-        , View.Utils.colPlus [ "md-4", "12" ]
-            [ "mb-2" ]
-            [ button
-                [ class "btn btn-primary btn-block"
-                , onClick SaveModel
+    Grid.row []
+        [ Grid.col [ Col.xs12 ] [ h3 [] [ text "Import/Export" ] ]
+        , Grid.col [ Col.md4, Col.xs12 ]
+            [ Btn.button
+                [ Btn.primary
+                , Btn.block
+                , Btn.attrs [ class "mb-2" ]
+                , Btn.onClick SaveModel
                 ]
                 [ icon "download"
                 , text <| " Save Team \"" ++ teamName ++ "\""
                 ]
             ]
-        , View.Utils.colPlus [ "md-4", "6" ]
-            [ "mb-2" ]
-            [ button
-                [ class "btn btn-primary btn-block"
-                , onClick Share
+        , Grid.col [ Col.md4, Col.xs12 ]
+            [ Btn.button
+                [ Btn.primary
+                , Btn.block
+                , Btn.attrs [ class "mb-2" ]
+                , Btn.onClick Share
                 ]
                 [ icon "share", text " Share" ]
             ]
-        , View.Utils.colPlus [ "md-4", "6" ]
-            [ "mb-2" ]
-            [ button
-                [ class "btn btn-primary btn-block"
-                , onClick Import
+        , Grid.col [ Col.md4, Col.xs12 ]
+            [ Btn.button
+                [ Btn.primary
+                , Btn.block
+                , Btn.attrs [ class "mb-2" ]
+                , Btn.onClick Import
                 ]
                 [ icon "upload", text " Import" ]
             ]
-        , View.Utils.colPlus [ "md-4", "12" ]
-            []
+        , Grid.col [ Col.xs4 ]
             [ ul
                 []
                 (List.map storageMapper model.storageKeys)
             ]
-        , View.Utils.colPlus [ "md-8", "12" ]
-            []
-            [ textarea
-                [ class "form-control mt-2"
-                , onInput SetImport
-                , rows 15
-                , style "font-family" "monospace"
+        , Grid.col [ Col.xs8 ]
+            [ Textarea.textarea
+                [ Textarea.onInput SetImport
+                , Textarea.rows 15
+                , Textarea.attrs [ style "font-family" "monospace" ]
+                , Textarea.value model.importValue
                 ]
-                [ text model.importValue ]
             ]
         ]
 
 
 renderAbout : Html Msg
 renderAbout =
-    View.Utils.row
-        [ View.Utils.col "12"
+    Grid.row []
+        [ Grid.col []
             [ h3 [] [ text "About" ]
             , p [] [ text "Built by Milo Gertjejansen." ]
             , p [] [ text "Email: milo plus glom at milogert dot com" ]
@@ -146,12 +156,13 @@ renderAbout =
 storageMapper : String -> Html Msg
 storageMapper s =
     li []
-        [ button
-            [ class "btn btn-link", onClick <| LoadModel s ]
+        [ Btn.button
+            [ Btn.roleLink, Btn.onClick <| LoadModel s ]
             [ text s ]
-        , button
-            [ class "btn btn-sm btn-danger"
-            , onClick <| DeleteItem s
+        , Btn.button
+            [ Btn.danger
+            , Btn.small
+            , Btn.onClick <| DeleteItem s
             ]
             [ icon "trash-alt" ]
         ]

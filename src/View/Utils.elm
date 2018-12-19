@@ -1,5 +1,21 @@
-module View.Utils exposing (card, col, colPlus, crewUsed, detailSection, factBadge, factsHolder, icon, iconClass, iconb, renderCountDown, renderDice, renderSpecial, row, rowPlus, vehicleSponsorFilter, weaponSponsorFilter)
+module View.Utils exposing
+    ( card
+    , crewUsed
+    , detailSection
+    , factBadge
+    , factsHolder
+    , icon
+    , iconClass
+    , iconb
+    , renderCountDown
+    , renderDice
+    , renderSpecial
+    , vehicleSponsorFilter
+    , weaponSponsorFilter
+    )
 
+import Bootstrap.Form as Form
+import Bootstrap.Grid as Grid
 import Html exposing (Html, b, button, div, h1, h2, h3, h4, h5, h6, hr, img, input, label, li, node, option, p, select, small, span, text, textarea, ul)
 import Html.Attributes exposing (checked, class, classList, disabled, for, href, id, max, min, placeholder, rel, src, type_, value)
 import Html.Events exposing (onInput)
@@ -28,38 +44,6 @@ iconClass styleOrBrand s cl =
         , classList <| List.map (\c -> ( c, True )) cl
         ]
         []
-
-
-row : List (Html Msg) -> Html Msg
-row body =
-    rowPlus [] body
-
-
-rowPlus : List String -> List (Html Msg) -> Html Msg
-rowPlus classes body =
-    div [ class "row", classList <| mapClassList classes ] body
-
-
-col : String -> List (Html Msg) -> Html Msg
-col colMod body =
-    case colMod of
-        "" ->
-            colPlus [] [] body
-
-        _ ->
-            colPlus [ colMod ] [] body
-
-
-colPlus : List String -> List String -> List (Html Msg) -> Html Msg
-colPlus colMods classes body =
-    case colMods of
-        [] ->
-            div [ class "col", classList <| mapClassList classes ] body
-
-        _ ->
-            div
-                [ classList <| List.map (\x -> ( "col-" ++ x, True )) colMods ++ mapClassList classes ]
-                body
 
 
 mapClassList : List String -> List ( String, Bool )
@@ -92,8 +76,8 @@ renderSpecial isPreview ammoMsg ammoUsed s =
                     div [] [ text <| "Ammo: " ++ String.fromInt i ]
 
                 False ->
-                    div [ class "form-row" ]
-                        [ label [ class "col-form-label" ] [ text "Ammo: " ]
+                    Form.row []
+                        [ Form.colLabel [] [ text "Ammo: " ]
                         , renderCountDown ammoMsg i ammoUsed
                         ]
 
@@ -125,7 +109,7 @@ renderSpecial isPreview ammoMsg ammoUsed s =
             text <| fromSpecial s
 
 
-renderCountDown : Maybe (Int -> String -> Msg) -> Int -> Int -> Html Msg
+renderCountDown : Maybe (Int -> String -> Msg) -> Int -> Int -> Form.Col Msg
 renderCountDown msg start current =
     let
         baseAttr =
@@ -144,7 +128,7 @@ renderCountDown msg start current =
                 Just m ->
                     (onInput <| m start) :: baseAttr
     in
-    col "" [ input attr [] ]
+    Form.col [] [ input attr [] ]
 
 
 renderDice : Maybe Dice -> String

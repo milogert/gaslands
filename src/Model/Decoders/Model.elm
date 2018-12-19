@@ -2,6 +2,7 @@ module Model.Decoders.Model exposing (modelDecoder)
 
 import Json.Decode exposing (..)
 import Json.Decode.Pipeline exposing (hardcoded, optional, required)
+import Model.Decoders.Settings exposing (settingsDecoder)
 import Model.Decoders.Sponsors exposing (sponsorDecoder, sponsorTypeDecoderHelper)
 import Model.Decoders.Vehicles exposing (vehicleDecoder)
 import Model.Model exposing (..)
@@ -22,3 +23,4 @@ modelDecoder =
         |> hardcoded []
         |> hardcoded ""
         |> hardcoded []
+        |> required "settings" settingsDecoder

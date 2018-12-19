@@ -1,8 +1,28 @@
 module View.View exposing (view)
 
+import Bootstrap.Badge as Badge
+import Bootstrap.Button as Btn
+import Bootstrap.CDN as CDN
+import Bootstrap.Grid as Grid
+import Bootstrap.Grid.Col as Col
+import Bootstrap.Grid.Row as Row
 import Browser exposing (Document)
-import Html exposing (Html, a, button, div, form, h1, h2, h3, h4, h5, h6, hr, img, input, label, li, node, option, p, select, small, span, text, textarea, ul)
-import Html.Attributes exposing (attribute, checked, class, classList, disabled, for, href, id, max, min, placeholder, readonly, rel, src, style, type_, value)
+import Html
+    exposing
+        ( Html
+        , div
+        , h2
+        , hr
+        , span
+        , text
+        )
+import Html.Attributes
+    exposing
+        ( attribute
+        , class
+        , classList
+        , style
+        )
 import Html.Events exposing (onClick, onInput)
 import Model.Model exposing (..)
 import View.Details
@@ -43,11 +63,13 @@ view model =
                     ToOverview
 
         backButton =
-            button
-                [ disabled <| model.view == Overview
-                , class "btn btn-light btn-sm btn-block"
-                , onClick viewToGoTo
-                , attribute "aria-label" "Back Button"
+            Btn.button
+                [ Btn.disabled <| model.view == Overview
+                , Btn.light
+                , Btn.small
+                , Btn.block
+                , Btn.onClick viewToGoTo
+                , Btn.attrs [ attribute "aria-label" "Back Button" ]
                 ]
                 [ icon "arrow-left" ]
 
@@ -60,13 +82,44 @@ view model =
         gearPhaseText =
             String.fromInt model.gearPhase
 
-        teamName =
-            case model.teamName of
-                Nothing ->
-                    ""
+        gearPhaseButton =
+            Btn.button
+                [ Btn.small
+                , Btn.primary
+                , Btn.attrs [ class "ml-2" ]
+                , Btn.onClick NextGearPhase
+                ]
+                [ icon "cogs", Badge.badgeLight [] [ text gearPhaseText ] ]
 
-                Just s ->
-                    s
+        pointsBadgeFunction =
+            case compare currentPoints maxPoints of
+                LT ->
+                    Badge.badgeWarning
+
+                EQ ->
+                    Badge.badgeSuccess
+
+                GT ->
+                    Badge.badgeDanger
+
+        pointsBadge =
+            pointsBadgeFunction
+                [ class "ml-2" ]
+                [ text <| String.fromInt currentPoints ++ " of " ++ String.fromInt maxPoints
+                , icon "coins"
+                ]
+
+        settingsButton =
+            Btn.button
+                [ Btn.small
+                , Btn.light
+                , Btn.onClick ToSettings
+                , Btn.attrs
+                    [ attribute "aria-label" "Back Button"
+                    , class "ml-2"
+                    ]
+                ]
+                [ icon "wrench" ]
 
         viewDisplay =
             h2 [ style "margin-bottom" "0" ]
@@ -74,41 +127,19 @@ view model =
     in
     Document
         (viewToStr model)
-        [ div [ class "container" ]
-            [ View.Utils.rowPlus [ "mt-2", "mb-2" ]
-                [ View.Utils.colPlus [ "auto" ]
-                    [ "my-auto" ]
-                    [ backButton ]
-                , View.Utils.colPlus []
-                    [ "my-auto", "col" ]
-                    [ viewDisplay ]
-                , View.Utils.colPlus [ "12", "md-auto" ]
-                    [ "form-inline", "col", "mb-auto", "mt-1", "mt-md-auto" ]
-                    [ span [ class "mr-2" ]
-                        [ View.Sponsor.renderBadge model.sponsor ]
-                    , button
-                        [ class "btn btn-sm btn-primary mr-2"
-                        , value <| String.fromInt model.gearPhase
-                        , onClick NextGearPhase
-                        ]
-                        [ icon "cogs", span [ class "badge badge-light" ] [ text gearPhaseText ] ]
-                    , span
-                        [ class "badge mr-2"
-                        , classList
-                            [ ( "badge-danger", currentPoints > maxPoints )
-                            , ( "badge-success", currentPoints == maxPoints )
-                            , ( "badge-warning", currentPoints < maxPoints )
-                            ]
-                        ]
-                        [ text <| String.fromInt currentPoints ++ " of " ++ String.fromInt maxPoints
-                        , icon "coins"
-                        ]
-                    , button
-                        [ class "btn btn-sm btn-light"
-                        , onClick ToSettings
-                        , attribute "aria-label" "Back Button"
-                        ]
-                        [ icon "wrench" ]
+        [ Grid.container []
+            [ CDN.stylesheet -- creates an inline style node with the Bootstrap CSS
+            , Grid.row [ Row.middleXs ]
+                [ Grid.col [ Col.xsAuto ] [ backButton ]
+                , Grid.col [] [ viewDisplay ]
+                , Grid.col
+                    [ Col.xs12
+                    , Col.mdAuto
+                    ]
+                    [ View.Sponsor.renderBadge model.sponsor
+                    , gearPhaseButton
+                    , pointsBadge
+                    , settingsButton
                     ]
                 ]
             , hr [] []
@@ -122,21 +153,12 @@ view model =
 
 displayAlert : Model -> Html Msg
 displayAlert model =
-    case model.error of
-        [] ->
-            text ""
-
-        _ ->
-            div [] <|
-                List.map
-                    (\x ->
-                        row
-                            [ div
-                                [ class "col alert alert-danger" ]
-                                [ text <| errorToStr x ]
-                            ]
-                    )
-                    model.error
+    model.error
+        |> List.map
+            (\x ->
+                Grid.simpleRow [ Grid.col [] [ text <| errorToStr x ] ]
+            )
+        |> div []
 
 
 render : Model -> Html Msg

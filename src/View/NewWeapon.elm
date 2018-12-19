@@ -1,5 +1,7 @@
 module View.NewWeapon exposing (view)
 
+import Bootstrap.Grid as Grid
+import Bootstrap.Grid.Col as Col
 import Html exposing (Html, button, div, h1, h2, h3, h4, h5, h6, img, input, label, li, node, option, p, select, small, span, text, textarea, ul)
 import Html.Attributes exposing (checked, class, disabled, for, href, id, max, min, multiple, placeholder, rel, size, src, type_, value)
 import Html.Events exposing (onClick, onInput)
@@ -60,10 +62,10 @@ view model v =
                 ]
                 options
     in
-    View.Utils.row
-        [ View.Utils.col "md-3"
+    Grid.row []
+        [ Grid.col [ Col.md3 ]
             [ addButton
             , selectList
             ]
-        , View.Utils.col "md-9" [ body ]
+        , Grid.col [ Col.md9 ] [ body ]
         ]
