@@ -1,11 +1,11 @@
-module Model.Encoders.Shared exposing (specialEncoder, requiredSponsorEncoder)
+module Model.Encoders.Shared exposing (requiredSponsorEncoder, specialEncoder)
 
 import Json.Encode exposing (..)
-import Model.Sponsors exposing (SponsorType)
 import Model.Shared exposing (..)
+import Model.Sponsors exposing (SponsorType, fromSponsorType)
 
 
-specialEncoder : Special -> Value
+specialEncoder : Special -> List ( String, Value )
 specialEncoder s =
     case s of
         Ammo i ->
@@ -51,33 +51,32 @@ specialEncoder s =
             modEncoder s i
 
 
-ammoEncoder : Int -> Value
+ammoEncoder : Int -> List ( String, Value )
 ammoEncoder i =
-    object [ ( "type", string "Ammo" ), ( "count", int i ) ]
+    [ ( "type", string "Ammo" ), ( "count", int i ) ]
 
 
-specialRuleEncoder : String -> Value
+specialRuleEncoder : String -> List ( String, Value )
 specialRuleEncoder t =
-    object [ ( "type", string "SpecialRule" ), ( "text", string t ) ]
+    [ ( "type", string "SpecialRule" ), ( "text", string t ) ]
 
 
-namedSpecialRuleEncoder : String -> String -> Value
-namedSpecialRuleEncoder t1 t2 =
-    object
-        [ ( "type", string "NamedSpecialRule" )
-        , ( "name", string t1 )
-        , ( "text", string t2 )
-        ]
+namedSpecialRuleEncoder : String -> String -> List ( String, Value )
+namedSpecialRuleEncoder name text =
+    [ ( "type", string "NamedSpecialRule" )
+    , ( "name", string name )
+    , ( "text", string text )
+    ]
 
 
-genericEncoder : Special -> Value
+genericEncoder : Special -> List ( String, Value )
 genericEncoder s =
-    object [ ( "type", string <| toString s ) ]
+    [ ( "type", string <| fromSpecial s ) ]
 
 
-modEncoder : Special -> Int -> Value
+modEncoder : Special -> Int -> List ( String, Value )
 modEncoder s i =
-    object [ ( "type", string <| modEncoderHelper s ), ( "modifier", int i ) ]
+    [ ( "type", string <| modEncoderHelper s ), ( "modifier", int i ) ]
 
 
 modEncoderHelper : Special -> String
@@ -99,11 +98,11 @@ modEncoderHelper s =
             ""
 
 
-requiredSponsorEncoder : Maybe SponsorType -> Value
+requiredSponsorEncoder : Maybe SponsorType -> String
 requiredSponsorEncoder mst =
     case mst of
         Nothing ->
-            null
+            ""
 
         Just st ->
-            string <| toString st
+            fromSponsorType st

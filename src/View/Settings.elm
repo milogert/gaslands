@@ -1,7 +1,7 @@
 module View.Settings exposing (view)
 
-import Html exposing (Html, button, div, h3, text, textarea, ul, li, a, label, input, hr, p)
-import Html.Attributes exposing (class, rows, style, href, for, classList, type_, id, value, placeholder)
+import Html exposing (Html, a, button, div, h3, hr, input, label, li, p, text, textarea, ul)
+import Html.Attributes exposing (class, classList, for, href, id, placeholder, rows, style, type_, value)
 import Html.Events exposing (onClick, onInput)
 import Model.Model exposing (..)
 import View.Utils exposing (icon, iconb)
@@ -54,7 +54,7 @@ renderGameSettings model =
                         [ type_ "number"
                         , class "form-control my-1"
                         , id "squadPoints"
-                        , value <| toString model.pointsAllowed
+                        , value <| String.fromInt model.pointsAllowed
                         , onInput UpdatePointsAllowed
                         ]
                         []
@@ -75,51 +75,51 @@ renderImportExport model =
                 Just s ->
                     s
     in
-        View.Utils.row
-            [ View.Utils.col "12" [ h3 [] [ text "Import/Export" ] ]
-            , View.Utils.colPlus [ "md-4", "12" ]
-                [ "mb-2" ]
-                [ button
-                    [ class "btn btn-primary btn-block"
-                    , onClick SaveModel
-                    ]
-                    [ icon "download"
-                    , text <| " Save Team \"" ++ teamName ++ "\""
-                    ]
+    View.Utils.row
+        [ View.Utils.col "12" [ h3 [] [ text "Import/Export" ] ]
+        , View.Utils.colPlus [ "md-4", "12" ]
+            [ "mb-2" ]
+            [ button
+                [ class "btn btn-primary btn-block"
+                , onClick SaveModel
                 ]
-            , View.Utils.colPlus [ "md-4", "6" ]
-                [ "mb-2" ]
-                [ button
-                    [ class "btn btn-primary btn-block"
-                    , onClick Share
-                    ]
-                    [ icon "share", text " Share" ]
-                ]
-            , View.Utils.colPlus [ "md-4", "6" ]
-                [ "mb-2" ]
-                [ button
-                    [ class "btn btn-primary btn-block"
-                    , onClick Import
-                    ]
-                    [ icon "upload", text " Import" ]
-                ]
-            , View.Utils.colPlus [ "md-4", "12" ]
-                []
-                [ ul
-                    []
-                    (List.map storageMapper model.storageKeys)
-                ]
-            , View.Utils.colPlus [ "md-8", "12" ]
-                []
-                [ textarea
-                    [ class "form-control mt-2"
-                    , onInput SetImport
-                    , rows 15
-                    , style [ ( "font-family", "monospace" ) ]
-                    ]
-                    [ text model.importValue ]
+                [ icon "download"
+                , text <| " Save Team \"" ++ teamName ++ "\""
                 ]
             ]
+        , View.Utils.colPlus [ "md-4", "6" ]
+            [ "mb-2" ]
+            [ button
+                [ class "btn btn-primary btn-block"
+                , onClick Share
+                ]
+                [ icon "share", text " Share" ]
+            ]
+        , View.Utils.colPlus [ "md-4", "6" ]
+            [ "mb-2" ]
+            [ button
+                [ class "btn btn-primary btn-block"
+                , onClick Import
+                ]
+                [ icon "upload", text " Import" ]
+            ]
+        , View.Utils.colPlus [ "md-4", "12" ]
+            []
+            [ ul
+                []
+                (List.map storageMapper model.storageKeys)
+            ]
+        , View.Utils.colPlus [ "md-8", "12" ]
+            []
+            [ textarea
+                [ class "form-control mt-2"
+                , onInput SetImport
+                , rows 15
+                , style "font-family" "monospace"
+                ]
+                [ text model.importValue ]
+            ]
+        ]
 
 
 renderAbout : Html Msg

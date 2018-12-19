@@ -4,19 +4,15 @@ import Model.Model exposing (..)
 import Model.Sponsors exposing (..)
 import Model.Upgrades exposing (..)
 import Model.Weapons exposing (..)
-import Ports.Storage
 import Ports.Photo
+import Ports.Storage
 import Task
+import Update.Data
 import Update.Sponsor
+import Update.Upgrade
+import Update.Utils exposing (doSaveModel)
 import Update.Vehicle
 import Update.Weapon
-import Update.Upgrade
-import Update.Data
-
-
-doSaveModel : Cmd Msg
-doSaveModel =
-    Task.perform (\_ -> SaveModel) (Task.succeed SaveModel)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -24,48 +20,66 @@ update msg model =
     case msg of
         -- ROUTING.
         ToOverview ->
-            { model
+            ( { model
                 | view = Overview
                 , tmpVehicle = Nothing
                 , tmpWeapon = Nothing
                 , tmpUpgrade = Nothing
-            }
-                ! [ doSaveModel ]
+              }
+            , doSaveModel
+            )
 
         ToDetails v ->
-            { model | view = Details v }
-                ! [ Ports.Photo.destroyStream ""
-                  , doSaveModel
-                  ]
+            ( { model | view = Details v }
+            , Cmd.batch
+                [ Ports.Photo.destroyStream ""
+                , doSaveModel
+                ]
+            )
 
         ToSponsorSelect ->
-            { model | view = SelectingSponsor } ! []
+            ( { model | view = SelectingSponsor }
+            , Cmd.none
+            )
 
         ToNewVehicle ->
-            { model | view = AddingVehicle, tmpVehicle = Nothing } ! []
+            ( { model | view = AddingVehicle, tmpVehicle = Nothing }
+            , Cmd.none
+            )
 
         ToNewWeapon v ->
-            { model | view = AddingWeapon v, tmpWeapon = Nothing } ! []
+            ( { model | view = AddingWeapon v, tmpWeapon = Nothing }
+            , Cmd.none
+            )
 
         ToNewUpgrade v ->
-            { model | view = AddingUpgrade v, tmpUpgrade = Nothing } ! []
+            ( { model | view = AddingUpgrade v, tmpUpgrade = Nothing }
+            , Cmd.none
+            )
 
         ToSettings ->
-            { model | view = Settings } ! [ Ports.Storage.getKeys "" ]
+            ( { model | view = Settings }
+            , Ports.Storage.getKeys ""
+            )
 
         UpdatePointsAllowed s ->
-            { model
-                | pointsAllowed = Result.withDefault 0 (String.toInt s)
-            }
-                ! [ doSaveModel ]
+            ( { model
+                | pointsAllowed = Maybe.withDefault 0 (String.toInt s)
+              }
+            , doSaveModel
+            )
 
         UpdateTeamName s ->
             case s of
                 "" ->
-                    { model | teamName = Nothing } ! [ doSaveModel ]
+                    ( { model | teamName = Nothing }
+                    , Cmd.none
+                    )
 
                 _ ->
-                    { model | teamName = Just s } ! [ doSaveModel ]
+                    ( { model | teamName = Just s }
+                    , Cmd.none
+                    )
 
         -- VEHICLE.
         AddVehicle ->
@@ -90,23 +104,29 @@ update msg model =
                 gearPhase =
                     if model.gearPhase < 6 then
                         model.gearPhase + 1
+
                     else
                         1
             in
-                { model
-                    | view = Overview
-                    , gearPhase = gearPhase
-                    , vehicles = vs
-                }
-                    ! []
+            ( { model
+                | view = Overview
+                , gearPhase = gearPhase
+                , vehicles = vs
+              }
+            , Cmd.none
+            )
 
         TmpName name ->
             case model.tmpVehicle of
                 Just v ->
-                    { model | tmpVehicle = Just { v | name = name } } ! []
+                    ( { model | tmpVehicle = Just { v | name = name } }
+                    , Cmd.none
+                    )
 
                 Nothing ->
-                    model ! []
+                    ( model
+                    , Cmd.none
+                    )
 
         TmpVehicleType vtstr ->
             Update.Vehicle.setTmpVehicleType model vtstr
@@ -114,28 +134,32 @@ update msg model =
         TmpNotes notes ->
             case model.tmpVehicle of
                 Just v ->
-                    { model | tmpVehicle = Just { v | notes = notes } } ! []
+                    ( { model | tmpVehicle = Just { v | notes = notes } }
+                    , Cmd.none
+                    )
 
                 Nothing ->
-                    model ! []
+                    ( model
+                    , Cmd.none
+                    )
 
         UpdateActivated v activated ->
             Update.Vehicle.updateActivated model v activated
 
         UpdateGear v strCurrent ->
-            Update.Vehicle.updateGear model v (String.toInt strCurrent |> Result.withDefault 1)
+            Update.Vehicle.updateGear model v (String.toInt strCurrent |> Maybe.withDefault 1)
 
         ShiftGear v mod min max ->
             Update.Vehicle.updateGear model v <| clamp min max <| v.gear.current + mod
 
         UpdateHazards v strCurrent ->
-            Update.Vehicle.updateHazards model v (String.toInt strCurrent |> Result.withDefault 1)
+            Update.Vehicle.updateHazards model v (String.toInt strCurrent |> Maybe.withDefault 1)
 
         ShiftHazards v mod min max ->
             Update.Vehicle.updateHazards model v <| clamp min max <| v.hazards + mod
 
         UpdateHull v strCurrent ->
-            Update.Vehicle.updateHull model v (String.toInt strCurrent |> Result.withDefault 1)
+            Update.Vehicle.updateHull model v (String.toInt strCurrent |> Maybe.withDefault 1)
 
         ShiftHull v mod min max ->
             Update.Vehicle.updateHull model v <| clamp min max <| v.hull.current + mod
@@ -168,7 +192,9 @@ update msg model =
                     Update.Vehicle.setUrlForVehicle model vehicle url
 
                 _ ->
-                    model ! []
+                    ( model
+                    , Cmd.none
+                    )
 
         DiscardPhoto vehicle ->
             Update.Vehicle.discardPhoto model vehicle
@@ -181,14 +207,16 @@ update msg model =
             Update.Weapon.deleteWeapon model v w
 
         UpdateAmmoUsed v w total strLeft ->
-            Update.Weapon.updateAmmoUsed model v w (total - (String.toInt strLeft |> Result.withDefault 1))
+            Update.Weapon.updateAmmoUsed model v w (total - (String.toInt strLeft |> Maybe.withDefault 1))
 
         TmpWeaponUpdate name ->
             let
                 w =
                     nameToWeapon name
             in
-                { model | tmpWeapon = w } ! []
+            ( { model | tmpWeapon = w }
+            , Cmd.none
+            )
 
         TmpWeaponMountPoint mountPointStr ->
             let
@@ -203,10 +231,14 @@ update msg model =
                         Just tmpWeapon ->
                             Just { tmpWeapon | mountPoint = mountPoint }
             in
-                { model | tmpWeapon = w } ! []
+            ( { model | tmpWeapon = w }
+            , Cmd.none
+            )
 
         SetWeaponsReady ->
-            model ! []
+            ( model
+            , Cmd.none
+            )
 
         SetWeaponFired v w ->
             Update.Weapon.setWeaponFired model v w
@@ -226,51 +258,67 @@ update msg model =
                 u =
                     nameToUpgrade name
             in
-                { model | tmpUpgrade = u } ! []
+            ( { model | tmpUpgrade = u }
+            , Cmd.none
+            )
 
         -- SPONSOR.
         SponsorUpdate s ->
             let
-                sponsor =
+                mSponsor =
                     stringToSponsor s
 
                 name =
-                    case sponsor of
+                    case mSponsor of
                         Nothing ->
                             Nothing
 
-                        Just s ->
-                            Just s.name
+                        Just sponsor ->
+                            Just sponsor.name
             in
-                Update.Sponsor.set model name
+            Update.Sponsor.set model name
 
         -- DATA.
         Import ->
             Update.Data.import_ model
 
         SetImport json ->
-            { model | importValue = json } ! []
+            ( { model | importValue = json }
+            , Cmd.none
+            )
 
         Share ->
             Update.Data.share model
 
         GetStorage value ->
-            { model | importValue = value } ! []
+            ( { model | importValue = value }
+            , Cmd.none
+            )
 
         GetStorageKeys keys ->
-            { model | storageKeys = keys } ! []
+            ( { model | storageKeys = keys }
+            , Cmd.none
+            )
 
         SetStorageCallback entry ->
-            model ! [ Ports.Storage.getKeys "", Task.perform SetImport (Task.succeed entry.value) ]
+            ( model
+            , Cmd.batch [ Ports.Storage.getKeys "", Task.perform SetImport (Task.succeed entry.value) ]
+            )
 
         SaveModel ->
             Update.Data.saveModel model
 
         LoadModel key ->
-            model ! [ Ports.Storage.get key ]
+            ( model
+            , Ports.Storage.get key
+            )
 
         DeleteItem key ->
-            model ! [ Ports.Storage.delete key ]
+            ( model
+            , Ports.Storage.delete key
+            )
 
         DeleteItemCallback deletedKey ->
-            model ! [ Ports.Storage.getKeys "" ]
+            ( model
+            , Ports.Storage.getKeys ""
+            )

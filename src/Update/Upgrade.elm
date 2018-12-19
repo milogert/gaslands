@@ -1,8 +1,8 @@
 module Update.Upgrade exposing (addUpgrade, deleteUpgrade)
 
 import Model.Model exposing (..)
-import Model.Vehicles exposing (..)
 import Model.Upgrades exposing (..)
+import Model.Vehicles exposing (..)
 import Update.Utils
 
 
@@ -24,12 +24,13 @@ addUpgrade model v u =
         newvehicles =
             pre ++ vehicleNew :: post
     in
-        { model
-            | view = Details vehicleNew
-            , error = []
-            , vehicles = newvehicles
-        }
-            ! []
+    ( { model
+        | view = Details vehicleNew
+        , error = []
+        , vehicles = newvehicles
+      }
+    , Cmd.none
+    )
 
 
 deleteUpgrade : Model -> Vehicle -> Upgrade -> ( Model, Cmd Msg )
@@ -44,4 +45,6 @@ deleteUpgrade model v u =
         vehiclesNew =
             Update.Utils.replaceAtIndex v.id vehicleUpdated model.vehicles
     in
-        { model | view = Details vehicleUpdated, vehicles = vehiclesNew } ! []
+    ( { model | view = Details vehicleUpdated, vehicles = vehiclesNew }
+    , Cmd.none
+    )

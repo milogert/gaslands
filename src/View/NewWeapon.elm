@@ -1,7 +1,7 @@
 module View.NewWeapon exposing (view)
 
 import Html exposing (Html, button, div, h1, h2, h3, h4, h5, h6, img, input, label, li, node, option, p, select, small, span, text, textarea, ul)
-import Html.Attributes exposing (checked, class, disabled, for, href, id, max, min, placeholder, rel, src, type_, value, multiple, size)
+import Html.Attributes exposing (checked, class, disabled, for, href, id, max, min, multiple, placeholder, rel, size, src, type_, value)
 import Html.Events exposing (onClick, onInput)
 import Model.Model exposing (..)
 import Model.Vehicles exposing (..)
@@ -20,7 +20,7 @@ view model v =
             crewLeft > 0
 
         addButton =
-            case (model.tmpWeapon) of
+            case model.tmpWeapon of
                 Just w ->
                     button
                         [ class "form-control btn btn-primary mb-3"
@@ -46,7 +46,7 @@ view model v =
         options =
             allWeaponsList
                 |> List.filter
-                    (\x -> x.slots <= (slotsRemaining v))
+                    (\x -> x.slots <= slotsRemaining v)
                 |> List.filter (\x -> x.name /= handgun.name)
                 |> List.filter (View.Utils.weaponSponsorFilter model)
                 |> List.map .name
@@ -60,10 +60,10 @@ view model v =
                 ]
                 options
     in
-        View.Utils.row
-            [ View.Utils.col "md-3"
-                [ addButton
-                , selectList
-                ]
-            , View.Utils.col "md-9" [ body ]
+    View.Utils.row
+        [ View.Utils.col "md-3"
+            [ addButton
+            , selectList
             ]
+        , View.Utils.col "md-9" [ body ]
+        ]

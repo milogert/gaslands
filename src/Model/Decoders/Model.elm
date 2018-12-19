@@ -1,15 +1,15 @@
 module Model.Decoders.Model exposing (modelDecoder)
 
 import Json.Decode exposing (..)
-import Json.Decode.Pipeline exposing (decode, required, optional, hardcoded)
+import Json.Decode.Pipeline exposing (hardcoded, optional, required)
+import Model.Decoders.Sponsors exposing (sponsorDecoder, sponsorTypeDecoderHelper)
 import Model.Decoders.Vehicles exposing (vehicleDecoder)
-import Model.Decoders.Sponsors exposing (sponsorTypeDecoderHelper, sponsorDecoder)
 import Model.Model exposing (..)
 
 
 modelDecoder : Decoder Model
 modelDecoder =
-    decode Model
+    succeed Model
         |> hardcoded Overview
         |> optional "teamName" (nullable string) Nothing
         |> required "pointsAllowed" int

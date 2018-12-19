@@ -1,16 +1,14 @@
 import './main.css';
-import { Main } from './Main.elm';
+import { Elm } from './Main.elm';
 import registerServiceWorker from './registerServiceWorker';
 
-var app = Main.embed(document.getElementById('root'));
+const app = Elm.Main.init({
+  node: document.getElementById('root')
+});
+
+console.log(app.ports);
 
 registerServiceWorker();
-
-// receive something from Elm
-app.ports.exportModel.subscribe(function (str) {
-  var myWindow = window.open("", "_blank");
-  myWindow.document.write(str);
-});
 
 app.ports.share.subscribe(function(str) {
     if (!("share" in navigator))

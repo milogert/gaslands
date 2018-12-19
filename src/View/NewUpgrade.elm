@@ -1,7 +1,7 @@
 module View.NewUpgrade exposing (view)
 
 import Html exposing (Html, button, div, h1, h2, h3, h4, h5, h6, img, input, label, li, node, option, p, select, small, span, text, textarea, ul)
-import Html.Attributes exposing (checked, class, disabled, for, href, id, max, min, placeholder, rel, src, type_, value, multiple, size)
+import Html.Attributes exposing (checked, class, disabled, for, href, id, max, min, multiple, placeholder, rel, size, src, type_, value)
 import Html.Events exposing (onClick, onInput)
 import Model.Model exposing (..)
 import Model.Upgrades exposing (..)
@@ -14,7 +14,7 @@ view : Model -> Vehicle -> Html Msg
 view model v =
     let
         addButton =
-            case (model.tmpUpgrade) of
+            case model.tmpUpgrade of
                 Just u ->
                     button
                         [ class "form-control btn btn-primary mb-3"
@@ -37,20 +37,20 @@ view model v =
                 Nothing ->
                     text "Select an upgrade."
     in
-        View.Utils.row
-            [ View.Utils.col "md-3"
-                [ addButton
-                , select
-                    [ onInput TmpUpgradeUpdate
-                    , class "form-control mb-3"
-                    , size 8
-                    ]
-                    (allUpgradesList
-                        |> List.filter
-                            (\x -> x.slots <= (slotsRemaining v))
-                        |> List.map .name
-                        |> List.map (\t -> option [ value t ] [ text t ])
-                    )
+    View.Utils.row
+        [ View.Utils.col "md-3"
+            [ addButton
+            , select
+                [ onInput TmpUpgradeUpdate
+                , class "form-control mb-3"
+                , size 8
                 ]
-            , View.Utils.col "md-9" [ body ]
+                (allUpgradesList
+                    |> List.filter
+                        (\x -> x.slots <= slotsRemaining v)
+                    |> List.map .name
+                    |> List.map (\t -> option [ value t ] [ text t ])
+                )
             ]
+        , View.Utils.col "md-9" [ body ]
+        ]

@@ -1,8 +1,8 @@
 module Subscriptions.Subscriptions exposing (subscriptions)
 
 import Model.Model exposing (..)
-import Ports.Storage
 import Ports.Photo
+import Ports.Storage
 
 
 subscriptions : Model -> Sub Msg

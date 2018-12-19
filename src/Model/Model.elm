@@ -1,4 +1,4 @@
-module Model.Model exposing (CurrentView(..), ErrorType(..), Model, Msg(..), init, totalPoints, viewToStr, errorToStr)
+module Model.Model exposing (CurrentView(..), ErrorType(..), Model, Msg(..), errorToStr, init, totalPoints, viewToStr)
 
 import Model.Sponsors exposing (..)
 import Model.Upgrades exposing (..)
@@ -68,10 +68,10 @@ viewToStr : Model -> String
 viewToStr model =
     case model.view of
         Overview ->
-            "Team " ++ (Maybe.withDefault "NoName" model.teamName)
+            "Team " ++ Maybe.withDefault "NoName" model.teamName
 
         Details v ->
-            (Maybe.withDefault "NoName" model.teamName) ++ "'s Vehicle"
+            Maybe.withDefault "NoName" model.teamName ++ "'s Vehicle"
 
         SelectingSponsor ->
             "Sponsor Select"
@@ -94,9 +94,9 @@ totalPoints model =
     List.sum <| List.map vehicleCost model.vehicles
 
 
-init : ( Model, Cmd Msg )
-init =
-    Model
+init : () -> ( Model, Cmd Msg )
+init _ =
+    ( Model
         Overview
         Nothing
         50
@@ -109,7 +109,8 @@ init =
         []
         ""
         []
-        ! []
+    , Cmd.none
+    )
 
 
 type

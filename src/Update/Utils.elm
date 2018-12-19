@@ -1,17 +1,19 @@
-module Update.Utils exposing (..)
+module Update.Utils exposing (correctIds, deleteFromList, doSaveModel, getItem, replaceAtIndex, replaceWeaponInVehicle)
 
+import Model.Model exposing (..)
 import Model.Vehicles exposing (..)
 import Model.Weapons exposing (..)
+import Task
 
 
-(!!) : Int -> List a -> Maybe a
-(!!) n xs =
-    List.head <| List.drop n xs
+doSaveModel : Cmd Msg
+doSaveModel =
+    Task.perform (\_ -> SaveModel) (Task.succeed SaveModel)
 
 
 deleteFromList : Int -> List a -> List a
 deleteFromList index list =
-    (List.take index list) ++ (List.drop (index + 1) list)
+    List.take index list ++ List.drop (index + 1) list
 
 
 correctIds : List { a | id : Int } -> List { a | id : Int }
@@ -20,8 +22,8 @@ correctIds xs =
 
 
 replaceAtIndex : Int -> a -> List a -> List a
-replaceAtIndex  i item xs =
-    (List.take i xs) ++ item :: (List.drop (i + 1) xs)
+replaceAtIndex i item xs =
+    List.take i xs ++ item :: List.drop (i + 1) xs
 
 
 getItem : Int -> List a -> Maybe a
@@ -37,4 +39,4 @@ replaceWeaponInVehicle v w =
         weaponsNew =
             replaceAtIndex w.id w v.weapons |> correctIds
     in
-        { v | weapons = weaponsNew }
+    { v | weapons = weaponsNew }

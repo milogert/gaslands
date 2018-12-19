@@ -1,13 +1,13 @@
-module View.Utils exposing (icon, iconb, iconClass, card, crewUsed, detailSection, renderCountDown, renderDice, renderSpecial, row, rowPlus, col, colPlus, factsHolder, factBadge, vehicleSponsorFilter, weaponSponsorFilter)
+module View.Utils exposing (card, col, colPlus, crewUsed, detailSection, factBadge, factsHolder, icon, iconClass, iconb, renderCountDown, renderDice, renderSpecial, row, rowPlus, vehicleSponsorFilter, weaponSponsorFilter)
 
-import Html exposing (Html, node, button, div, h1, h2, h3, h4, h5, h6, hr, img, input, label, li, node, option, p, select, small, span, text, textarea, ul, b)
+import Html exposing (Html, b, button, div, h1, h2, h3, h4, h5, h6, hr, img, input, label, li, node, option, p, select, small, span, text, textarea, ul)
 import Html.Attributes exposing (checked, class, classList, disabled, for, href, id, max, min, placeholder, rel, src, type_, value)
 import Html.Events exposing (onInput)
 import Model.Model exposing (..)
 import Model.Shared exposing (..)
+import Model.Sponsors exposing (..)
 import Model.Vehicles exposing (..)
 import Model.Weapons exposing (..)
-import Model.Sponsors exposing (..)
 
 
 icon : String -> Html Msg
@@ -58,7 +58,7 @@ colPlus colMods classes body =
 
         _ ->
             div
-                [ classList <| (List.map (\x -> ( "col-" ++ x, True )) colMods) ++ (mapClassList classes) ]
+                [ classList <| List.map (\x -> ( "col-" ++ x, True )) colMods ++ mapClassList classes ]
                 body
 
 
@@ -89,7 +89,7 @@ renderSpecial isPreview ammoMsg ammoUsed s =
         Ammo i ->
             case isPreview of
                 True ->
-                    div [] [ text <| "Ammo: " ++ (toString i) ]
+                    div [] [ text <| "Ammo: " ++ String.fromInt i ]
 
                 False ->
                     div [ class "form-row" ]
@@ -103,26 +103,26 @@ renderSpecial isPreview ammoMsg ammoUsed s =
         TreacherousSurface ->
             text "The dropped template counts as a treacherous surface."
 
-        SpecialRule s ->
-            text <| s
+        SpecialRule rule ->
+            text rule
 
         NamedSpecialRule name rule ->
             span [] [ b [] [ text <| name ++ ": " ], text rule ]
 
         HandlingMod i ->
-            text <| "Handling modification: " ++ (toString i)
+            text <| "Handling modification: " ++ String.fromInt i
 
         HullMod i ->
-            text <| "Hull modification: " ++ (toString i)
+            text <| "Hull modification: " ++ String.fromInt i
 
         GearMod i ->
-            text <| "Gear modification: " ++ (toString i)
+            text <| "Gear modification: " ++ String.fromInt i
 
         CrewMod i ->
-            text <| "Crew modification: " ++ (toString i)
+            text <| "Crew modification: " ++ String.fromInt i
 
         _ ->
-            text <| toString s
+            text <| fromSpecial s
 
 
 renderCountDown : Maybe (Int -> String -> Msg) -> Int -> Int -> Html Msg
@@ -131,9 +131,9 @@ renderCountDown msg start current =
         baseAttr =
             [ class "form-control form-control-sm"
             , type_ "number"
-            , Html.Attributes.max <| toString start
+            , Html.Attributes.max <| String.fromInt start
             , Html.Attributes.min "0"
-            , value <| toString <| start - current
+            , value <| String.fromInt <| start - current
             ]
 
         attr =
@@ -144,7 +144,7 @@ renderCountDown msg start current =
                 Just m ->
                     (onInput <| m start) :: baseAttr
     in
-        col "" [ input attr [] ]
+    col "" [ input attr [] ]
 
 
 renderDice : Maybe Dice -> String
@@ -154,7 +154,7 @@ renderDice maybeDice =
             ""
 
         Just dice ->
-            toString dice.number ++ "d" ++ toString dice.die
+            String.fromInt dice.number ++ "d" ++ String.fromInt dice.die
 
 
 crewUsed : Vehicle -> Int

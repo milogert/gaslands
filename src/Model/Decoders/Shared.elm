@@ -1,8 +1,8 @@
-module Model.Decoders.Shared exposing (specialDecoder, requiredSponsorDecoderHelper)
+module Model.Decoders.Shared exposing (requiredSponsorDecoderHelper, specialDecoder)
 
 import Json.Decode exposing (..)
-import Model.Sponsors exposing (SponsorType)
 import Model.Shared exposing (..)
+import Model.Sponsors exposing (SponsorType)
 
 
 specialDecoder : Decoder Special
@@ -128,12 +128,12 @@ crewModDecoder =
 requiredSponsorDecoderHelper : String -> Decoder (Maybe SponsorType)
 requiredSponsorDecoderHelper str =
     let
-        sponsor =
+        mSponsor =
             Model.Sponsors.stringToSponsor str
     in
-        case sponsor of
-            Just sponsor ->
-                succeed <| Just sponsor.name
+    case mSponsor of
+        Just sponsor ->
+            succeed <| Just sponsor.name
 
-            Nothing ->
-                fail <| str ++ " is not a valid sponsor type"
+        Nothing ->
+            fail <| str ++ " is not a valid sponsor type"

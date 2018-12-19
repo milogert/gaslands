@@ -11,10 +11,11 @@ render shouldShowSidebar left right =
         displayNone =
             if shouldShowSidebar then
                 ""
+
             else
                 "d-none"
     in
-        View.Utils.row
-            [ View.Utils.colPlus [ "md-3 sm-12" ] [ displayNone ] left
-            , View.Utils.col "" right
-            ]
+    View.Utils.row
+        [ View.Utils.colPlus [ "md-3 sm-12" ] [ displayNone ] left
+        , View.Utils.col "" right
+        ]

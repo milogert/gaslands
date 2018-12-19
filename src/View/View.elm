@@ -1,21 +1,22 @@
 module View.View exposing (view)
 
-import Html exposing (Html, button, div, h1, h2, h3, h4, h5, h6, hr, img, input, label, li, node, option, p, select, small, span, text, textarea, ul, form, a)
-import Html.Attributes exposing (attribute, checked, class, classList, disabled, for, href, id, max, min, placeholder, rel, src, type_, value, readonly, style)
+import Browser exposing (Document)
+import Html exposing (Html, a, button, div, form, h1, h2, h3, h4, h5, h6, hr, img, input, label, li, node, option, p, select, small, span, text, textarea, ul)
+import Html.Attributes exposing (attribute, checked, class, classList, disabled, for, href, id, max, min, placeholder, readonly, rel, src, style, type_, value)
 import Html.Events exposing (onClick, onInput)
 import Model.Model exposing (..)
 import View.Details
-import View.Settings
-import View.Sponsor
-import View.SponsorSelect
 import View.NewUpgrade
 import View.NewVehicle
 import View.NewWeapon
 import View.Overview
+import View.Settings
+import View.Sponsor
+import View.SponsorSelect
 import View.Utils exposing (..)
 
 
-view : Model -> Html Msg
+view : Model -> Document Msg
 view model =
     let
         viewToGoTo =
@@ -57,7 +58,7 @@ view model =
             model.pointsAllowed
 
         gearPhaseText =
-            (toString model.gearPhase)
+            String.fromInt model.gearPhase
 
         teamName =
             case model.teamName of
@@ -68,10 +69,12 @@ view model =
                     s
 
         viewDisplay =
-            h2 [ style [ ( "margin-bottom", "0" ) ] ]
+            h2 [ style "margin-bottom" "0" ]
                 [ text <| viewToStr model ]
     in
-        div [ class "container" ]
+    Document
+        (viewToStr model)
+        [ div [ class "container" ]
             [ View.Utils.rowPlus [ "mt-2", "mb-2" ]
                 [ View.Utils.colPlus [ "auto" ]
                     [ "my-auto" ]
@@ -85,7 +88,7 @@ view model =
                         [ View.Sponsor.renderBadge model.sponsor ]
                     , button
                         [ class "btn btn-sm btn-primary mr-2"
-                        , value <| toString model.gearPhase
+                        , value <| String.fromInt model.gearPhase
                         , onClick NextGearPhase
                         ]
                         [ icon "cogs", span [ class "badge badge-light" ] [ text gearPhaseText ] ]
@@ -97,7 +100,8 @@ view model =
                             , ( "badge-warning", currentPoints < maxPoints )
                             ]
                         ]
-                        [ text <| (toString currentPoints) ++ " of " ++ toString maxPoints ++ " points"
+                        [ text <| String.fromInt currentPoints ++ " of " ++ String.fromInt maxPoints
+                        , icon "coins"
                         ]
                     , button
                         [ class "btn btn-sm btn-light"
@@ -113,6 +117,7 @@ view model =
 
             --, sizeShower
             ]
+        ]
 
 
 displayAlert : Model -> Html Msg
@@ -125,12 +130,11 @@ displayAlert model =
             div [] <|
                 List.map
                     (\x ->
-                        (row
+                        row
                             [ div
                                 [ class "col alert alert-danger" ]
                                 [ text <| errorToStr x ]
                             ]
-                        )
                     )
                     model.error
 

@@ -1,11 +1,28 @@
-module Update.Vehicle exposing (addVehicle, deleteVehicle, setTmpVehicleType, updateActivated, updateGear, updateHazards, updateCrew, updateEquipment, updateHull, updateNotes, rollSkidDice, setPerkInVehicle, getStream, takePhoto, setUrlForVehicle, discardPhoto)
+module Update.Vehicle exposing
+    ( addVehicle
+    , deleteVehicle
+    , discardPhoto
+    , getStream
+    , rollSkidDice
+    , setPerkInVehicle
+    , setTmpVehicleType
+    , setUrlForVehicle
+    , takePhoto
+    , updateActivated
+    , updateCrew
+    , updateEquipment
+    , updateGear
+    , updateHazards
+    , updateHull
+    , updateNotes
+    )
 
 import Model.Model exposing (..)
+import Model.Sponsors exposing (..)
 import Model.Vehicles exposing (..)
 import Model.Weapons exposing (..)
-import Model.Sponsors exposing (..)
-import Update.Utils
 import Ports.Photo
+import Update.Utils exposing (..)
 
 
 addVehicle : Model -> ( Model, Cmd Msg )
@@ -16,21 +33,26 @@ addVehicle model =
                 oldl =
                     model.vehicles
             in
-                case ( vehicleTmp.vtype, vehicleTmp.name ) of
-                    ( _, "" ) ->
-                        { model | error = VehicleNameError :: model.error } ! []
+            case ( vehicleTmp.vtype, vehicleTmp.name ) of
+                ( _, "" ) ->
+                    ( { model | error = VehicleNameError :: model.error }
+                    , Cmd.none
+                    )
 
-                    ( _, _ ) ->
-                        { model
-                            | view = Overview
-                            , vehicles = oldl ++ [ { vehicleTmp | id = List.length oldl } ]
-                            , tmpVehicle = Nothing
-                            , error = []
-                        }
-                            ! []
+                ( _, _ ) ->
+                    ( { model
+                        | view = Overview
+                        , vehicles = oldl ++ [ { vehicleTmp | id = List.length oldl } ]
+                        , tmpVehicle = Nothing
+                        , error = []
+                      }
+                    , doSaveModel
+                    )
 
         Nothing ->
-            model ! []
+            ( model
+            , Cmd.none
+            )
 
 
 setTmpVehicleType : Model -> String -> ( Model, Cmd Msg )
@@ -121,7 +143,9 @@ setTmpVehicleType model vtstr =
                 []
                 requiredSponsor
     in
-        { model | tmpVehicle = Just newtv } ! []
+    ( { model | tmpVehicle = Just newtv }
+    , Cmd.none
+    )
 
 
 updateActivated : Model -> Vehicle -> Bool -> ( Model, Cmd Msg )
@@ -144,7 +168,9 @@ updateActivated model v activated =
                 _ ->
                     model.view
     in
-        { model | view = newView, vehicles = pre ++ nv :: post } ! []
+    ( { model | view = newView, vehicles = pre ++ nv :: post }
+    , Cmd.none
+    )
 
 
 updateGear : Model -> Vehicle -> Int -> ( Model, Cmd Msg )
@@ -167,7 +193,9 @@ updateGear model v newGear =
         vehiclesList =
             Update.Utils.replaceAtIndex v.id vehicleUpdated model.vehicles
     in
-        { model | view = newView, vehicles = vehiclesList } ! []
+    ( { model | view = newView, vehicles = vehiclesList }
+    , Cmd.none
+    )
 
 
 updateHazards : Model -> Vehicle -> Int -> ( Model, Cmd Msg )
@@ -187,7 +215,9 @@ updateHazards model v newHazards =
         vehiclesList =
             Update.Utils.replaceAtIndex v.id vehicleUpdated model.vehicles
     in
-        { model | view = newView, vehicles = vehiclesList } ! []
+    ( { model | view = newView, vehicles = vehiclesList }
+    , Cmd.none
+    )
 
 
 updateHull : Model -> Vehicle -> Int -> ( Model, Cmd Msg )
@@ -207,13 +237,15 @@ updateHull model v currentHull =
 
         newView =
             case model.view of
-                Details v ->
+                Details _ ->
                     Details nv
 
                 _ ->
                     model.view
     in
-        { model | view = newView, vehicles = pre ++ nv :: post } ! []
+    ( { model | view = newView, vehicles = pre ++ nv :: post }
+    , Cmd.none
+    )
 
 
 updateCrew : Model -> Vehicle -> String -> ( Model, Cmd Msg )
@@ -223,7 +255,7 @@ updateCrew model v strCurrent =
             List.take v.id model.vehicles
 
         current =
-            String.toInt strCurrent |> Result.toMaybe |> Maybe.withDefault 0
+            String.toInt strCurrent |> Maybe.withDefault 0
 
         nv =
             { v | crew = current }
@@ -231,7 +263,9 @@ updateCrew model v strCurrent =
         post =
             List.drop (v.id + 1) model.vehicles
     in
-        { model | vehicles = pre ++ nv :: post } ! []
+    ( { model | vehicles = pre ++ nv :: post }
+    , Cmd.none
+    )
 
 
 updateEquipment : Model -> Vehicle -> String -> ( Model, Cmd Msg )
@@ -241,7 +275,7 @@ updateEquipment model v strCurrent =
             List.take v.id model.vehicles
 
         current =
-            String.toInt strCurrent |> Result.toMaybe |> Maybe.withDefault 0
+            String.toInt strCurrent |> Maybe.withDefault 0
 
         nv =
             { v | equipment = current }
@@ -249,7 +283,9 @@ updateEquipment model v strCurrent =
         post =
             List.drop (v.id + 1) model.vehicles
     in
-        { model | vehicles = pre ++ nv :: post } ! []
+    ( { model | vehicles = pre ++ nv :: post }
+    , Cmd.none
+    )
 
 
 updateNotes : Model -> Vehicle -> String -> ( Model, Cmd Msg )
@@ -258,7 +294,9 @@ updateNotes model v notes =
         vehiclesNew =
             Update.Utils.replaceAtIndex v.id { v | notes = notes } model.vehicles
     in
-        { model | vehicles = vehiclesNew } ! []
+    ( { model | vehicles = vehiclesNew }
+    , Cmd.none
+    )
 
 
 updateAmmoUsed : Model -> Vehicle -> Weapon -> Int -> ( Model, Cmd Msg )
@@ -276,7 +314,9 @@ updateAmmoUsed model v w used =
         vehiclesNew =
             Update.Utils.replaceAtIndex v.id vehicleUpdated model.vehicles
     in
-        { model | view = Details vehicleUpdated, vehicles = vehiclesNew } ! []
+    ( { model | view = Details vehicleUpdated, vehicles = vehiclesNew }
+    , Cmd.none
+    )
 
 
 deleteVehicle : Model -> Vehicle -> ( Model, Cmd Msg )
@@ -285,7 +325,9 @@ deleteVehicle model v =
         newvehicles =
             Update.Utils.deleteFromList v.id model.vehicles |> Update.Utils.correctIds
     in
-        { model | view = Overview, vehicles = newvehicles } ! []
+    ( { model | view = Overview, vehicles = newvehicles }
+    , Cmd.none
+    )
 
 
 rollSkidDice : Model -> Vehicle -> List SkidResult -> ( Model, Cmd Msg )
@@ -297,7 +339,9 @@ rollSkidDice model v skidResults =
         vehiclesNew =
             Update.Utils.replaceAtIndex v.id vehicleUpdated model.vehicles
     in
-        { model | view = Details vehicleUpdated, vehicles = vehiclesNew } ! []
+    ( { model | view = Details vehicleUpdated, vehicles = vehiclesNew }
+    , Cmd.none
+    )
 
 
 replaceWeaponInVehicle : Vehicle -> Weapon -> Vehicle
@@ -306,7 +350,7 @@ replaceWeaponInVehicle v w =
         weaponsNew =
             Update.Utils.replaceAtIndex w.id w v.weapons |> Update.Utils.correctIds
     in
-        { v | weapons = weaponsNew }
+    { v | weapons = weaponsNew }
 
 
 setPerkInVehicle : Model -> Vehicle -> VehiclePerk -> Bool -> ( Model, Cmd Msg )
@@ -329,17 +373,23 @@ setPerkInVehicle model v perk isSet =
         vehiclesNew =
             Update.Utils.replaceAtIndex v.id vehicleUpdated model.vehicles
     in
-        { model | view = Details vehicleUpdated, vehicles = vehiclesNew } ! []
+    ( { model | view = Details vehicleUpdated, vehicles = vehiclesNew }
+    , Cmd.none
+    )
 
 
 getStream : Model -> Vehicle -> ( Model, Cmd Msg )
 getStream model v =
-    model ! [ Ports.Photo.getStream "" ]
+    ( model
+    , Ports.Photo.getStream ""
+    )
 
 
 takePhoto : Model -> Vehicle -> ( Model, Cmd Msg )
 takePhoto model v =
-    model ! [ Ports.Photo.takePhoto "" ]
+    ( model
+    , Ports.Photo.takePhoto ""
+    )
 
 
 setUrlForVehicle : Model -> Vehicle -> String -> ( Model, Cmd Msg )
@@ -351,7 +401,9 @@ setUrlForVehicle model v url =
         vehiclesNew =
             Update.Utils.replaceAtIndex v.id vehicleUpdated model.vehicles
     in
-        { model | view = Details vehicleUpdated, vehicles = vehiclesNew } ! [ Ports.Photo.destroyStream "" ]
+    ( { model | view = Details vehicleUpdated, vehicles = vehiclesNew }
+    , Ports.Photo.destroyStream ""
+    )
 
 
 discardPhoto : Model -> Vehicle -> ( Model, Cmd Msg )
@@ -363,4 +415,6 @@ discardPhoto model v =
         vehiclesNew =
             Update.Utils.replaceAtIndex v.id vehicleUpdated model.vehicles
     in
-        { model | view = Details vehicleUpdated, vehicles = vehiclesNew } ! [ Ports.Photo.getStream "" ]
+    ( { model | view = Details vehicleUpdated, vehicles = vehiclesNew }
+    , Ports.Photo.getStream ""
+    )

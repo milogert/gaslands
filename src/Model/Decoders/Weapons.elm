@@ -1,14 +1,14 @@
-module Model.Decoders.Weapons exposing (..)
+module Model.Decoders.Weapons exposing (diceDecoder, mountPointDecoder, mountPointDecoderHelper, rangeDecoder, rangeHelper, weaponDecoder, wtypeDecoder)
 
 import Json.Decode exposing (..)
 import Json.Decode.Pipeline exposing (..)
-import Model.Weapons exposing (..)
 import Model.Decoders.Shared exposing (..)
+import Model.Weapons exposing (..)
 
 
 weaponDecoder : Decoder Weapon
 weaponDecoder =
-    decode Weapon
+    succeed Weapon
         |> required "name" string
         |> required "wtype" wtypeDecoder
         |> optional "mountPoint" (map Just mountPointDecoder) Nothing
@@ -77,7 +77,7 @@ wtypeDecoder =
 
 diceDecoder : Decoder Dice
 diceDecoder =
-    decode Dice
+    succeed Dice
         |> required "number" int
         |> required "die" int
 

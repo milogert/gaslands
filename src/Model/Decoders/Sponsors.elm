@@ -1,13 +1,13 @@
-module Model.Decoders.Sponsors exposing (..)
+module Model.Decoders.Sponsors exposing (perkClassDecoderHelper, sponsorDecoder, sponsorTypeDecoderHelper, teamPerkDecoder, vehiclePerkDecoder)
 
-import Json.Decode as D exposing (Decoder)
-import Json.Decode.Pipeline exposing (decode, required, hardcoded)
+import Json.Decode as D exposing (Decoder, succeed)
+import Json.Decode.Pipeline exposing (hardcoded, required)
 import Model.Sponsors exposing (..)
 
 
 sponsorDecoder : Decoder Sponsor
 sponsorDecoder =
-    decode Sponsor
+    succeed Sponsor
         |> required "name" (D.string |> D.andThen sponsorTypeDecoderHelper)
         |> required "description" D.string
         |> required "perks" (D.list teamPerkDecoder)
@@ -41,7 +41,7 @@ sponsorTypeDecoderHelper s =
 
 teamPerkDecoder : Decoder TeamPerk
 teamPerkDecoder =
-    decode TeamPerk
+    succeed TeamPerk
         |> required "name" D.string
         |> required "description" D.string
 
@@ -79,7 +79,7 @@ perkClassDecoderHelper s =
 
 vehiclePerkDecoder : Decoder VehiclePerk
 vehiclePerkDecoder =
-    decode VehiclePerk
+    succeed VehiclePerk
         |> required "name" D.string
         |> required "cost" D.int
         |> required "description" D.string

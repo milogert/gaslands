@@ -1,9 +1,32 @@
-module Model.Vehicles exposing (..)
+module Model.Vehicles exposing
+    ( GearTracker
+    , HullHolder
+    , SkidResult(..)
+    , Vehicle
+    , VehicleType(..)
+    , WeightClass(..)
+    , allVehicleTypes
+    , fromVehicleType
+    , fromVehicleWeight
+    , slotsRemaining
+    , slotsUsed
+    , strToVT
+    , typeToCost
+    , typeToCrewMax
+    , typeToEquipmentMax
+    , typeToGearMax
+    , typeToHandling
+    , typeToHullMax
+    , typeToSpecials
+    , typeToSponsorReq
+    , typeToWeight
+    , vehicleCost
+    )
 
 import Model.Shared exposing (..)
+import Model.Sponsors exposing (..)
 import Model.Upgrades exposing (..)
 import Model.Weapons exposing (..)
-import Model.Sponsors exposing (..)
 
 
 type alias Vehicle =
@@ -90,6 +113,22 @@ type WeightClass
     | Airborne
 
 
+fromVehicleWeight : WeightClass -> String
+fromVehicleWeight weight =
+    case weight of
+        Light ->
+            "Light"
+
+        Middle ->
+            "Middle"
+
+        Heavy ->
+            "Heavy"
+
+        Airborne ->
+            "Airborne"
+
+
 type alias HullHolder =
     { current : Int
     , max : Int
@@ -98,12 +137,12 @@ type alias HullHolder =
 
 slotsUsed : Vehicle -> Int
 slotsUsed v =
-    List.sum <| (List.map .slots v.weapons) ++ (List.map .slots v.upgrades)
+    List.sum <| List.map .slots v.weapons ++ List.map .slots v.upgrades
 
 
 slotsRemaining : Vehicle -> Int
 slotsRemaining v =
-    v.equipment - (slotsUsed v)
+    v.equipment - slotsUsed v
 
 
 
@@ -369,9 +408,18 @@ typeToHullMax t =
             8
 
 
-vTToStr : VehicleType -> String
-vTToStr t =
+fromVehicleType : VehicleType -> String
+fromVehicleType t =
     case t of
+        Bike ->
+            "Bike"
+
+        Buggy ->
+            "Buggy"
+
+        Car ->
+            "Car"
+
         PerformanceCar ->
             "Performance Car"
 
@@ -381,11 +429,20 @@ vTToStr t =
         MonsterTruck ->
             "Monster Truck"
 
+        Bus ->
+            "Bus"
+
         WarRig ->
             "War Rig"
 
-        _ ->
-            toString t
+        Tank ->
+            "Tank"
+
+        Gyrocopter ->
+            "Gyrocopter"
+
+        Helicopter ->
+            "Helicopter"
 
 
 strToVT : String -> Maybe VehicleType
@@ -441,7 +498,7 @@ typeToSpecials type_ =
             ]
 
         PerformanceCar ->
-            [ NamedSpecialRule "Slip Away" "If this vehicle is targeted wtih a tailgate, T-bone or sideswipe smash attack, and this vehicle declares evade as its reaction, this vehicle may perform a free activation immediately after tha active vehicle completes its activation."
+            [ NamedSpecialRule "Slip Away" "If this vehicle is targeted wtih a tailgate, T-bone or sideswipe smash attack, and this vehicle declares evade as its reaction, this vehicle may perform a free activation immediately after the active vehicle completes its activation."
             , SpecialRule "This free activation does not count as the vehicle's activation this gear phase."
             ]
 

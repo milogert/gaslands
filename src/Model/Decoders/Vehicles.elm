@@ -1,17 +1,17 @@
-module Model.Decoders.Vehicles exposing (..)
+module Model.Decoders.Vehicles exposing (gearDecoder, hullDecoder, skidResultDecoder, skidResultHelper, vehicleDecoder, vtypeDecoder, weightDecoder)
 
-import Json.Decode exposing (Decoder, string, int, bool, list, succeed, fail, andThen, nullable)
-import Json.Decode.Pipeline exposing (decode, required, hardcoded, optional)
-import Model.Vehicles exposing (..)
+import Json.Decode exposing (Decoder, andThen, bool, fail, int, list, nullable, string, succeed)
+import Json.Decode.Pipeline exposing (hardcoded, optional, required)
 import Model.Decoders.Shared exposing (..)
-import Model.Decoders.Weapons exposing (..)
-import Model.Decoders.Upgrades exposing (..)
 import Model.Decoders.Sponsors exposing (..)
+import Model.Decoders.Upgrades exposing (..)
+import Model.Decoders.Weapons exposing (..)
+import Model.Vehicles exposing (..)
 
 
 vehicleDecoder : Decoder Vehicle
 vehicleDecoder =
-    decode Vehicle
+    succeed Vehicle
         |> required "name" string
         |> optional "photo" (nullable string) Nothing
         |> required "vtype" vtypeDecoder
@@ -44,18 +44,18 @@ vtypeDecoder =
                     vtype =
                         strToVT str
                 in
-                    case vtype of
-                        Just vt ->
-                            succeed vt
+                case vtype of
+                    Just vt ->
+                        succeed vt
 
-                        Nothing ->
-                            fail <| str ++ " is not a valid vehicle type"
+                    Nothing ->
+                        fail <| str ++ " is not a valid vehicle type"
             )
 
 
 gearDecoder : Decoder GearTracker
 gearDecoder =
-    decode GearTracker
+    succeed GearTracker
         |> hardcoded 1
         |> required "max" int
 
@@ -85,7 +85,7 @@ weightDecoder =
 
 hullDecoder : Decoder HullHolder
 hullDecoder =
-    decode HullHolder
+    succeed HullHolder
         |> hardcoded 0
         |> required "max" int
 

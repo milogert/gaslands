@@ -1,4 +1,4 @@
-module Model.Encoders.Sponsors exposing (sponsorEncoder, vehiclePerkEncoder, sponsorTypeEncoder)
+module Model.Encoders.Sponsors exposing (sponsorEncoder, sponsorTypeEncoder, vehiclePerkEncoder)
 
 import Json.Encode exposing (..)
 import Model.Sponsors exposing (..)
@@ -12,30 +12,28 @@ sponsorEncoder msponsor =
 
         Just sponsor ->
             object
-                [ ( "name", string <| toString sponsor.name )
+                [ ( "name", string <| fromSponsorType sponsor.name )
                 , ( "description", string sponsor.description )
-                , ( "perks", list <| List.map teamPerkEncoder sponsor.perks )
-                , ( "grantedClasses", list <| List.map (\s -> s |> toString |> string) sponsor.grantedClasses )
+                , ( "perks", list object <| List.map teamPerkEncoder sponsor.perks )
+                , ( "grantedClasses", list string <| List.map (\s -> s |> fromPerkClass) sponsor.grantedClasses )
                 ]
 
 
 sponsorTypeEncoder : SponsorType -> Value
 sponsorTypeEncoder sponsorType =
-    string <| toString sponsorType
+    string <| fromSponsorType sponsorType
 
 
-teamPerkEncoder : TeamPerk -> Value
+teamPerkEncoder : TeamPerk -> List ( String, Value )
 teamPerkEncoder perk =
-    object
-        [ ( "name", string perk.name )
-        , ( "description", string perk.description )
-        ]
+    [ ( "name", string perk.name )
+    , ( "description", string perk.description )
+    ]
 
 
-vehiclePerkEncoder : VehiclePerk -> Value
+vehiclePerkEncoder : VehiclePerk -> List ( String, Value )
 vehiclePerkEncoder perk =
-    object
-        [ ( "name", string perk.name )
-        , ( "cost", int perk.cost )
-        , ( "description", string perk.description )
-        ]
+    [ ( "name", string perk.name )
+    , ( "cost", int perk.cost )
+    , ( "description", string perk.description )
+    ]
