@@ -11,7 +11,7 @@ import Model.Model exposing (..)
 modelDecoder : Decoder Model
 modelDecoder =
     succeed Model
-        |> hardcoded Overview
+        |> hardcoded ViewDashboard
         |> optional "teamName" (nullable string) Nothing
         |> required "pointsAllowed" int
         |> hardcoded 0

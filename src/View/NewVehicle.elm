@@ -50,20 +50,20 @@ view model =
 
         addButton =
             button
-                [ onClick AddVehicle
+                [ onClick <| VehicleMsg AddVehicle
                 , class "btn btn-primary btn-block mb-3"
                 , disabled disabledButton
                 ]
                 [ text buttonText ]
 
         options =
-            allVehicleTypes
+            allVehicles
                 |> List.filter (View.Utils.vehicleSponsorFilter model)
-                |> List.map vehicleOption
+                |> List.indexedMap vehicleOption
 
         selectList =
             select
-                [ onInput TmpVehicleType
+                [ onInput <| VehicleMsg << TmpVehicleType
                 , class "form-control mb-3"
                 , size 8
                 ]
@@ -78,6 +78,8 @@ view model =
         ]
 
 
-vehicleOption : VehicleType -> Html Msg
-vehicleOption vt =
-    option [ value <| fromVehicleType vt ] [ text <| fromVehicleType vt ]
+vehicleOption : Int -> Vehicle -> Html Msg
+vehicleOption i vt =
+    option
+        [ value <| String.fromInt i ]
+        [ text <| fromVehicleType vt.vtype ]

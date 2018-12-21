@@ -1,6 +1,5 @@
 module View.Utils exposing
-    ( card
-    , crewUsed
+    ( crewUsed
     , detailSection
     , factBadge
     , factsHolder
@@ -14,10 +13,22 @@ module View.Utils exposing
     , weaponSponsorFilter
     )
 
+import Bootstrap.Badge as Badge
 import Bootstrap.Form as Form
+import Bootstrap.Form.Input as Input
 import Bootstrap.Grid as Grid
-import Html exposing (Html, b, button, div, h1, h2, h3, h4, h5, h6, hr, img, input, label, li, node, option, p, select, small, span, text, textarea, ul)
-import Html.Attributes exposing (checked, class, classList, disabled, for, href, id, max, min, placeholder, rel, src, type_, value)
+import Html
+    exposing
+        ( Html
+        , b
+        , div
+        , h5
+        , hr
+        , node
+        , span
+        , text
+        )
+import Html.Attributes exposing (class, classList)
 import Html.Events exposing (onInput)
 import Model.Model exposing (..)
 import Model.Shared exposing (..)
@@ -51,19 +62,9 @@ mapClassList classes =
     List.map (\x -> ( x, True )) classes
 
 
-card : List ( String, Bool ) -> Html Msg -> Html Msg -> Bool -> Html Msg
-card cl body footer hideFooter =
-    div [ class "card", classList cl ]
-        [ div [ class "card-body" ] [ body ]
-        , div
-            [ class "card-footer", classList [ ( "d-none", hideFooter ) ] ]
-            [ footer ]
-        ]
-
-
 detailSection : CurrentView -> List (Html Msg) -> List (Html Msg) -> Html Msg
 detailSection currentView headerContents bodyContents =
-    div [ classList [ ( "d-none", currentView == Overview ) ] ]
+    div [ classList [ ( "d-none", currentView == ViewDashboard ) ] ]
         [ hr [] [], h5 [] headerContents, div [] bodyContents ]
 
 
@@ -113,11 +114,12 @@ renderCountDown : Maybe (Int -> String -> Msg) -> Int -> Int -> Form.Col Msg
 renderCountDown msg start current =
     let
         baseAttr =
-            [ class "form-control form-control-sm"
-            , type_ "number"
-            , Html.Attributes.max <| String.fromInt start
-            , Html.Attributes.min "0"
-            , value <| String.fromInt <| start - current
+            [ Input.small
+            , Input.value <| String.fromInt <| start - current
+            , Input.attrs
+                [ Html.Attributes.max <| String.fromInt start
+                , Html.Attributes.min "0"
+                ]
             ]
 
         attr =
@@ -126,9 +128,9 @@ renderCountDown msg start current =
                     baseAttr
 
                 Just m ->
-                    (onInput <| m start) :: baseAttr
+                    (Input.onInput <| m start) :: baseAttr
     in
-    Form.col [] [ input attr [] ]
+    Form.col [] [ Input.number attr ]
 
 
 renderDice : Maybe Dice -> String
@@ -153,12 +155,12 @@ factsHolder facts =
 
 factBadge : String -> Html Msg
 factBadge factString =
-    span [ class "badge badge-secondary mr-2" ] [ text factString ]
+    Badge.badgeSecondary [ class "mr-2" ] [ text factString ]
 
 
-vehicleSponsorFilter : Model -> VehicleType -> Bool
-vehicleSponsorFilter model vt =
-    sponsorFilter_ model (typeToSponsorReq vt)
+vehicleSponsorFilter : Model -> Vehicle -> Bool
+vehicleSponsorFilter model v =
+    sponsorFilter_ model v.requiredSponsor
 
 
 weaponSponsorFilter : Model -> Weapon -> Bool

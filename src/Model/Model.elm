@@ -35,13 +35,13 @@ type alias Model =
 
 
 type CurrentView
-    = Overview
-    | Details Vehicle
-    | SelectingSponsor
-    | AddingVehicle
-    | AddingWeapon Vehicle
-    | AddingUpgrade Vehicle
-    | Settings
+    = ViewDashboard
+    | ViewDetails Vehicle
+    | ViewSelectingSponsor
+    | ViewAddingVehicle
+    | ViewAddingWeapon Vehicle
+    | ViewAddingUpgrade Vehicle
+    | ViewSettings
 
 
 type ErrorType
@@ -78,25 +78,25 @@ errorToStr e =
 viewToStr : Model -> String
 viewToStr model =
     case model.view of
-        Overview ->
+        ViewDashboard ->
             "Team " ++ Maybe.withDefault "NoName" model.teamName
 
-        Details v ->
-            Maybe.withDefault "NoName" model.teamName ++ "'s Vehicle"
+        ViewDetails v ->
+            v.name
 
-        SelectingSponsor ->
+        ViewSelectingSponsor ->
             "Sponsor Select"
 
-        AddingVehicle ->
+        ViewAddingVehicle ->
             "Adding Vehicle"
 
-        AddingWeapon v ->
+        ViewAddingWeapon v ->
             "Adding Weapon to " ++ v.name
 
-        AddingUpgrade v ->
+        ViewAddingUpgrade v ->
             "Adding Upgrade to " ++ v.name
 
-        Settings ->
+        ViewSettings ->
             "Settings"
 
 
@@ -108,7 +108,7 @@ totalPoints model =
 init : () -> ( Model, Cmd Msg )
 init _ =
     ( Model
-        Overview
+        ViewDashboard
         Nothing
         50
         1
@@ -128,31 +128,9 @@ init _ =
 type
     Msg
     -- ROUTES.
-    = ToOverview
-    | ToDetails Vehicle
-    | ToSponsorSelect
-    | ToNewVehicle
-    | ToNewWeapon Vehicle
-    | ToNewUpgrade Vehicle
-    | ToSettings
+    = To CurrentView
       -- VEHICLE.
-    | AddVehicle
-    | DeleteVehicle Vehicle
-    | TmpName String
-    | TmpVehicleType String
-    | TmpNotes String
-    | NextGearPhase
-    | UpdateActivated Vehicle Bool
-    | UpdateGear Vehicle String
-    | ShiftGear Vehicle Int Int Int
-    | UpdateHazards Vehicle String
-    | ShiftHazards Vehicle Int Int Int
-    | UpdateHull Vehicle String
-    | ShiftHull Vehicle Int Int Int
-    | UpdateCrew Vehicle String
-    | UpdateEquipment Vehicle String
-    | UpdateNotes Vehicle String
-    | SetPerkInVehicle Vehicle VehiclePerk Bool
+    | VehicleMsg VehicleEvent
       -- WEAPON.
     | AddWeapon Vehicle Weapon
     | DeleteWeapon Vehicle Weapon
@@ -181,7 +159,5 @@ type
     | LoadModel String
     | DeleteItem String
     | DeleteItemCallback String
-    | GetStream Vehicle
-    | TakePhoto Vehicle
-    | SetPhotoUrlCallback String
-    | DiscardPhoto Vehicle
+      -- SETTINGS.
+    | SettingsMsg SettingsEvent

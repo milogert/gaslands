@@ -1,11 +1,41 @@
 module View.Sponsor exposing (render, renderBadge, renderPerkClass)
 
-import Html exposing (Html, a, b, div, h3, h6, input, label, li, p, span, text, ul)
-import Html.Attributes exposing (attribute, checked, class, for, href, id, title, type_)
+import Bootstrap.Form.Checkbox as Checkbox
+import Html
+    exposing
+        ( Html
+        , a
+        , b
+        , div
+        , h3
+        , h6
+        , li
+        , p
+        , span
+        , text
+        , ul
+        )
+import Html.Attributes
+    exposing
+        ( class
+        , href
+        , title
+        )
 import Html.Events exposing (onCheck, onClick)
-import Model.Model exposing (Msg(..))
-import Model.Sponsors exposing (PerkClass, Sponsor, SponsorType, TeamPerk, VehiclePerk, fromPerkClass, fromSponsorType, getClassPerks, typeToSponsor)
-import Model.Vehicles exposing (Vehicle)
+import Model.Model exposing (..)
+import Model.Sponsors
+    exposing
+        ( PerkClass
+        , Sponsor
+        , SponsorType
+        , TeamPerk
+        , VehiclePerk
+        , fromPerkClass
+        , fromSponsorType
+        , getClassPerks
+        , typeToSponsor
+        )
+import Model.Vehicles exposing (..)
 import View.Utils exposing (icon)
 
 
@@ -54,7 +84,7 @@ renderBadge ms =
     span [ class "sponsor-badge" ]
         [ a
             [ class "badge badge-secondary"
-            , onClick ToSponsorSelect
+            , onClick <| To ViewSelectingSponsor
             , href "#"
             , title description
             ]
@@ -75,21 +105,14 @@ renderPerkClass vehicle perkClass =
 
 renderVehiclePerk : Vehicle -> VehiclePerk -> Html Msg
 renderVehiclePerk vehicle perk =
-    div [ class "form-check" ]
-        [ input
-            [ class "form-check-input"
-            , type_ "checkbox"
-            , id perk.name
-            , onCheck <| SetPerkInVehicle vehicle perk
-            , checked <| List.member perk vehicle.perks
-            ]
-            []
-        , label
-            [ class "form-check-label"
-            , for perk.name
-            ]
-            [ b [] [ text perk.name ]
-            , text <| " (" ++ String.fromInt perk.cost ++ ") "
-            , text perk.description
-            ]
+    Checkbox.checkbox
+        [ Checkbox.id perk.name
+        , Checkbox.onCheck <| VehicleMsg << SetPerkInVehicle vehicle perk
+        , Checkbox.checked <| List.member perk vehicle.perks
         ]
+    <|
+        perk.name
+            ++ " ("
+            ++ String.fromInt perk.cost
+            ++ ") "
+            ++ perk.description

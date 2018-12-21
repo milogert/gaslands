@@ -98,11 +98,11 @@ modEncoderHelper s =
             ""
 
 
-requiredSponsorEncoder : Maybe SponsorType -> String
+requiredSponsorEncoder : Maybe SponsorType -> Value
 requiredSponsorEncoder mst =
     case mst of
         Nothing ->
-            ""
+            null
 
         Just st ->
-            fromSponsorType st
+            string <| fromSponsorType st

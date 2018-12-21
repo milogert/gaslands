@@ -1,4 +1,11 @@
-module Update.Weapon exposing (addWeapon, deleteWeapon, rollAttackDice, rollWeaponDie, setWeaponFired, updateAmmoUsed)
+module Update.Weapon exposing
+    ( addWeapon
+    , deleteWeapon
+    , rollAttackDice
+    , rollWeaponDie
+    , setWeaponFired
+    , updateAmmoUsed
+    )
 
 import Model.Model exposing (..)
 import Model.Vehicles exposing (..)
@@ -32,7 +39,7 @@ addWeapon model v w =
             )
 
         ( _, _ ) ->
-            ( { model | view = Details vehicleNew, error = [], vehicles = newvehicles }
+            ( { model | view = ViewDetails vehicleNew, error = [], vehicles = newvehicles }
             , Cmd.none
             )
 
@@ -52,7 +59,7 @@ updateAmmoUsed model v w used =
         vehiclesNew =
             Update.Utils.replaceAtIndex v.id vehicleUpdated model.vehicles
     in
-    ( { model | view = Details vehicleUpdated, vehicles = vehiclesNew }
+    ( { model | view = ViewDetails vehicleUpdated, vehicles = vehiclesNew }
     , Cmd.none
     )
 
@@ -89,7 +96,7 @@ setWeaponFired model v w =
                     0
     in
     ( { model
-        | view = Details vehicleUpdated
+        | view = ViewDetails vehicleUpdated
         , vehicles = vehiclesNew
       }
     , Random.generate (RollWeaponDie v weaponUpdated) (Random.int minRoll maxRoll)
@@ -109,7 +116,7 @@ rollWeaponDie model v w result =
             Update.Utils.replaceAtIndex v.id vehicleUpdated model.vehicles
     in
     ( { model
-        | view = Details vehicleUpdated
+        | view = ViewDetails vehicleUpdated
         , vehicles = vehiclesNew
       }
     , Cmd.none
@@ -128,7 +135,7 @@ deleteWeapon model v w =
         vehiclesNew =
             Update.Utils.replaceAtIndex v.id vehicleUpdated model.vehicles
     in
-    ( { model | view = Details vehicleUpdated, vehicles = vehiclesNew }
+    ( { model | view = ViewDetails vehicleUpdated, vehicles = vehiclesNew }
     , Cmd.none
     )
 

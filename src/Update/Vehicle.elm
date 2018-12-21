@@ -1,21 +1,4 @@
-module Update.Vehicle exposing
-    ( addVehicle
-    , deleteVehicle
-    , discardPhoto
-    , getStream
-    , rollSkidDice
-    , setPerkInVehicle
-    , setTmpVehicleType
-    , setUrlForVehicle
-    , takePhoto
-    , updateActivated
-    , updateCrew
-    , updateEquipment
-    , updateGear
-    , updateHazards
-    , updateHull
-    , updateNotes
-    )
+module Update.Vehicle exposing (update)
 
 import Model.Model exposing (..)
 import Model.Sponsors exposing (..)
@@ -23,6 +6,121 @@ import Model.Vehicles exposing (..)
 import Model.Weapons exposing (..)
 import Ports.Photo
 import Update.Utils exposing (..)
+
+
+update : Model -> VehicleEvent -> ( Model, Cmd Msg )
+update model event =
+    case event of
+        AddVehicle ->
+            addVehicle model
+
+        DeleteVehicle v ->
+            deleteVehicle model v
+
+        NextGearPhase ->
+            let
+                weaponFunc =
+                    \w -> { w | status = WeaponReady, attackRoll = 0 }
+
+                vehicleFunc =
+                    \v -> { v | weapons = v.weapons |> List.map weaponFunc }
+
+                vs =
+                    model.vehicles
+                        |> List.map vehicleFunc
+                        |> List.map (\v -> { v | activated = False })
+
+                gearPhase =
+                    if model.gearPhase < 6 then
+                        model.gearPhase + 1
+
+                    else
+                        1
+            in
+            ( { model
+                | view = ViewDashboard
+                , gearPhase = gearPhase
+                , vehicles = vs
+              }
+            , Cmd.none
+            )
+
+        TmpName name ->
+            case model.tmpVehicle of
+                Just v ->
+                    ( { model | tmpVehicle = Just { v | name = name } }
+                    , Cmd.none
+                    )
+
+                Nothing ->
+                    ( model
+                    , Cmd.none
+                    )
+
+        TmpVehicleType indexString ->
+            setTmpVehicleType model (Maybe.withDefault 0 (String.toInt indexString))
+
+        TmpNotes notes ->
+            case model.tmpVehicle of
+                Just v ->
+                    ( { model | tmpVehicle = Just { v | notes = notes } }
+                    , Cmd.none
+                    )
+
+                Nothing ->
+                    ( model
+                    , Cmd.none
+                    )
+
+        UpdateActivated v activated ->
+            updateActivated model v activated
+
+        UpdateGear v strCurrent ->
+            updateGear model v (String.toInt strCurrent |> Maybe.withDefault 1)
+
+        ShiftGear v mod min max ->
+            updateGear model v <| clamp min max <| v.gear.current + mod
+
+        UpdateHazards v strCurrent ->
+            updateHazards model v (String.toInt strCurrent |> Maybe.withDefault 1)
+
+        ShiftHazards v mod min max ->
+            updateHazards model v <| clamp min max <| v.hazards + mod
+
+        UpdateHull v strCurrent ->
+            updateHull model v (String.toInt strCurrent |> Maybe.withDefault 1)
+
+        ShiftHull v mod min max ->
+            updateHull model v <| clamp min max <| v.hull.current + mod
+
+        UpdateCrew v strCurrent ->
+            updateCrew model v strCurrent
+
+        UpdateEquipment v strCurrent ->
+            updateEquipment model v strCurrent
+
+        UpdateNotes v notes ->
+            updateNotes model v notes
+
+        SetPerkInVehicle vehicle perk isSet ->
+            setPerkInVehicle model vehicle perk isSet
+
+        GetStream v ->
+            getStream model v
+
+        TakePhoto v ->
+            takePhoto model v
+
+        SetPhotoUrlCallback url ->
+            case model.view of
+                ViewDetails vehicle ->
+                    setUrlForVehicle model vehicle url
+
+                _ ->
+                    ( model, Cmd.none )
+
+        DiscardPhoto vehicle ->
+            discardPhoto model vehicle
 
 
 addVehicle : Model -> ( Model, Cmd Msg )
@@ -41,7 +139,7 @@ addVehicle model =
 
                 ( _, _ ) ->
                     ( { model
-                        | view = Overview
+                        | view = ViewDashboard
                         , vehicles = oldl ++ [ { vehicleTmp | id = List.length oldl } ]
                         , tmpVehicle = Nothing
                         , error = []
@@ -55,9 +153,12 @@ addVehicle model =
             )
 
 
-setTmpVehicleType : Model -> String -> ( Model, Cmd Msg )
-setTmpVehicleType model vtstr =
+setTmpVehicleType : Model -> Int -> ( Model, Cmd Msg )
+setTmpVehicleType model index =
     let
+        tailVehicles =
+            List.drop (index + 1)
+
         name =
             case model.tmpVehicle of
                 Just v ->
@@ -162,8 +263,8 @@ updateActivated model v activated =
 
         newView =
             case model.view of
-                Details currentVehicle ->
-                    Details nv
+                ViewDetails currentVehicle ->
+                    ViewDetails nv
 
                 _ ->
                     model.view
@@ -184,8 +285,8 @@ updateGear model v newGear =
 
         newView =
             case model.view of
-                Details _ ->
-                    Details vehicleUpdated
+                ViewDetails _ ->
+                    ViewDetails vehicleUpdated
 
                 _ ->
                     model.view
@@ -206,8 +307,8 @@ updateHazards model v newHazards =
 
         newView =
             case model.view of
-                Details _ ->
-                    Details vehicleUpdated
+                ViewDetails _ ->
+                    ViewDetails vehicleUpdated
 
                 _ ->
                     model.view
@@ -237,8 +338,8 @@ updateHull model v currentHull =
 
         newView =
             case model.view of
-                Details _ ->
-                    Details nv
+                ViewDetails _ ->
+                    ViewDetails nv
 
                 _ ->
                     model.view
@@ -314,7 +415,7 @@ updateAmmoUsed model v w used =
         vehiclesNew =
             Update.Utils.replaceAtIndex v.id vehicleUpdated model.vehicles
     in
-    ( { model | view = Details vehicleUpdated, vehicles = vehiclesNew }
+    ( { model | view = ViewDetails vehicleUpdated, vehicles = vehiclesNew }
     , Cmd.none
     )
 
@@ -325,7 +426,7 @@ deleteVehicle model v =
         newvehicles =
             Update.Utils.deleteFromList v.id model.vehicles |> Update.Utils.correctIds
     in
-    ( { model | view = Overview, vehicles = newvehicles }
+    ( { model | view = ViewDashboard, vehicles = newvehicles }
     , Cmd.none
     )
 
@@ -339,7 +440,7 @@ rollSkidDice model v skidResults =
         vehiclesNew =
             Update.Utils.replaceAtIndex v.id vehicleUpdated model.vehicles
     in
-    ( { model | view = Details vehicleUpdated, vehicles = vehiclesNew }
+    ( { model | view = ViewDetails vehicleUpdated, vehicles = vehiclesNew }
     , Cmd.none
     )
 
@@ -373,7 +474,7 @@ setPerkInVehicle model v perk isSet =
         vehiclesNew =
             Update.Utils.replaceAtIndex v.id vehicleUpdated model.vehicles
     in
-    ( { model | view = Details vehicleUpdated, vehicles = vehiclesNew }
+    ( { model | view = ViewDetails vehicleUpdated, vehicles = vehiclesNew }
     , Cmd.none
     )
 
@@ -401,7 +502,7 @@ setUrlForVehicle model v url =
         vehiclesNew =
             Update.Utils.replaceAtIndex v.id vehicleUpdated model.vehicles
     in
-    ( { model | view = Details vehicleUpdated, vehicles = vehiclesNew }
+    ( { model | view = ViewDetails vehicleUpdated, vehicles = vehiclesNew }
     , Ports.Photo.destroyStream ""
     )
 
@@ -415,6 +516,6 @@ discardPhoto model v =
         vehiclesNew =
             Update.Utils.replaceAtIndex v.id vehicleUpdated model.vehicles
     in
-    ( { model | view = Details vehicleUpdated, vehicles = vehiclesNew }
+    ( { model | view = ViewDetails vehicleUpdated, vehicles = vehiclesNew }
     , Ports.Photo.getStream ""
     )

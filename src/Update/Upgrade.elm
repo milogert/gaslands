@@ -25,7 +25,7 @@ addUpgrade model v u =
             pre ++ vehicleNew :: post
     in
     ( { model
-        | view = Details vehicleNew
+        | view = ViewDetails vehicleNew
         , error = []
         , vehicles = newvehicles
       }
@@ -45,6 +45,6 @@ deleteUpgrade model v u =
         vehiclesNew =
             Update.Utils.replaceAtIndex v.id vehicleUpdated model.vehicles
     in
-    ( { model | view = Details vehicleUpdated, vehicles = vehiclesNew }
+    ( { model | view = ViewDetails vehicleUpdated, vehicles = vehiclesNew }
     , Cmd.none
     )

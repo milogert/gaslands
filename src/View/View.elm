@@ -25,11 +25,12 @@ import Html.Attributes
         )
 import Html.Events exposing (onClick, onInput)
 import Model.Model exposing (..)
+import Model.Vehicles exposing (..)
+import View.Dashboard
 import View.Details
 import View.NewUpgrade
 import View.NewVehicle
 import View.NewWeapon
-import View.Overview
 import View.Settings
 import View.Sponsor
 import View.SponsorSelect
@@ -41,30 +42,18 @@ view model =
     let
         viewToGoTo =
             case model.view of
-                Details _ ->
-                    ToOverview
+                ViewAddingWeapon v ->
+                    To <| ViewDetails v
 
-                SelectingSponsor ->
-                    ToOverview
+                ViewAddingUpgrade v ->
+                    To <| ViewDetails v
 
-                AddingVehicle ->
-                    ToOverview
-
-                AddingWeapon v ->
-                    ToDetails v
-
-                AddingUpgrade v ->
-                    ToDetails v
-
-                Settings ->
-                    ToOverview
-
-                Overview ->
-                    ToOverview
+                _ ->
+                    To ViewDashboard
 
         backButton =
             Btn.button
-                [ Btn.disabled <| model.view == Overview
+                [ Btn.disabled <| model.view == ViewDashboard
                 , Btn.light
                 , Btn.small
                 , Btn.block
@@ -87,7 +76,7 @@ view model =
                 [ Btn.small
                 , Btn.primary
                 , Btn.attrs [ class "ml-2" ]
-                , Btn.onClick NextGearPhase
+                , Btn.onClick <| VehicleMsg NextGearPhase
                 ]
                 [ icon "cogs", Badge.badgeLight [] [ text gearPhaseText ] ]
 
@@ -113,7 +102,7 @@ view model =
             Btn.button
                 [ Btn.small
                 , Btn.light
-                , Btn.onClick ToSettings
+                , Btn.onClick <| To ViewSettings
                 , Btn.attrs
                     [ attribute "aria-label" "Back Button"
                     , class "ml-2"
@@ -129,7 +118,10 @@ view model =
         (viewToStr model)
         [ Grid.container []
             [ CDN.stylesheet -- creates an inline style node with the Bootstrap CSS
-            , Grid.row [ Row.middleXs ]
+            , Grid.row
+                [ Row.middleXs
+                , Row.attrs [ class "my-2" ]
+                ]
                 [ Grid.col [ Col.xsAuto ] [ backButton ]
                 , Grid.col [] [ viewDisplay ]
                 , Grid.col
@@ -142,7 +134,8 @@ view model =
                     , settingsButton
                     ]
                 ]
-            , hr [] []
+
+            --, hr [] []
             , displayAlert model
             , render model
 
@@ -164,25 +157,25 @@ displayAlert model =
 render : Model -> Html Msg
 render model =
     case model.view of
-        Overview ->
-            View.Overview.view model
+        ViewDashboard ->
+            View.Dashboard.view model
 
-        Details v ->
+        ViewDetails v ->
             View.Details.view model v
 
-        SelectingSponsor ->
+        ViewSelectingSponsor ->
             View.SponsorSelect.view model
 
-        AddingVehicle ->
+        ViewAddingVehicle ->
             View.NewVehicle.view model
 
-        AddingWeapon v ->
+        ViewAddingWeapon v ->
             View.NewWeapon.view model v
 
-        AddingUpgrade v ->
+        ViewAddingUpgrade v ->
             View.NewUpgrade.view model v
 
-        Settings ->
+        ViewSettings ->
             View.Settings.view model
 
 

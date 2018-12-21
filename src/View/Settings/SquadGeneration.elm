@@ -9,28 +9,14 @@ import Bootstrap.Grid.Col as Col
 import Html
     exposing
         ( Html
-        , a
         , div
-        , h3
         , h4
-        , hr
-        , li
-        , p
         , text
-        , ul
         )
 import Html.Attributes
     exposing
         ( class
-        , classList
         , for
-        , href
-        , id
-        , placeholder
-        , rows
-        , style
-        , type_
-        , value
         )
 import Model.Model exposing (..)
 import Model.Settings exposing (..)
@@ -88,8 +74,7 @@ render settings =
                 ]
             , Btn.button
                 [ Btn.success
-
-                --, Btn.onClick
+                , Btn.onClick <| SettingsMsg GenerateTeam
                 ]
                 [ icon "random"
                 , text "Spin!"

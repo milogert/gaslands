@@ -27,7 +27,7 @@ vehicleEncoder v =
     , ( "id", int v.id )
     , ( "specials", list object <| List.map specialEncoder v.specials )
     , ( "perks", list object <| List.map vehiclePerkEncoder v.perks )
-    , ( "requiredSponsor", string <| requiredSponsorEncoder v.requiredSponsor )
+    , ( "requiredSponsor", requiredSponsorEncoder v.requiredSponsor )
     ]
 
 

@@ -18,7 +18,7 @@ weaponEncoder w =
     , ( "id", int w.id )
     , ( "status", weaponStatusEncoder w.status )
     , ( "ammoUsed", int w.ammoUsed )
-    , ( "requiredSponsor", string <| requiredSponsorEncoder w.requiredSponsor )
+    , ( "requiredSponsor", requiredSponsorEncoder w.requiredSponsor )
     ]
 
 

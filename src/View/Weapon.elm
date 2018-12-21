@@ -2,8 +2,27 @@ module View.Weapon exposing (render)
 
 import Bootstrap.Grid as Grid
 import Bootstrap.Grid.Col as Col
-import Html exposing (Html, button, div, h1, h2, h3, h4, h5, h6, hr, img, input, label, li, node, option, p, select, small, span, text, textarea, ul)
-import Html.Attributes exposing (checked, class, classList, disabled, for, href, id, max, min, placeholder, rel, src, type_, value)
+import Html
+    exposing
+        ( Html
+        , button
+        , div
+        , h6
+        , li
+        , option
+        , select
+        , span
+        , text
+        , ul
+        )
+import Html.Attributes
+    exposing
+        ( class
+        , classList
+        , disabled
+        , id
+        , value
+        )
 import Html.Events exposing (onClick, onInput)
 import Model.Model exposing (..)
 import Model.Utils exposing (..)
@@ -18,7 +37,7 @@ render model vehicle weapon =
     let
         isPreview =
             case model.view of
-                AddingWeapon _ ->
+                ViewAddingWeapon _ ->
                     True
 
                 _ ->

@@ -7,4 +7,17 @@ import Model.Settings exposing (..)
 
 settingsDecoder : Decoder Settings
 settingsDecoder =
-    D.fail "Not implemented"
+    D.succeed Settings
+        |> required "percentVehicles" D.int
+        |> required "percentWeapons" D.int
+        |> required "percentUpgrades" D.int
+        |> required "percentPerks" D.int
+        |> required "pointsAllowed" D.int
+        |> optional "spinResults" (D.list spinResultDecoder) []
+
+
+spinResultDecoder : Decoder SpinResult
+spinResultDecoder =
+    D.succeed SpinResult
+        |> required "summary" D.string
+        |> required "cost" D.int
