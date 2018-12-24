@@ -2,6 +2,7 @@ import './main.css';
 import { Main } from './Main.elm';
 import registerServiceWorker from './registerServiceWorker';
 
+
 var app = Main.embed(document.getElementById('root'));
 
 registerServiceWorker();
@@ -21,44 +22,22 @@ app.ports.share.subscribe(function(str) {
     window.navigator.share({text: str});
 });
 
+// Storage.
+import { storage } from './storage.js';
 app.ports.get.subscribe(function(str) {
-    if (!("localStorage" in window))
-    {
-        alert("Local storage is not supported currently.");
-        return;
-    }
-    app.ports.getSub.send(window.localStorage.getItem(str));
+    app.ports.getSub.send(storage.getItem(str));
 });
 
 app.ports.getKeys.subscribe(function(str) {
-    if (!("localStorage" in window))
-    {
-        alert("Local storage is not supported currently.");
-        return;
-    }
-    app.ports.getKeysSub.send(Object.keys(window.localStorage));
+    app.ports.getKeysSub.send(storage.getKeys(str));
 });
 
 app.ports.set.subscribe(function(storageObj) {
-    if (!("localStorage" in window))
-    {
-        alert("Local storage is not supported currently.");
-        return;
-    }
-    window.localStorage.setItem(
-        storageObj.key, storageObj.value
-    );
-    app.ports.setSub.send(storageObj);
+    app.ports.setSub.send(storage.setItem(storageObj));
 });
 
 app.ports.delete.subscribe(function(key) {
-    if (!("localStorage" in window))
-    {
-        alert("Local storage is not supported currently.");
-        return;
-    }
-    window.localStorage.removeItem(key);
-    app.ports.deleteSub.send(key);
+    app.ports.deleteSub.send(storage.deleteItem(key));
 });
 
 // Photo capabilities.
