@@ -1,14 +1,35 @@
 module View.Weapon exposing (render)
 
-import Html exposing (Html, button, div, h1, h2, h3, h4, h5, h6, hr, img, input, label, li, node, option, p, select, small, span, text, textarea, ul)
-import Html.Attributes exposing (checked, class, classList, disabled, for, href, id, max, min, placeholder, rel, src, type_, value)
+import Bootstrap.Grid as Grid
+import Bootstrap.Grid.Col as Col
+import Html
+    exposing
+        ( Html
+        , button
+        , div
+        , h6
+        , li
+        , option
+        , select
+        , span
+        , text
+        , ul
+        )
+import Html.Attributes
+    exposing
+        ( class
+        , classList
+        , disabled
+        , id
+        , value
+        )
 import Html.Events exposing (onClick, onInput)
 import Model.Model exposing (..)
 import Model.Utils exposing (..)
 import Model.Vehicles exposing (..)
 import Model.Weapons exposing (..)
-import View.Utils exposing (icon)
 import View.EquipmentLayout
+import View.Utils exposing (icon)
 
 
 render : Model -> Vehicle -> Weapon -> Html Msg
@@ -16,7 +37,7 @@ render model vehicle weapon =
     let
         isPreview =
             case model.view of
-                AddingWeapon _ ->
+                ViewAddingWeapon _ ->
                     True
 
                 _ ->
@@ -50,7 +71,7 @@ render model vehicle weapon =
                     text ""
 
                 i ->
-                    text <| " (rolled " ++ (toString i) ++ ")"
+                    text <| " (rolled " ++ String.fromInt i ++ ")"
 
         fireButton =
             button
@@ -78,17 +99,17 @@ render model vehicle weapon =
                 [ text <| View.Utils.renderDice weapon.attack ++ " damage" ]
 
         mountPointId =
-            "mountPoint-" ++ (toString weapon.id)
+            "mountPoint-" ++ String.fromInt weapon.id
 
         mountPoint =
             case ( weapon.mountPoint, isPreview ) of
                 ( Just CrewFired, _ ) ->
                     span [ class "badge badge-secondary mr-2" ]
-                        [ text <| mountPointToString CrewFired ]
+                        [ text <| fromWeaponMounting CrewFired ]
 
                 ( Just point, False ) ->
                     span [ class "badge badge-secondary mr-2" ]
-                        [ text <| mountPointToString point ]
+                        [ text <| fromWeaponMounting point ]
 
                 ( _, True ) ->
                     div [ class "mr-2" ]
@@ -97,15 +118,14 @@ render model vehicle weapon =
                             , onInput TmpWeaponMountPoint
                             , id mountPointId
                             ]
-                            ((option [ value "" ] [ text "" ])
-                                :: (List.map
-                                        (\m ->
-                                            option
-                                                [ value <| mountPointToString m ]
-                                                [ text <| mountPointToString m ]
-                                        )
-                                        [ Full, Front, LeftSide, RightSide, Rear ]
-                                   )
+                            (option [ value "" ] [ text "" ]
+                                :: List.map
+                                    (\m ->
+                                        option
+                                            [ value <| fromWeaponMounting m ]
+                                            [ text <| fromWeaponMounting m ]
+                                    )
+                                    [ Full, Front, LeftSide, RightSide, Rear ]
                             )
                         ]
 
@@ -123,16 +143,16 @@ render model vehicle weapon =
                         _ ->
                             "slots"
             in
-                span [ class "badge badge-secondary mr-2" ]
-                    [ text <| toString weapon.slots ++ " " ++ slotLabel ++ " used" ]
+            span [ class "badge badge-secondary mr-2" ]
+                [ text <| String.fromInt weapon.slots ++ " " ++ slotLabel ++ " used" ]
 
         typeBadge =
             span [ class "badge badge-secondary mr-2" ]
-                [ text <| toString weapon.wtype ++ " type" ]
+                [ text <| fromWeaponType weapon.wtype ++ " type" ]
 
         rangeBadge =
             span [ class "badge badge-secondary mr-2" ]
-                [ text <| toString weapon.range ++ " range" ]
+                [ text <| fromWeaponRange weapon.range ++ " range" ]
 
         pointBadge =
             let
@@ -147,8 +167,8 @@ render model vehicle weapon =
                         _ ->
                             "points"
             in
-                span [ class "badge badge-secondary mr-2" ]
-                    [ text <| toString finalCost ++ " " ++ pointLabel ]
+            span [ class "badge badge-secondary mr-2" ]
+                [ text <| String.fromInt finalCost ++ " " ++ pointLabel ]
 
         factsHolder =
             View.Utils.factsHolder
@@ -171,21 +191,20 @@ render model vehicle weapon =
                 _ ->
                     ul [] <| List.map renderSpecialFunc weapon.specials
     in
-        View.EquipmentLayout.render
-            (not isPreview)
-            [ View.Utils.row
-                [ div [ class "col-md-12 col mb-2" ]
-                    [ h6 [] [ text <| weapon.name ++ " " ] ]
-                , View.Utils.colPlus [ "md-12", "auto" ] [ "mb-2" ] [ fireButton ]
-                , View.Utils.colPlus [ "md-12", "auto" ]
-                    [ "mb-2" ]
-                    [ button
-                        [ class "btn btn-sm btn-danger btn-block"
-                        , classList [ ( "d-none", isPreview ) ]
-                        , onClick <| DeleteWeapon vehicle weapon
-                        ]
-                        [ icon "trash-alt" ]
+    View.EquipmentLayout.render
+        (not isPreview)
+        [ Grid.row []
+            [ Grid.col [ Col.xs, Col.md12 ]
+                [ h6 [] [ text <| weapon.name ++ " " ] ]
+            , Grid.col [ Col.xsAuto, Col.md12 ] [ fireButton ]
+            , Grid.col [ Col.xsAuto, Col.md12 ]
+                [ button
+                    [ class "btn btn-sm btn-danger btn-block"
+                    , classList [ ( "d-none", isPreview ) ]
+                    , onClick <| DeleteWeapon vehicle weapon
                     ]
+                    [ icon "trash-alt" ]
                 ]
             ]
-            [ factsHolder, specials ]
+        ]
+        [ factsHolder, specials ]

@@ -1,66 +1,87 @@
-module View.Vehicle exposing (render, renderPreview)
+module View.Vehicle exposing (renderCard, renderDetails, renderPreview)
 
-import Html exposing (Html, button, div, h1, h2, h3, h4, h5, h6, hr, img, input, label, li, node, option, p, select, small, span, text, textarea, ul, video)
-import Html.Attributes exposing (checked, class, classList, disabled, for, href, id, max, min, placeholder, rel, src, type_, value, max, attribute, style, autoplay)
+import Bootstrap.Button as Btn
+import Bootstrap.Card as Card
+import Bootstrap.Card.Block as Block
+import Bootstrap.Form.Input as Input
+import Bootstrap.Form.InputGroup as InputGroup
+import Bootstrap.Form.Textarea as Textarea
+import Bootstrap.Grid as Grid
+import Bootstrap.Grid.Col as Col
+import Bootstrap.Grid.Row as Row
+import Html
+    exposing
+        ( Html
+        , div
+        , h4
+        , input
+        , li
+        , small
+        , span
+        , text
+        , ul
+        )
+import Html.Attributes
+    exposing
+        ( checked
+        , class
+        , classList
+        , disabled
+        , placeholder
+        , style
+        )
 import Html.Events exposing (onClick, onInput)
 import Model.Model exposing (..)
+import Model.Sponsors exposing (..)
 import Model.Utils exposing (..)
-import Model.Sponsors
 import Model.Vehicles exposing (..)
 import Model.Weapons exposing (handgun)
-import View.Sponsor
 import View.Photo
+import View.Sponsor
 import View.Upgrade
 import View.Utils exposing (icon, iconClass)
 import View.Weapon
 
 
-render : Model -> CurrentView -> Vehicle -> Html Msg
-render model currentView v =
+configure : Model -> CurrentView -> Vehicle -> ( Html Msg, List (Html Msg), Html Msg )
+configure model currentView v =
     let
         vtype =
-            vTToStr v.vtype
+            fromVehicleType v.vtype
 
         vehicleTypeBadge =
             View.Utils.factBadge vtype
 
         weightBadge =
             View.Utils.factBadge <|
-                (toString v.weight)
+                fromVehicleWeight v.weight
                     ++ "-weight"
 
         handlingBadge =
             View.Utils.factBadge <|
-                (toString <| totalHandling v)
+                (String.fromInt <| totalHandling v)
                     ++ " handling"
 
         equipmentUsed =
             List.sum (List.map .slots v.weapons)
 
         equipmentRemaining =
-            toString <| v.equipment - equipmentUsed
+            String.fromInt <| v.equipment - equipmentUsed
 
         crewBadge =
-            View.Utils.factBadge <| (toString <| totalCrew v) ++ " total crew"
+            View.Utils.factBadge <| (String.fromInt <| totalCrew v) ++ " total crew"
 
         isCrewAvailable =
-            (totalCrew v) > View.Utils.crewUsed v
+            totalCrew v > View.Utils.crewUsed v
 
         crewRemaining =
-            toString <| (totalCrew v) - View.Utils.crewUsed v
+            String.fromInt <| totalCrew v - View.Utils.crewUsed v
 
         wrecked =
-            v.hull.current >= (totalHull v)
+            v.hull.current >= totalHull v
 
         canActivate =
             model.gearPhase <= v.gear.current
-
-        name =
-            div [ class "vehicle-name-holder" ]
-                [ h3
-                    [ class "vehicle-name" ]
-                    [ text v.name ]
-                ]
 
         activatedText =
             case ( v.activated, canActivate ) of
@@ -78,11 +99,12 @@ render model currentView v =
                 [ class "vehicle-activate-button-holder mb-2"
                 , classList [ ( "d-none", wrecked ) ]
                 ]
-                [ button
-                    [ class "btn btn-sm btn-primary btn-block form-control"
-                    , onClick (UpdateActivated v (not v.activated))
-                    , checked v.activated
-                    , disabled <| not canActivate || v.activated
+                [ Btn.button
+                    [ Btn.primary
+                    , Btn.small
+                    , Btn.block
+                    , Btn.onClick <| VehicleMsg <| UpdateActivated v (not v.activated)
+                    , Btn.disabled <| not canActivate || v.activated
                     ]
                     [ text activatedText ]
                 ]
@@ -97,25 +119,13 @@ render model currentView v =
                 , equipmentSlotsBadge
                 ]
 
-        header =
-            div [ class "vehicle-header col-12 mb-2" ]
-                [ View.Utils.row
-                    [ div
-                        [ class "col-6 col-md-3"
-                        , classList [ ( "d-none", currentView /= Details v ) ]
-                        ]
-                        [ View.Photo.view model v
-                        ]
-                    , div
-                        [ class "col-6 col-md-9"
-                        , classList
-                            [ ( "col-12", currentView /= Details v )
-                            , ( "col-md-12", currentView /= Details v )
-                            ]
-                        ]
-                        [ name, activateButton, factsHolder ]
-                    ]
-                ]
+        photoPlus =
+            div
+                [ classList [ ( "d-none", currentView /= ViewDetails v ) ] ]
+                [ View.Photo.view model v ]
+
+        stats =
+            div [] [ activateButton, factsHolder ]
 
         gearCounter =
             case wrecked of
@@ -126,7 +136,7 @@ render model currentView v =
                     counterElement
                         (iconClass "fas" "cogs" [ "mx-auto" ])
                         1
-                        v.gear.max
+                        (totalGear v)
                         v.gear.current
                         (ShiftGear v -1)
                         (ShiftGear v 1)
@@ -148,15 +158,18 @@ render model currentView v =
             counterElement
                 (iconClass "fas" "shield-alt" [ "mx-auto" ])
                 0
-                v.hull.max
+                (totalHull v)
                 v.hull.current
                 (ShiftHull v -1)
                 (ShiftHull v 1)
                 (UpdateHull v)
 
         counterHolder =
-            div [ class "counter-holder col-12" ]
-                [ gearCounter, hazardCounter, hullCounter ]
+            div []
+                [ gearCounter
+                , hazardCounter
+                , hullCounter
+                ]
 
         renderSpecialFunc special =
             li [] [ View.Utils.renderSpecial False Nothing 0 special ]
@@ -170,20 +183,18 @@ render model currentView v =
                     ul [] <| List.map renderSpecialFunc v.specials
 
         specialHolder =
-            div [ class "special-holder col-12" ]
-                [ specials ]
+            div [] [ specials ]
 
         notes =
             div
-                [ class "vehicle-notes-holder col-12"
-                , classList [ ( "d-none", currentView == Overview ) ]
+                [ class "vehicle-notes-holder"
+                , classList [ ( "d-none", currentView == ViewDashboard ) ]
                 ]
-                [ textarea
-                    [ onInput (UpdateNotes v)
-                    , class "form-control"
-                    , placeholder "Notes"
+                [ Textarea.textarea
+                    [ Textarea.onInput <| VehicleMsg << UpdateNotes v
+                    , Textarea.attrs [ placeholder "Notes" ]
+                    , Textarea.value v.notes
                     ]
-                    [ text v.notes ]
                 ]
 
         weaponsUsingSlots =
@@ -207,21 +218,23 @@ render model currentView v =
                             , ( "badge-danger", not isCrewAvailable )
                             ]
                         ]
-                        [ text <| (toString <| View.Utils.crewUsed v) ++ "/" ++ (toString <| totalCrew v) ++ " crew used" ]
+                        [ text <| (String.fromInt <| View.Utils.crewUsed v) ++ "/" ++ (String.fromInt <| totalCrew v) ++ " crew used" ]
                     ]
                 , small [ class "ml-2" ]
                     [ span [ class "badge badge-dark" ]
-                        [ text <| (toString <| weaponsUsingSlots) ++ "/" ++ (toString v.equipment) ++ " slots used" ]
+                        [ text <| (String.fromInt <| weaponsUsingSlots) ++ "/" ++ String.fromInt v.equipment ++ " slots used" ]
                     ]
                 , small [ class "ml-2" ]
-                    [ button
-                        [ onClick <| ToNewWeapon v
-                        , class "btn btn-sm btn-link"
+                    [ Btn.button
+                        [ Btn.roleLink
+                        , Btn.small
+                        , Btn.onClick <| To <| ViewAddingWeapon v
                         ]
                         [ icon "plus", text "Weapon" ]
-                    , button
-                        [ onClick <| AddWeapon v handgun
-                        , class "btn btn-sm btn-link"
+                    , Btn.button
+                        [ Btn.roleLink
+                        , Btn.small
+                        , Btn.onClick <| AddWeapon v handgun
                         ]
                         [ icon "plus", text "Handgun" ]
                     ]
@@ -234,12 +247,14 @@ render model currentView v =
                 [ text "Upgrade List"
                 , small [ class "ml-2" ]
                     [ span [ class "badge badge-dark" ]
-                        [ text <| (toString <| upgradeUsingSlots) ++ "/" ++ (toString v.equipment) ++ " slots used" ]
+                        [ text <| (String.fromInt <| upgradeUsingSlots) ++ "/" ++ String.fromInt v.equipment ++ " slots used" ]
                     ]
                 , small []
-                    [ button
-                        [ onClick <| ToNewUpgrade v
-                        , class "btn btn-sm btn-link ml-2"
+                    [ Btn.button
+                        [ Btn.roleLink
+                        , Btn.small
+                        , Btn.onClick <| To <| ViewAddingUpgrade v
+                        , Btn.attrs [ class "ml-2" ]
                         ]
                         [ icon "plus", text "Upgrade" ]
                     ]
@@ -255,7 +270,7 @@ render model currentView v =
                     View.Utils.detailSection
                         currentView
                         [ text "Perks Available from "
-                        , text <| toString sponsor
+                        , text <| fromSponsorType sponsor
                         ]
                         [ div [ class "row" ]
                             (sponsor
@@ -267,7 +282,7 @@ render model currentView v =
 
         pointsCostBadge =
             View.Utils.factBadge <|
-                (toString <| vehicleCost v)
+                (String.fromInt <| vehicleCost v)
                     ++ " points"
 
         equipmentSlotsBadge =
@@ -280,51 +295,79 @@ render model currentView v =
                         _ ->
                             "slots"
             in
-                View.Utils.factBadge <|
-                    (toString v.equipment)
-                        ++ " build "
-                        ++ slots
+            View.Utils.factBadge <|
+                String.fromInt v.equipment
+                    ++ " build "
+                    ++ slots
+
+        header =
+            text v.name
 
         body =
-            div
-                [ class "vehicle-body row"
-                , classList [ ( "card-text", currentView /= Details v ) ]
-                ]
-                [ header
-                , counterHolder
-                , specialHolder
-                , notes
-                , div [ class "list-holder col-12", classList [ ( "d-none", wrecked ) ] ]
-                    [ weaponList
-                    , upgradeList
-                    , availablePerks
-                    ]
-                ]
+            [ stats
+            , counterHolder
+            , specialHolder
+            , notes
+            , weaponList
+            , upgradeList
+            , availablePerks
+            ]
 
         footer =
             div
                 [ class "buttons"
                 , classList [ ( "d-none", wrecked ) ]
                 ]
-                [ button
-                    [ class "btn btn-sm btn-danger"
-                    , onClick <| DeleteVehicle v
+                [ Btn.button
+                    [ Btn.danger
+                    , Btn.small
+                    , Btn.onClick <| VehicleMsg <| DeleteVehicle v
                     ]
                     [ icon "trash-alt" ]
-                , button
-                    [ class "btn btn-sm btn-info float-right"
-                    , classList [ ( "d-none", currentView /= Overview ) ]
-                    , onClick <| ToDetails v
+                , Btn.button
+                    [ Btn.info
+                    , Btn.small
+                    , Btn.attrs
+                        [ class "float-right"
+                        , classList [ ( "d-none", currentView /= ViewDashboard ) ]
+                        ]
+                    , Btn.onClick <| To <| ViewDetails v
                     ]
                     [ icon "info" ]
                 ]
     in
-        case currentView of
-            Details v ->
-                body
+    ( header, body, footer )
 
-            _ ->
-                View.Utils.card [ ( "border-danger", wrecked ) ] body footer False
+
+renderDetails : Model -> CurrentView -> Vehicle -> Html Msg
+renderDetails model currentView v =
+    let
+        ( header, body, footer ) =
+            configure model currentView v
+    in
+    body
+        |> List.map (\b -> Grid.col [ Col.xs12 ] [ b ])
+        |> Grid.simpleRow
+
+
+renderCard : Model -> CurrentView -> Vehicle -> Card.Config Msg
+renderCard model currentView v =
+    let
+        ( header, body, footer ) =
+            configure model currentView v
+
+        cardDisplay =
+            case v.hull.current >= totalHull v of
+                True ->
+                    [ Card.outlineDanger ]
+
+                False ->
+                    []
+    in
+    Card.config cardDisplay
+        |> Card.headerH4 [] [ header ]
+        |> Card.block [] (List.map (\b -> Block.text [] [ b ]) body)
+        |> Card.footer [] [ footer ]
 
 
 renderPreview : Model -> CurrentView -> Vehicle -> Html Msg
@@ -332,48 +375,48 @@ renderPreview model currentView v =
     let
         name =
             input
-                [ onInput TmpName
+                [ onInput <| VehicleMsg << TmpName
                 , placeholder "Name"
                 , class "form-control mr-2"
                 ]
                 [ text v.name ]
 
         vtype =
-            vTToStr v.vtype
+            fromVehicleType v.vtype
 
         vehicleTypeBadge =
             View.Utils.factBadge vtype
 
         weightBadge =
             View.Utils.factBadge <|
-                (toString v.weight)
+                fromVehicleWeight v.weight
                     ++ "-weight"
 
         handlingBadge =
             View.Utils.factBadge <|
-                (toString <| totalHandling v)
+                (String.fromInt <| totalHandling v)
                     ++ " handling"
 
         equipmentUsed =
             List.sum (List.map .slots v.weapons)
 
         equipmentRemaining =
-            toString <| v.equipment - equipmentUsed
+            String.fromInt <| v.equipment - equipmentUsed
 
         crewBadge =
-            View.Utils.factBadge <| (toString <| totalCrew v) ++ " total crew"
+            View.Utils.factBadge <| (String.fromInt <| totalCrew v) ++ " total crew"
 
         isCrewAvailable =
-            (totalCrew v) > View.Utils.crewUsed v
+            totalCrew v > View.Utils.crewUsed v
 
         crewRemaining =
-            toString <| (totalCrew v) - View.Utils.crewUsed v
+            String.fromInt <| totalCrew v - View.Utils.crewUsed v
 
         gearBox =
-            div [] [ text <| "Gear Max: " ++ toString (totalGear v) ]
+            div [] [ text <| "Gear Max: " ++ String.fromInt (totalGear v) ]
 
         hullChecks =
-            div [] [ text <| "Hull Max: " ++ toString (totalHull v) ]
+            div [] [ text <| "Hull Max: " ++ String.fromInt (totalHull v) ]
 
         renderSpecialFunc special =
             li [] [ View.Utils.renderSpecial True Nothing 0 special ]
@@ -400,7 +443,7 @@ renderPreview model currentView v =
 
         pointsCostBadge =
             View.Utils.factBadge <|
-                (toString <| vehicleCost v)
+                (String.fromInt <| vehicleCost v)
                     ++ " points"
 
         equipmentSlotsBadge =
@@ -413,10 +456,10 @@ renderPreview model currentView v =
                         _ ->
                             "slots"
             in
-                View.Utils.factBadge <|
-                    (toString v.equipment)
-                        ++ " build "
-                        ++ slots
+            View.Utils.factBadge <|
+                String.fromInt v.equipment
+                    ++ " build "
+                    ++ slots
 
         factsHolder =
             View.Utils.factsHolder
@@ -429,20 +472,22 @@ renderPreview model currentView v =
                 ]
 
         body =
-            div [ classList [ ( "card-text", currentView /= Details v ) ] ]
-                [ header
-                , factsHolder
+            div [ classList [ ( "card-text", currentView /= ViewDetails v ) ] ]
+                [ factsHolder
                 , gearBox
                 , hullChecks
                 , specials
                 ]
     in
-        case currentView of
-            Details v ->
-                div [] [ body ]
+    case currentView of
+        ViewDetails _ ->
+            div [] [ body ]
 
-            _ ->
-                View.Utils.card [] body (text "") True
+        _ ->
+            Card.config []
+                |> Card.headerH4 [] [ header ]
+                |> Card.block [] [ Block.text [] [ body ] ]
+                |> Card.view
 
 
 counterElement :
@@ -450,49 +495,47 @@ counterElement :
     -> Int
     -> Int
     -> Int
-    -> (Int -> Int -> Msg)
-    -> (Int -> Int -> Msg)
-    -> (String -> Msg)
+    -> (Int -> Int -> VehicleEvent)
+    -> (Int -> Int -> VehicleEvent)
+    -> (String -> VehicleEvent)
     -> Html Msg
 counterElement icon_ min max counterValue decrementMsg incrementMsg inputMsg =
-    div [ class "mb-2 input-group" ]
-        [ div [ class "input-group-prepend" ]
-            [ span
-                [ class "input-group-text"
-                , style
-                    [ ( "min-width", "4rem" )
-                    , ( "text-align", "center" )
-                    ]
+    InputGroup.config
+        (InputGroup.number
+            [ Input.onInput <| VehicleMsg << inputMsg
+            , Input.value <| String.fromInt counterValue
+            , Input.attrs
+                [ style "text-align" "center"
+                , Html.Attributes.min <| String.fromInt min
+                , Html.Attributes.max <| String.fromInt max
+                ]
+            ]
+        )
+        |> InputGroup.small
+        |> InputGroup.attrs [ class "my-2" ]
+        |> InputGroup.predecessors
+            [ InputGroup.span
+                [ style "min-width" "4rem"
+                , style "text-align" "center"
                 ]
                 [ icon_ ]
-            , button
-                [ class "btn btn-outline-secondary"
-                , onClick <| decrementMsg min max
+            , InputGroup.button
+                [ Btn.outlineSecondary
+                , Btn.onClick <| VehicleMsg <| decrementMsg min max
+                , Btn.disabled <| min == counterValue
                 ]
-                [ text "-" ]
+                [ icon "minus" ]
             ]
-        , input
-            [ class "form-control"
-            , type_ "number"
-            , onInput inputMsg
-            , value <| toString counterValue
-            , Html.Attributes.min <| toString min
-            , Html.Attributes.max <| toString max
-            , style [ ( "text-align", "center" ) ]
-            ]
-            []
-        , div [ class "input-group-append" ]
-            [ button
-                [ class "btn btn-outline-secondary"
-                , onClick <| incrementMsg min max
+        |> InputGroup.successors
+            [ InputGroup.button
+                [ Btn.outlineSecondary
+                , Btn.onClick <| VehicleMsg <| incrementMsg min max
+                , Btn.disabled <| counterValue >= max
                 ]
-                [ text "+" ]
-            , span
-                [ class "input-group-text"
-                , style
-                    [ ( "min-width", "4rem" )
-                    ]
-                ]
-                [ span [ class "mx-auto" ] [ text <| "of " ++ (toString max) ] ]
+                [ icon "plus" ]
+
+            {--, InputGroup.span
+                [ style "min-width" "4rem" ]
+                [ span [ class "mx-auto" ] [ text <| "of " ++ String.fromInt max ] ]--}
             ]
-        ]
+        |> InputGroup.view

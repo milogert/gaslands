@@ -1,7 +1,9 @@
 module View.NewVehicle exposing (view)
 
+import Bootstrap.Grid as Grid
+import Bootstrap.Grid.Col as Col
 import Html exposing (Html, button, div, h1, h2, h3, h4, h5, h6, img, input, label, li, node, option, p, select, small, span, text, textarea, ul)
-import Html.Attributes exposing (checked, class, disabled, for, href, id, max, min, placeholder, rel, src, type_, value, multiple, size)
+import Html.Attributes exposing (checked, class, disabled, for, href, id, max, min, multiple, placeholder, rel, size, src, type_, value)
 import Html.Events exposing (onClick, onInput)
 import Model.Model exposing (..)
 import Model.Vehicles exposing (..)
@@ -48,34 +50,36 @@ view model =
 
         addButton =
             button
-                [ onClick AddVehicle
+                [ onClick <| VehicleMsg AddVehicle
                 , class "btn btn-primary btn-block mb-3"
                 , disabled disabledButton
                 ]
                 [ text buttonText ]
 
         options =
-            allVehicleTypes
+            allVehicles
                 |> List.filter (View.Utils.vehicleSponsorFilter model)
-                |> List.map vehicleOption
+                |> List.indexedMap vehicleOption
 
         selectList =
             select
-                [ onInput TmpVehicleType
+                [ onInput <| VehicleMsg << TmpVehicleType
                 , class "form-control mb-3"
                 , size 8
                 ]
                 options
     in
-        View.Utils.row
-            [ View.Utils.col "md-3"
-                [ addButton
-                , selectList
-                ]
-            , View.Utils.col "md-9" [ body ]
+    Grid.row []
+        [ Grid.col [ Col.md3 ]
+            [ addButton
+            , selectList
             ]
+        , Grid.col [ Col.md9 ] [ body ]
+        ]
 
 
-vehicleOption : VehicleType -> Html Msg
-vehicleOption vt =
-    option [ value <| vTToStr vt ] [ text <| vTToStr vt ]
+vehicleOption : Int -> Vehicle -> Html Msg
+vehicleOption i vt =
+    option
+        [ value <| String.fromInt i ]
+        [ text <| fromVehicleType vt.vtype ]

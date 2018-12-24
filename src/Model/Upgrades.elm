@@ -1,7 +1,7 @@
-module Model.Upgrades exposing (Upgrade, allUpgradesList, armourPlating, extraCrewmember, nameToUpgrade, nitroBooster, tankTracks, upgradeDecoder)
+module Model.Upgrades exposing (Upgrade, allUpgradesList, armourPlating, extraCrewmember, nameToUpgrade, nitroBooster, tankTracks)
 
-import Json.Decode as D exposing (Decoder)
-import Json.Decode.Pipeline exposing (decode, required, hardcoded)
+import Json.Decode as D exposing (Decoder, succeed)
+import Json.Decode.Pipeline exposing (hardcoded, required)
 import Model.Shared exposing (..)
 
 
@@ -12,17 +12,6 @@ type alias Upgrade =
     , cost : Int
     , id : Int
     }
-
-
-upgradeDecoder : Decoder Upgrade
-upgradeDecoder =
-    decode Upgrade
-        |> required "name" D.string
-        |> required "slots" D.int
-        --|> required "specials" (D.list specialDecoder)
-        |> hardcoded []
-        |> required "cost" D.int
-        |> required "id" D.int
 
 
 allUpgradesList : List Upgrade
@@ -58,7 +47,7 @@ nitroBooster =
     Upgrade "Nitro Booster"
         0
         [ Ammo 1
-        , SpecialRule "This vehicle ay declare that it is using this item at the start of an activation. This vehicle activates twice during this activation."
+        , SpecialRule "This vehicle may declare that it is using this item at the start of an activation. This vehicle activates twice during this activation."
         , SpecialRule "During its first activation, this vehicle may only select the long straight template as its maneuver, does not make a skit check and must skip its attack step."
         , SpecialRule "After the first activation, this vehicle gains hazard tokens until it has 5 hazard tokens."
         , SpecialRule "During the second activation, this vehicle is free to choose a maneuver as normal, must make a skid check as normal, and may take its attack step as normal."

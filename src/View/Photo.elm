@@ -1,7 +1,7 @@
-module View.Photo exposing (view, renderPhoto)
+module View.Photo exposing (renderPhoto, view)
 
-import Html exposing (Html, text, div, button, video, img, a)
-import Html.Attributes exposing (class, classList, style, autoplay, src, href)
+import Html exposing (Html, a, button, div, img, text, video)
+import Html.Attributes exposing (autoplay, class, classList, href, src, style)
 import Html.Events exposing (onClick)
 import Model.Model exposing (..)
 import Model.Vehicles exposing (..)
@@ -14,7 +14,7 @@ view model v =
             a
                 [ href "#"
                 , class "text-danger"
-                , onClick <| DiscardPhoto v
+                , onClick <| VehicleMsg <| DiscardPhoto v
                 ]
                 [ text "(Re)Take Photo" ]
 
@@ -29,19 +29,19 @@ view model v =
         videoDisplay =
             video
                 [ autoplay True
-                , onClick <| TakePhoto v
-                , style [ ( "max-width", "100%" ) ]
+                , onClick <| VehicleMsg <| TakePhoto v
+                , style "max-width" "100%"
                 , classList [ ( "d-none", not displayStream ) ]
                 ]
                 []
     in
-        div
-            [ class "card" ]
-            [ videoDisplay
-            , renderPhoto v.photo displayPhoto
-            , div [ class "card-body text-center" ]
-                [ discardButton ]
-            ]
+    div
+        [ class "card" ]
+        [ videoDisplay
+        , renderPhoto v.photo displayPhoto
+        , div [ class "card-body text-center" ]
+            [ discardButton ]
+        ]
 
 
 renderPhoto : Maybe String -> Bool -> Html Msg

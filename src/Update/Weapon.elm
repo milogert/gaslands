@@ -1,4 +1,11 @@
-module Update.Weapon exposing (addWeapon, deleteWeapon, setWeaponFired, updateAmmoUsed, rollAttackDice, rollWeaponDie)
+module Update.Weapon exposing
+    ( addWeapon
+    , deleteWeapon
+    , rollAttackDice
+    , rollWeaponDie
+    , setWeaponFired
+    , updateAmmoUsed
+    )
 
 import Model.Model exposing (..)
 import Model.Vehicles exposing (..)
@@ -25,12 +32,16 @@ addWeapon model v w =
         newvehicles =
             pre ++ vehicleNew :: post
     in
-        case ( w.wtype, w.mountPoint ) of
-            ( _, Nothing ) ->
-                { model | error = [ WeaponMountPointError ] } ! []
+    case ( w.wtype, w.mountPoint ) of
+        ( _, Nothing ) ->
+            ( { model | error = [ WeaponMountPointError ] }
+            , Cmd.none
+            )
 
-            ( _, _ ) ->
-                { model | view = Details vehicleNew, error = [], vehicles = newvehicles } ! []
+        ( _, _ ) ->
+            ( { model | view = ViewDetails vehicleNew, error = [], vehicles = newvehicles }
+            , Cmd.none
+            )
 
 
 updateAmmoUsed : Model -> Vehicle -> Weapon -> Int -> ( Model, Cmd Msg )
@@ -48,7 +59,9 @@ updateAmmoUsed model v w used =
         vehiclesNew =
             Update.Utils.replaceAtIndex v.id vehicleUpdated model.vehicles
     in
-        { model | view = Details vehicleUpdated, vehicles = vehiclesNew } ! []
+    ( { model | view = ViewDetails vehicleUpdated, vehicles = vehiclesNew }
+    , Cmd.none
+    )
 
 
 setWeaponFired : Model -> Vehicle -> Weapon -> ( Model, Cmd Msg )
@@ -82,11 +95,12 @@ setWeaponFired model v w =
                 Nothing ->
                     0
     in
-        { model
-            | view = Details vehicleUpdated
-            , vehicles = vehiclesNew
-        }
-            ! [ Random.generate (RollWeaponDie v weaponUpdated) (Random.int minRoll maxRoll) ]
+    ( { model
+        | view = ViewDetails vehicleUpdated
+        , vehicles = vehiclesNew
+      }
+    , Random.generate (RollWeaponDie v weaponUpdated) (Random.int minRoll maxRoll)
+    )
 
 
 rollWeaponDie : Model -> Vehicle -> Weapon -> Int -> ( Model, Cmd Msg )
@@ -101,11 +115,12 @@ rollWeaponDie model v w result =
         vehiclesNew =
             Update.Utils.replaceAtIndex v.id vehicleUpdated model.vehicles
     in
-        { model
-            | view = Details vehicleUpdated
-            , vehicles = vehiclesNew
-        }
-            ! []
+    ( { model
+        | view = ViewDetails vehicleUpdated
+        , vehicles = vehiclesNew
+      }
+    , Cmd.none
+    )
 
 
 deleteWeapon : Model -> Vehicle -> Weapon -> ( Model, Cmd Msg )
@@ -120,10 +135,13 @@ deleteWeapon model v w =
         vehiclesNew =
             Update.Utils.replaceAtIndex v.id vehicleUpdated model.vehicles
     in
-        { model | view = Details vehicleUpdated, vehicles = vehiclesNew } ! []
-
+    ( { model | view = ViewDetails vehicleUpdated, vehicles = vehiclesNew }
+    , Cmd.none
+    )
 
 
 rollAttackDice : Model -> Vehicle -> Weapon -> ( Model, Cmd Msg )
 rollAttackDice model v w =
-    model ! []
+    ( model
+    , Cmd.none
+    )

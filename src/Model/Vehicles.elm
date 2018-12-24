@@ -1,9 +1,49 @@
-module Model.Vehicles exposing (..)
+module Model.Vehicles exposing
+    ( GearTracker
+    , HullHolder
+    , SkidResult(..)
+    , Vehicle
+    , VehicleEvent(..)
+    , VehicleType(..)
+    , WeightClass(..)
+    , allVehicleTypes
+    , allVehicles
+    , fromVehicleType
+    , fromVehicleWeight
+    , slotsRemaining
+    , slotsUsed
+    , strToVT
+    , vehicleCost
+    )
 
 import Model.Shared exposing (..)
+import Model.Sponsors exposing (..)
 import Model.Upgrades exposing (..)
 import Model.Weapons exposing (..)
-import Model.Sponsors exposing (..)
+
+
+type VehicleEvent
+    = AddVehicle
+    | DeleteVehicle Vehicle
+    | TmpName String
+    | TmpVehicleType String
+    | TmpNotes String
+    | NextGearPhase
+    | UpdateActivated Vehicle Bool
+    | UpdateGear Vehicle String
+    | ShiftGear Vehicle Int Int Int
+    | UpdateHazards Vehicle String
+    | ShiftHazards Vehicle Int Int Int
+    | UpdateHull Vehicle String
+    | ShiftHull Vehicle Int Int Int
+    | UpdateCrew Vehicle String
+    | UpdateEquipment Vehicle String
+    | UpdateNotes Vehicle String
+    | SetPerkInVehicle Vehicle VehiclePerk Bool
+    | GetStream Vehicle
+    | TakePhoto Vehicle
+    | SetPhotoUrlCallback String
+    | DiscardPhoto Vehicle
 
 
 type alias Vehicle =
@@ -90,6 +130,22 @@ type WeightClass
     | Airborne
 
 
+fromVehicleWeight : WeightClass -> String
+fromVehicleWeight weight =
+    case weight of
+        Light ->
+            "Light"
+
+        Middle ->
+            "Middle"
+
+        Heavy ->
+            "Heavy"
+
+        Airborne ->
+            "Airborne"
+
+
 type alias HullHolder =
     { current : Int
     , max : Int
@@ -98,280 +154,260 @@ type alias HullHolder =
 
 slotsUsed : Vehicle -> Int
 slotsUsed v =
-    List.sum <| (List.map .slots v.weapons) ++ (List.map .slots v.upgrades)
+    List.sum <| List.map .slots v.weapons ++ List.map .slots v.upgrades
 
 
 slotsRemaining : Vehicle -> Int
 slotsRemaining v =
-    v.equipment - (slotsUsed v)
+    v.equipment - slotsUsed v
+
+
+allVehicles : List Vehicle
+allVehicles =
+    [ bike
+    , buggy
+    , car
+    , performanceCar
+    , pickupTruck
+    , monsterTruck
+    , bus
+    , warRig
+    , tank
+    , gyrocopter
+    , helicopter
+    ]
+
+
+defaultVehicle : Vehicle
+defaultVehicle =
+    Vehicle
+        ""
+        Nothing
+        Bike
+        (GearTracker 0 0)
+        0
+        0
+        []
+        (HullHolder 0 0)
+        0
+        0
+        Light
+        False
+        []
+        []
+        ""
+        0
+        0
+        []
+        []
+        Nothing
+
+
+bike : Vehicle
+bike =
+    { defaultVehicle
+        | vtype = Bike
+        , gear = GearTracker 1 6
+        , handling = 5
+        , hull = HullHolder 1 4
+        , crew = 1
+        , equipment = 1
+        , weight = Light
+        , cost = 5
+        , specials =
+            [ NamedSpecialRule "Full Throttle" "This vehicle considers the long straight maneuver template to be permitted in any gear. The long straight is not considered either hazardous or trivial in any gear."
+            , NamedSpecialRule "Pivot" "At the start of this vehicle's activation, if this vehicle's current gar is 1, this vehicle may make a pivot about its centre to face any direction. This pivot cannot cause a collision, and cannot leave this vehicle touching an obstruction."
+            ]
+    }
+
+
+buggy : Vehicle
+buggy =
+    { defaultVehicle
+        | vtype = Buggy
+        , gear = GearTracker 1 6
+        , handling = 4
+        , hull = HullHolder 1 6
+        , crew = 2
+        , equipment = 2
+        , weight = Light
+        , cost = 5
+        , specials =
+            [ NamedSpecialRule "Roll Cage" "When this vehicle suffers a flip, this vehicle may choose to ignore the 2 hits received from the flip."
+            ]
+    }
+
+
+car : Vehicle
+car =
+    { defaultVehicle
+        | vtype = Car
+        , gear = GearTracker 1 5
+        , handling = 3
+        , hull = HullHolder 1 10
+        , crew = 2
+        , equipment = 2
+        , weight = Middle
+        , cost = 12
+    }
+
+
+performanceCar : Vehicle
+performanceCar =
+    { defaultVehicle
+        | vtype = PerformanceCar
+        , gear = GearTracker 1 6
+        , handling = 4
+        , hull = HullHolder 1 8
+        , crew = 1
+        , equipment = 2
+        , weight = Middle
+        , cost = 15
+        , specials =
+            [ NamedSpecialRule "Slip Away" "If this vehicle is targeted wtih a tailgate, T-bone or sideswipe smash attack, and this vehicle declares evade as its reaction, this vehicle may perform a free activation immediately after the active vehicle completes its activation."
+            , SpecialRule "This free activation does not count as the vehicle's activation this gear phase."
+            ]
+    }
+
+
+pickupTruck : Vehicle
+pickupTruck =
+    { defaultVehicle
+        | vtype = PickupTruck
+        , gear = GearTracker 1 4
+        , handling = 2
+        , hull = HullHolder 1 12
+        , crew = 3
+        , equipment = 3
+        , weight = Middle
+        , cost = 15
+    }
+
+
+monsterTruck : Vehicle
+monsterTruck =
+    { defaultVehicle
+        | vtype = MonsterTruck
+        , gear = GearTracker 1 4
+        , handling = 3
+        , hull = HullHolder 1 10
+        , crew = 2
+        , equipment = 2
+        , weight = Heavy
+        , cost = 25
+        , specials =
+            [ NamedSpecialRule "Big Tires" "This vehicle may ignore the penalty for being on a rough surface, and considers a treacherous surface to be a rough surface."
+            , NamedSpecialRule "Crush Attack" "After resolving a collision with a Bike, Buggy, Car, Pickup Truck, Performance Car, Lightweight Obstacle or Middleweight Obstacle during movement step 1.7, this vehicle may ignore the obstruction for the remainder of its movement step, as it drives right over the top of it."
+            ]
+    }
+
+
+bus : Vehicle
+bus =
+    { defaultVehicle
+        | vtype = Bus
+        , gear = GearTracker 1 3
+        , handling = 2
+        , hull = HullHolder 1 16
+        , crew = 8
+        , equipment = 3
+        , weight = Heavy
+        , cost = 30
+    }
+
+
+warRig : Vehicle
+warRig =
+    { defaultVehicle
+        | vtype = WarRig
+        , gear = GearTracker 1 4
+        , handling = 2
+        , hull = HullHolder 1 20
+        , crew = 5
+        , equipment = 5
+        , weight = Heavy
+        , cost = 40
+        , specials = [ SpecialRule "See Page 52 of the core rulebook." ]
+    }
+
+
+tank : Vehicle
+tank =
+    { defaultVehicle
+        | vtype = Tank
+        , gear = GearTracker 1 3
+        , handling = 4
+        , hull = HullHolder 1 20
+        , crew = 3
+        , equipment = 4
+        , weight = Heavy
+        , cost = 40
+        , specials =
+            [ NamedSpecialRule "Pivot" "At the start of this vehicle's activation, if this vehicle's current gar is 1, this vehicle may make a pivot about its centre to face any direction. This pivot cannot cause a collision, and cannot leave this vehicle touching an obstruction."
+            , NamedSpecialRule "Crush Attack" "After resolving a collision with a Bike, Buggy, Car, Pickup Truck, Performance Car, Lightweight Obstacle or Middleweight Obstacle during movement step 1.7, this vehicle may ignore the obstruction for the remainder of its movement step, as it drives right over the top of it."
+            , NamedSpecialRule "All Terrain" "This vehicle may ignore the penalties for rough and treacherous surfaces."
+            ]
+        , requiredSponsor = Just Rutherford
+    }
+
+
+gyrocopter : Vehicle
+gyrocopter =
+    { defaultVehicle
+        | vtype = Gyrocopter
+        , gear = GearTracker 1 3
+        , handling = 4
+        , hull = HullHolder 1 4
+        , crew = 1
+        , equipment = 0
+        , weight = Airborne
+        , cost = 10
+        , specials =
+            [ NamedSpecialRule "Air Wolf" "At the start of this vehicle's activation, this vehicle may make a single pivot about its centre point, up to 90 degrees."
+            , NamedSpecialRule "Airborne" "This vehicle ignores obstructions, dropped weapons and terrain at all times, except that this vehicle may target other vehicles in its attack step."
+            , SpecialRule "Other vehicles ignore this vehicle at all times, except that other vehicles may target this vehicle during their attack steps. This vehicle cannot be involved in collisions."
+            , NamedSpecialRule "Bombs Away" "When purchasing weapons, this vehicle may count dropped weapons as requiring 0 build slots."
+            ]
+    }
+
+
+helicopter : Vehicle
+helicopter =
+    { defaultVehicle
+        | vtype = Helicopter
+        , gear = GearTracker 1 4
+        , handling = 3
+        , hull = HullHolder 1 8
+        , crew = 2
+        , equipment = 4
+        , weight = Airborne
+        , cost = 30
+        , specials =
+            [ NamedSpecialRule "Air Wolf" "At the start of this vehicle's activation, this vehicle may make a single pivot about its centre point, up to 90 degrees."
+            , NamedSpecialRule "Airborne" "This vehicle ignores obstructions, dropped weapons and terrain at all times, except that this vehicle may target other vehicles in its attack step."
+            , SpecialRule "Other vehicles ignore this vehicle at all times, except that other vehicles may target this vehicle during their attack steps. This vehicle cannot be involved in collisions."
+            , NamedSpecialRule "Bombs Away" "When purchasing weapons, this vehicle may count dropped weapons as requiring 0 build slots."
+            ]
+        , requiredSponsor = Just Rutherford
+    }
 
 
 
 -- Vehicle definitions.
 
 
-typeToWeight : VehicleType -> WeightClass
-typeToWeight t =
+fromVehicleType : VehicleType -> String
+fromVehicleType t =
     case t of
         Bike ->
-            Light
+            "Bike"
 
         Buggy ->
-            Light
+            "Buggy"
 
         Car ->
-            Middle
+            "Car"
 
-        PerformanceCar ->
-            Middle
-
-        PickupTruck ->
-            Middle
-
-        MonsterTruck ->
-            Heavy
-
-        Bus ->
-            Heavy
-
-        WarRig ->
-            Heavy
-
-        Tank ->
-            Heavy
-
-        Gyrocopter ->
-            Airborne
-
-        Helicopter ->
-            Airborne
-
-
-typeToCost : VehicleType -> Int
-typeToCost t =
-    case t of
-        Bike ->
-            5
-
-        Buggy ->
-            5
-
-        Car ->
-            12
-
-        PerformanceCar ->
-            15
-
-        PickupTruck ->
-            15
-
-        MonsterTruck ->
-            25
-
-        Bus ->
-            30
-
-        WarRig ->
-            40
-
-        Tank ->
-            40
-
-        Gyrocopter ->
-            10
-
-        Helicopter ->
-            30
-
-
-typeToGearMax : VehicleType -> Int
-typeToGearMax t =
-    case t of
-        Bus ->
-            3
-
-        Tank ->
-            3
-
-        Gyrocopter ->
-            3
-
-        PickupTruck ->
-            4
-
-        MonsterTruck ->
-            4
-
-        WarRig ->
-            4
-
-        Helicopter ->
-            4
-
-        Car ->
-            5
-
-        Bike ->
-            6
-
-        Buggy ->
-            6
-
-        PerformanceCar ->
-            6
-
-
-typeToEquipmentMax : VehicleType -> Int
-typeToEquipmentMax t =
-    case t of
-        Bike ->
-            1
-
-        Buggy ->
-            2
-
-        Car ->
-            2
-
-        PerformanceCar ->
-            2
-
-        PickupTruck ->
-            3
-
-        MonsterTruck ->
-            2
-
-        Bus ->
-            3
-
-        WarRig ->
-            5
-
-        Tank ->
-            4
-
-        Gyrocopter ->
-            0
-
-        Helicopter ->
-            4
-
-
-typeToCrewMax : VehicleType -> Int
-typeToCrewMax t =
-    case t of
-        Bike ->
-            1
-
-        Buggy ->
-            2
-
-        Car ->
-            2
-
-        PerformanceCar ->
-            1
-
-        PickupTruck ->
-            3
-
-        MonsterTruck ->
-            2
-
-        Bus ->
-            8
-
-        WarRig ->
-            5
-
-        Tank ->
-            3
-
-        Gyrocopter ->
-            1
-
-        Helicopter ->
-            2
-
-
-typeToHandling : VehicleType -> Int
-typeToHandling t =
-    case t of
-        Bike ->
-            5
-
-        Buggy ->
-            4
-
-        Car ->
-            3
-
-        PerformanceCar ->
-            4
-
-        PickupTruck ->
-            2
-
-        MonsterTruck ->
-            3
-
-        Bus ->
-            2
-
-        WarRig ->
-            2
-
-        Tank ->
-            4
-
-        Gyrocopter ->
-            4
-
-        Helicopter ->
-            3
-
-
-typeToHullMax : VehicleType -> Int
-typeToHullMax t =
-    case t of
-        Bike ->
-            4
-
-        Buggy ->
-            6
-
-        Car ->
-            10
-
-        PerformanceCar ->
-            8
-
-        PickupTruck ->
-            12
-
-        MonsterTruck ->
-            10
-
-        Bus ->
-            16
-
-        WarRig ->
-            20
-
-        Tank ->
-            20
-
-        Gyrocopter ->
-            4
-
-        Helicopter ->
-            8
-
-
-vTToStr : VehicleType -> String
-vTToStr t =
-    case t of
         PerformanceCar ->
             "Performance Car"
 
@@ -381,11 +417,20 @@ vTToStr t =
         MonsterTruck ->
             "Monster Truck"
 
+        Bus ->
+            "Bus"
+
         WarRig ->
             "War Rig"
 
-        _ ->
-            toString t
+        Tank ->
+            "Tank"
+
+        Gyrocopter ->
+            "Gyrocopter"
+
+        Helicopter ->
+            "Helicopter"
 
 
 strToVT : String -> Maybe VehicleType
@@ -423,68 +468,6 @@ strToVT s =
 
         "Helicopter" ->
             Just Helicopter
-
-        _ ->
-            Nothing
-
-
-typeToSpecials : VehicleType -> List Special
-typeToSpecials type_ =
-    case type_ of
-        Bike ->
-            [ NamedSpecialRule "Full Throttle" "This vehicle considers the long straight maneuver template to be permitted in any gear. The long straight is not considered either hazardous or trivial in any gear."
-            , NamedSpecialRule "Pivot" "At the start of this vehicle's activation, if this vehicle's current gar is 1, this vehicle may make a pivot about its centre to face any direction. This pivot cannot cause a collision, and cannot leave this vehicle touching an obstruction."
-            ]
-
-        Buggy ->
-            [ NamedSpecialRule "Roll Cage" "When this vehicle suffers a flip, this vehicle may choose to ignore the 2 hits received from the flip."
-            ]
-
-        PerformanceCar ->
-            [ NamedSpecialRule "Slip Away" "If this vehicle is targeted wtih a tailgate, T-bone or sideswipe smash attack, and this vehicle declares evade as its reaction, this vehicle may perform a free activation immediately after tha active vehicle completes its activation."
-            , SpecialRule "This free activation does not count as the vehicle's activation this gear phase."
-            ]
-
-        MonsterTruck ->
-            [ NamedSpecialRule "Big Tires" "This vehicle may ignore the penalty for being on a rough surface, and considers a treacherous surface to be a rough surface."
-            , NamedSpecialRule "Crush Attack" "After resolving a collision with a Bike, Buggy, Car, Pickup Truck, Performance Car, Lightweight Obstacle or Middleweight Obstacle during movement step 1.7, this vehicle may ignore the obstruction for the remainder of its movement step, as it drives right over the top of it."
-            ]
-
-        WarRig ->
-            [ SpecialRule "See Page 52 of the core rulebook." ]
-
-        Helicopter ->
-            [ NamedSpecialRule "Air Wolf" "At the start of this vehicle's activation, this vehicle may make a single pivot about its centre point, up to 90 degrees."
-            , NamedSpecialRule "Airborne" "This vehicle ignores obstructions, dropped weapons and terrain at all times, except that this vehicle may target other vehicles in its attack step."
-            , SpecialRule "Other vehicles ignore this vehicle at all times, except that other vehicles may target this vehicle during their attack steps. This vehicle cannot be involved in collisions."
-            , NamedSpecialRule "Bombs Away" "When purchasing weapons, this vehicle may count dropped weapons as requiring 0 build slots."
-            ]
-
-        Gyrocopter ->
-            [ NamedSpecialRule "Air Wolf" "At the start of this vehicle's activation, this vehicle may make a single pivot about its centre point, up to 90 degrees."
-            , NamedSpecialRule "Airborne" "This vehicle ignores obstructions, dropped weapons and terrain at all times, except that this vehicle may target other vehicles in its attack step."
-            , SpecialRule "Other vehicles ignore this vehicle at all times, except that other vehicles may target this vehicle during their attack steps. This vehicle cannot be involved in collisions."
-            , NamedSpecialRule "Bombs Away" "When purchasing weapons, this vehicle may count dropped weapons as requiring 0 build slots."
-            ]
-
-        Tank ->
-            [ NamedSpecialRule "Pivot" "At the start of this vehicle's activation, if this vehicle's current gar is 1, this vehicle may make a pivot about its centre to face any direction. This pivot cannot cause a collision, and cannot leave this vehicle touching an obstruction."
-            , NamedSpecialRule "Crush Attack" "After resolving a collision with a Bike, Buggy, Car, Pickup Truck, Performance Car, Lightweight Obstacle or Middleweight Obstacle during movement step 1.7, this vehicle may ignore the obstruction for the remainder of its movement step, as it drives right over the top of it."
-            , NamedSpecialRule "All Terrain" "This vehicle may ignore the penalties for rough and treacherous surfaces."
-            ]
-
-        _ ->
-            []
-
-
-typeToSponsorReq : VehicleType -> Maybe SponsorType
-typeToSponsorReq type_ =
-    case type_ of
-        Tank ->
-            Just Rutherford
-
-        Helicopter ->
-            Just Rutherford
 
         _ ->
             Nothing

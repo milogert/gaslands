@@ -1,24 +1,54 @@
 module View.Sponsor exposing (render, renderBadge, renderPerkClass)
 
-import Html exposing (Html, div, h3, h6, p, ul, text, span, li, b, a, input, label)
-import Html.Attributes exposing (attribute, class, href, title, type_, id, for, checked)
-import Html.Events exposing (onClick, onCheck)
-import Model.Model exposing (Msg(..))
-import Model.Vehicles exposing (Vehicle)
-import Model.Sponsors exposing (Sponsor, SponsorType, TeamPerk, PerkClass, getClassPerks, VehiclePerk, typeToSponsor)
+import Bootstrap.Form.Checkbox as Checkbox
+import Html
+    exposing
+        ( Html
+        , a
+        , b
+        , div
+        , h3
+        , h6
+        , li
+        , p
+        , span
+        , text
+        , ul
+        )
+import Html.Attributes
+    exposing
+        ( class
+        , href
+        , title
+        )
+import Html.Events exposing (onCheck, onClick)
+import Model.Model exposing (..)
+import Model.Sponsors
+    exposing
+        ( PerkClass
+        , Sponsor
+        , SponsorType
+        , TeamPerk
+        , VehiclePerk
+        , fromPerkClass
+        , fromSponsorType
+        , getClassPerks
+        , typeToSponsor
+        )
+import Model.Vehicles exposing (..)
 import View.Utils exposing (icon)
 
 
 render : Sponsor -> Html Msg
 render { name, description, perks, grantedClasses } =
     div []
-        [ h3 [] [ name |> toString |> text ]
+        [ h3 [] [ name |> fromSponsorType |> text ]
         , p [] [ text description ]
         , ul [] <| renderPerks perks
         , p [] <|
-            (b [] [ text "Available Perk Classes: " ])
+            b [] [ text "Available Perk Classes: " ]
                 :: (grantedClasses
-                        |> List.map toString
+                        |> List.map fromPerkClass
                         |> List.intersperse ", "
                         |> List.map text
                    )
@@ -48,29 +78,26 @@ renderBadge ms =
                 Nothing ->
                     ( "No Sponsor", "" )
 
-                Just s ->
-                    ( toString s, s |> typeToSponsor |> .description )
+                Just sponsor ->
+                    ( fromSponsorType sponsor, sponsor |> typeToSponsor |> .description )
     in
-        div [ class "sponsor-badge" ]
-            [ span
-                [ class "badge badge-secondary"
-                , title description
-                , attribute "data-toggle" "tooltip"
-                , attribute "data-html" "true"
-                ]
-                [ text name ]
-            , a
-                [ onClick ToSponsorSelect
-                , href "#"
-                ]
-                [ icon "exchange-alt" ]
+    span [ class "sponsor-badge" ]
+        [ a
+            [ class "badge badge-secondary"
+            , onClick <| To ViewSelectingSponsor
+            , href "#"
+            , title description
             ]
+            [ text name
+            , icon "exchange-alt"
+            ]
+        ]
 
 
 renderPerkClass : Vehicle -> PerkClass -> Html Msg
 renderPerkClass vehicle perkClass =
     div [ class "col-md-6" ] <|
-        [ h6 [] [ text <| toString perkClass ] ]
+        [ h6 [] [ text <| fromPerkClass perkClass ] ]
             ++ (getClassPerks perkClass
                     |> List.map (renderVehiclePerk vehicle)
                )
@@ -78,21 +105,14 @@ renderPerkClass vehicle perkClass =
 
 renderVehiclePerk : Vehicle -> VehiclePerk -> Html Msg
 renderVehiclePerk vehicle perk =
-    div [ class "form-check" ]
-        [ input
-            [ class "form-check-input"
-            , type_ "checkbox"
-            , id perk.name
-            , onCheck <| SetPerkInVehicle vehicle perk
-            , checked <| List.member perk vehicle.perks
-            ]
-            []
-        , label
-            [ class "form-check-label"
-            , for perk.name
-            ]
-            [ b [] [ text perk.name ]
-            , text <| " (" ++ (toString perk.cost) ++ ") "
-            , text perk.description
-            ]
+    Checkbox.checkbox
+        [ Checkbox.id perk.name
+        , Checkbox.onCheck <| VehicleMsg << SetPerkInVehicle vehicle perk
+        , Checkbox.checked <| List.member perk vehicle.perks
         ]
+    <|
+        perk.name
+            ++ " ("
+            ++ String.fromInt perk.cost
+            ++ ") "
+            ++ perk.description

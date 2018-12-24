@@ -1,5 +1,6 @@
-module Main exposing (..)
+module Main exposing (main)
 
+import Browser
 import Html
 import Model.Model as Model exposing (..)
 import Subscriptions.Subscriptions as Subscriptions
@@ -7,9 +8,9 @@ import Update.Update as Update
 import View.View as View
 
 
-main : Program Never Model Msg
+main : Program () Model Msg
 main =
-    Html.program
+    Browser.document
         { init = Model.init
         , view = View.view
         , update = Update.update

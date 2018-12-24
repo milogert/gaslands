@@ -1,10 +1,24 @@
-port module Ports.Storage exposing (StorageEntry, get, getSub, getKeys, getKeysSub, set, setSub, delete, deleteSub)
+port module Ports.Storage exposing
+    ( StorageEntry
+    , delete
+    , deleteSub
+    , get
+    , getKeys
+    , getKeysSub
+    , getSub
+    , set
+    , setSub
+    , share
+    )
 
 
 type alias StorageEntry =
     { key : String
     , value : String
     }
+
+
+port share : String -> Cmd msg
 
 
 port get : String -> Cmd msg

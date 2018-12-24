@@ -1,5 +1,8 @@
 module View.EquipmentLayout exposing (render)
 
+import Bootstrap.Grid as Grid
+import Bootstrap.Grid.Col as Col
+import Bootstrap.Grid.Row as Row
 import Html exposing (Html)
 import Model.Model exposing (..)
 import View.Utils
@@ -11,10 +14,11 @@ render shouldShowSidebar left right =
         displayNone =
             if shouldShowSidebar then
                 ""
+
             else
                 "d-none"
     in
-        View.Utils.row
-            [ View.Utils.colPlus [ "md-3 sm-12" ] [ displayNone ] left
-            , View.Utils.col "" right
-            ]
+    Grid.row [ Row.middleXs, Row.topMd ]
+        [ Grid.col [ Col.md3 ] left
+        , Grid.col [ Col.md9 ] right
+        ]

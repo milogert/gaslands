@@ -1,13 +1,40 @@
-module View.Utils exposing (icon, iconb, iconClass, card, crewUsed, detailSection, renderCountDown, renderDice, renderSpecial, row, rowPlus, col, colPlus, factsHolder, factBadge, vehicleSponsorFilter, weaponSponsorFilter)
+module View.Utils exposing
+    ( crewUsed
+    , detailSection
+    , factBadge
+    , factsHolder
+    , icon
+    , iconClass
+    , iconb
+    , renderCountDown
+    , renderDice
+    , renderSpecial
+    , vehicleSponsorFilter
+    , weaponSponsorFilter
+    )
 
-import Html exposing (Html, node, button, div, h1, h2, h3, h4, h5, h6, hr, img, input, label, li, node, option, p, select, small, span, text, textarea, ul, b)
-import Html.Attributes exposing (checked, class, classList, disabled, for, href, id, max, min, placeholder, rel, src, type_, value)
+import Bootstrap.Badge as Badge
+import Bootstrap.Form as Form
+import Bootstrap.Form.Input as Input
+import Bootstrap.Grid as Grid
+import Html
+    exposing
+        ( Html
+        , b
+        , div
+        , h5
+        , hr
+        , node
+        , span
+        , text
+        )
+import Html.Attributes exposing (class, classList)
 import Html.Events exposing (onInput)
 import Model.Model exposing (..)
 import Model.Shared exposing (..)
+import Model.Sponsors exposing (..)
 import Model.Vehicles exposing (..)
 import Model.Weapons exposing (..)
-import Model.Sponsors exposing (..)
 
 
 icon : String -> Html Msg
@@ -30,56 +57,14 @@ iconClass styleOrBrand s cl =
         []
 
 
-row : List (Html Msg) -> Html Msg
-row body =
-    rowPlus [] body
-
-
-rowPlus : List String -> List (Html Msg) -> Html Msg
-rowPlus classes body =
-    div [ class "row", classList <| mapClassList classes ] body
-
-
-col : String -> List (Html Msg) -> Html Msg
-col colMod body =
-    case colMod of
-        "" ->
-            colPlus [] [] body
-
-        _ ->
-            colPlus [ colMod ] [] body
-
-
-colPlus : List String -> List String -> List (Html Msg) -> Html Msg
-colPlus colMods classes body =
-    case colMods of
-        [] ->
-            div [ class "col", classList <| mapClassList classes ] body
-
-        _ ->
-            div
-                [ classList <| (List.map (\x -> ( "col-" ++ x, True )) colMods) ++ (mapClassList classes) ]
-                body
-
-
 mapClassList : List String -> List ( String, Bool )
 mapClassList classes =
     List.map (\x -> ( x, True )) classes
 
 
-card : List ( String, Bool ) -> Html Msg -> Html Msg -> Bool -> Html Msg
-card cl body footer hideFooter =
-    div [ class "card", classList cl ]
-        [ div [ class "card-body" ] [ body ]
-        , div
-            [ class "card-footer", classList [ ( "d-none", hideFooter ) ] ]
-            [ footer ]
-        ]
-
-
 detailSection : CurrentView -> List (Html Msg) -> List (Html Msg) -> Html Msg
 detailSection currentView headerContents bodyContents =
-    div [ classList [ ( "d-none", currentView == Overview ) ] ]
+    div [ classList [ ( "d-none", currentView == ViewDashboard ) ] ]
         [ hr [] [], h5 [] headerContents, div [] bodyContents ]
 
 
@@ -89,11 +74,11 @@ renderSpecial isPreview ammoMsg ammoUsed s =
         Ammo i ->
             case isPreview of
                 True ->
-                    div [] [ text <| "Ammo: " ++ (toString i) ]
+                    div [] [ text <| "Ammo: " ++ String.fromInt i ]
 
                 False ->
-                    div [ class "form-row" ]
-                        [ label [ class "col-form-label" ] [ text "Ammo: " ]
+                    Form.row []
+                        [ Form.colLabel [] [ text "Ammo: " ]
                         , renderCountDown ammoMsg i ammoUsed
                         ]
 
@@ -103,37 +88,38 @@ renderSpecial isPreview ammoMsg ammoUsed s =
         TreacherousSurface ->
             text "The dropped template counts as a treacherous surface."
 
-        SpecialRule s ->
-            text <| s
+        SpecialRule rule ->
+            text rule
 
         NamedSpecialRule name rule ->
             span [] [ b [] [ text <| name ++ ": " ], text rule ]
 
         HandlingMod i ->
-            text <| "Handling modification: " ++ (toString i)
+            text <| "Handling modification: " ++ String.fromInt i
 
         HullMod i ->
-            text <| "Hull modification: " ++ (toString i)
+            text <| "Hull modification: " ++ String.fromInt i
 
         GearMod i ->
-            text <| "Gear modification: " ++ (toString i)
+            text <| "Gear modification: " ++ String.fromInt i
 
         CrewMod i ->
-            text <| "Crew modification: " ++ (toString i)
+            text <| "Crew modification: " ++ String.fromInt i
 
         _ ->
-            text <| toString s
+            text <| fromSpecial s
 
 
-renderCountDown : Maybe (Int -> String -> Msg) -> Int -> Int -> Html Msg
+renderCountDown : Maybe (Int -> String -> Msg) -> Int -> Int -> Form.Col Msg
 renderCountDown msg start current =
     let
         baseAttr =
-            [ class "form-control form-control-sm"
-            , type_ "number"
-            , Html.Attributes.max <| toString start
-            , Html.Attributes.min "0"
-            , value <| toString <| start - current
+            [ Input.small
+            , Input.value <| String.fromInt <| start - current
+            , Input.attrs
+                [ Html.Attributes.max <| String.fromInt start
+                , Html.Attributes.min "0"
+                ]
             ]
 
         attr =
@@ -142,9 +128,9 @@ renderCountDown msg start current =
                     baseAttr
 
                 Just m ->
-                    (onInput <| m start) :: baseAttr
+                    (Input.onInput <| m start) :: baseAttr
     in
-        col "" [ input attr [] ]
+    Form.col [] [ Input.number attr ]
 
 
 renderDice : Maybe Dice -> String
@@ -154,7 +140,7 @@ renderDice maybeDice =
             ""
 
         Just dice ->
-            toString dice.number ++ "d" ++ toString dice.die
+            String.fromInt dice.number ++ "d" ++ String.fromInt dice.die
 
 
 crewUsed : Vehicle -> Int
@@ -169,12 +155,12 @@ factsHolder facts =
 
 factBadge : String -> Html Msg
 factBadge factString =
-    span [ class "badge badge-secondary mr-2" ] [ text factString ]
+    Badge.badgeSecondary [ class "mr-2" ] [ text factString ]
 
 
-vehicleSponsorFilter : Model -> VehicleType -> Bool
-vehicleSponsorFilter model vt =
-    sponsorFilter_ model (typeToSponsorReq vt)
+vehicleSponsorFilter : Model -> Vehicle -> Bool
+vehicleSponsorFilter model v =
+    sponsorFilter_ model v.requiredSponsor
 
 
 weaponSponsorFilter : Model -> Weapon -> Bool

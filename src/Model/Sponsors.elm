@@ -1,4 +1,30 @@
-module Model.Sponsors exposing (..)
+module Model.Sponsors exposing
+    ( PerkClass(..)
+    , Sponsor
+    , SponsorType(..)
+    , TeamPerk
+    , VehiclePerk
+    , aggression
+    , allSponsors
+    , badass
+    , daring
+    , fromPerkClass
+    , fromSponsorType
+    , getClassPerks
+    , idris
+    , military
+    , mishkin
+    , miyazaki
+    , precision
+    , prisonCars
+    , rutherford
+    , slime
+    , speed
+    , stringToSponsor
+    , technology
+    , typeToSponsor
+    , warden
+    )
 
 
 type alias Sponsor =
@@ -18,6 +44,28 @@ type SponsorType
     | Warden
 
 
+fromSponsorType : SponsorType -> String
+fromSponsorType sponsorType =
+    case sponsorType of
+        Rutherford ->
+            "Rutherford"
+
+        Miyazaki ->
+            "Miyazaki"
+
+        Mishkin ->
+            "Mishkin"
+
+        Idris ->
+            "Idris"
+
+        Slime ->
+            "Slime"
+
+        Warden ->
+            "Warden"
+
+
 type PerkClass
     = Aggression
     | Badass
@@ -27,6 +75,34 @@ type PerkClass
     | Speed
     | Technology
     | PrisonCars
+
+
+fromPerkClass : PerkClass -> String
+fromPerkClass perkClass =
+    case perkClass of
+        Aggression ->
+            "Aggression"
+
+        Badass ->
+            "Badass"
+
+        Daring ->
+            "Daring"
+
+        Military ->
+            "Military"
+
+        Precision ->
+            "Precision"
+
+        Speed ->
+            "Speed"
+
+        Technology ->
+            "Technology"
+
+        PrisonCars ->
+            "PrisonCars"
 
 
 type alias TeamPerk =

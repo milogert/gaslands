@@ -1,8 +1,9 @@
 module Subscriptions.Subscriptions exposing (subscriptions)
 
 import Model.Model exposing (..)
-import Ports.Storage
+import Model.Vehicles exposing (..)
 import Ports.Photo
+import Ports.Storage
 
 
 subscriptions : Model -> Sub Msg
@@ -12,5 +13,5 @@ subscriptions model =
         , Ports.Storage.getKeysSub GetStorageKeys
         , Ports.Storage.setSub SetStorageCallback
         , Ports.Storage.deleteSub DeleteItemCallback
-        , Ports.Photo.getPhotoUrl SetPhotoUrlCallback
+        , Ports.Photo.getPhotoUrl <| VehicleMsg << SetPhotoUrlCallback
         ]

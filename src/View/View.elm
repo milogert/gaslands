@@ -1,52 +1,64 @@
 module View.View exposing (view)
 
-import Html exposing (Html, button, div, h1, h2, h3, h4, h5, h6, hr, img, input, label, li, node, option, p, select, small, span, text, textarea, ul, form, a)
-import Html.Attributes exposing (attribute, checked, class, classList, disabled, for, href, id, max, min, placeholder, rel, src, type_, value, readonly, style)
+import Bootstrap.Badge as Badge
+import Bootstrap.Button as Btn
+import Bootstrap.CDN as CDN
+import Bootstrap.Grid as Grid
+import Bootstrap.Grid.Col as Col
+import Bootstrap.Grid.Row as Row
+import Browser exposing (Document)
+import Html
+    exposing
+        ( Html
+        , div
+        , h2
+        , hr
+        , span
+        , text
+        )
+import Html.Attributes
+    exposing
+        ( attribute
+        , class
+        , classList
+        , style
+        )
 import Html.Events exposing (onClick, onInput)
 import Model.Model exposing (..)
+import Model.Vehicles exposing (..)
+import View.Dashboard
 import View.Details
-import View.Settings
-import View.Sponsor
-import View.SponsorSelect
 import View.NewUpgrade
 import View.NewVehicle
 import View.NewWeapon
-import View.Overview
+import View.Settings
+import View.Sponsor
+import View.SponsorSelect
 import View.Utils exposing (..)
 
 
-view : Model -> Html Msg
+view : Model -> Document Msg
 view model =
     let
         viewToGoTo =
             case model.view of
-                Details _ ->
-                    ToOverview
+                ViewAddingWeapon v ->
+                    To <| ViewDetails v
 
-                SelectingSponsor ->
-                    ToOverview
+                ViewAddingUpgrade v ->
+                    To <| ViewDetails v
 
-                AddingVehicle ->
-                    ToOverview
-
-                AddingWeapon v ->
-                    ToDetails v
-
-                AddingUpgrade v ->
-                    ToDetails v
-
-                Settings ->
-                    ToOverview
-
-                Overview ->
-                    ToOverview
+                _ ->
+                    To ViewDashboard
 
         backButton =
-            button
-                [ disabled <| model.view == Overview
-                , class "btn btn-light btn-sm btn-block"
-                , onClick viewToGoTo
-                , attribute "aria-label" "Back Button"
+            Btn.button
+                [ Btn.disabled <| model.view == ViewDashboard
+                , Btn.light
+                , Btn.small
+                , Btn.block
+                , Btn.onClick viewToGoTo
+                , Btn.attrs [ attribute "aria-label" "Back Button" ]
                 ]
                 [ icon "arrow-left" ]
 
@@ -57,106 +69,113 @@ view model =
             model.pointsAllowed
 
         gearPhaseText =
-            (toString model.gearPhase)
+            String.fromInt model.gearPhase
 
-        teamName =
-            case model.teamName of
-                Nothing ->
-                    ""
+        gearPhaseButton =
+            Btn.button
+                [ Btn.small
+                , Btn.primary
+                , Btn.attrs [ class "ml-2" ]
+                , Btn.onClick <| VehicleMsg NextGearPhase
+                ]
+                [ icon "cogs", Badge.badgeLight [] [ text gearPhaseText ] ]
 
-                Just s ->
-                    s
+        pointsBadgeFunction =
+            case compare currentPoints maxPoints of
+                LT ->
+                    Badge.badgeWarning
 
-        viewDisplay =
-            h2 [ style [ ( "margin-bottom", "0" ) ] ]
-                [ text <| viewToStr model ]
-    in
-        div [ class "container" ]
-            [ View.Utils.rowPlus [ "mt-2", "mb-2" ]
-                [ View.Utils.colPlus [ "auto" ]
-                    [ "my-auto" ]
-                    [ backButton ]
-                , View.Utils.colPlus []
-                    [ "my-auto", "col" ]
-                    [ viewDisplay ]
-                , View.Utils.colPlus [ "12", "md-auto" ]
-                    [ "form-inline", "col", "mb-auto", "mt-1", "mt-md-auto" ]
-                    [ span [ class "mr-2" ]
-                        [ View.Sponsor.renderBadge model.sponsor ]
-                    , button
-                        [ class "btn btn-sm btn-primary mr-2"
-                        , value <| toString model.gearPhase
-                        , onClick NextGearPhase
-                        ]
-                        [ icon "cogs", span [ class "badge badge-light" ] [ text gearPhaseText ] ]
-                    , span
-                        [ class "badge mr-2"
-                        , classList
-                            [ ( "badge-danger", currentPoints > maxPoints )
-                            , ( "badge-success", currentPoints == maxPoints )
-                            , ( "badge-warning", currentPoints < maxPoints )
-                            ]
-                        ]
-                        [ text <| (toString currentPoints) ++ " of " ++ toString maxPoints ++ " points"
-                        ]
-                    , button
-                        [ class "btn btn-sm btn-light"
-                        , onClick ToSettings
-                        , attribute "aria-label" "Back Button"
-                        ]
-                        [ icon "wrench" ]
+                EQ ->
+                    Badge.badgeSuccess
+
+                GT ->
+                    Badge.badgeDanger
+
+        pointsBadge =
+            pointsBadgeFunction
+                [ class "ml-2" ]
+                [ text <| String.fromInt currentPoints ++ " of " ++ String.fromInt maxPoints
+                , icon "coins"
+                ]
+
+        settingsButton =
+            Btn.button
+                [ Btn.small
+                , Btn.light
+                , Btn.onClick <| To ViewSettings
+                , Btn.attrs
+                    [ attribute "aria-label" "Back Button"
+                    , class "ml-2"
                     ]
                 ]
-            , hr [] []
+                [ icon "wrench" ]
+
+        viewDisplay =
+            h2 [ style "margin-bottom" "0" ]
+                [ text <| viewToStr model ]
+    in
+    Document
+        (viewToStr model)
+        [ Grid.container []
+            [ CDN.stylesheet -- creates an inline style node with the Bootstrap CSS
+            , Grid.row
+                [ Row.middleXs
+                , Row.attrs [ class "my-2" ]
+                ]
+                [ Grid.col [ Col.xsAuto ] [ backButton ]
+                , Grid.col [] [ viewDisplay ]
+                , Grid.col
+                    [ Col.xs12
+                    , Col.mdAuto
+                    ]
+                    [ View.Sponsor.renderBadge model.sponsor
+                    , gearPhaseButton
+                    , pointsBadge
+                    , settingsButton
+                    ]
+                ]
+
+            --, hr [] []
             , displayAlert model
             , render model
 
             --, sizeShower
             ]
+        ]
 
 
 displayAlert : Model -> Html Msg
 displayAlert model =
-    case model.error of
-        [] ->
-            text ""
-
-        _ ->
-            div [] <|
-                List.map
-                    (\x ->
-                        (row
-                            [ div
-                                [ class "col alert alert-danger" ]
-                                [ text <| errorToStr x ]
-                            ]
-                        )
-                    )
-                    model.error
+    model.error
+        |> List.map
+            (\x ->
+                Grid.simpleRow [ Grid.col [] [ text <| errorToStr x ] ]
+            )
+        |> div []
 
 
 render : Model -> Html Msg
 render model =
     case model.view of
-        Overview ->
-            View.Overview.view model
+        ViewDashboard ->
+            View.Dashboard.view model
 
-        Details v ->
+        ViewDetails v ->
             View.Details.view model v
 
-        SelectingSponsor ->
+        ViewSelectingSponsor ->
             View.SponsorSelect.view model
 
-        AddingVehicle ->
+        ViewAddingVehicle ->
             View.NewVehicle.view model
 
-        AddingWeapon v ->
+        ViewAddingWeapon v ->
             View.NewWeapon.view model v
 
-        AddingUpgrade v ->
+        ViewAddingUpgrade v ->
             View.NewUpgrade.view model v
 
-        Settings ->
+        ViewSettings ->
             View.Settings.view model
 
 

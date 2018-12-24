@@ -6,4 +6,6 @@ import Model.Sponsors exposing (SponsorType)
 
 set : Model -> Maybe SponsorType -> ( Model, Cmd Msg )
 set model s =
-    { model | sponsor = s } ! []
+    ( { model | sponsor = s }
+    , Cmd.none
+    )

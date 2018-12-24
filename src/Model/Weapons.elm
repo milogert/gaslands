@@ -1,7 +1,45 @@
-module Model.Weapons exposing (..)
+module Model.Weapons exposing
+    ( Dice
+    , Range(..)
+    , Weapon
+    , WeaponMounting(..)
+    , WeaponStatus(..)
+    , WeaponType(..)
+    , allWeaponsList
+    , arcLightningProjector
+    , caltropDropper
+    , defaultWeapon
+    , explodingRam
+    , flamethrower
+    , fromWeaponMounting
+    , fromWeaponRange
+    , fromWeaponStatus
+    , fromWeaponType
+    , glueDropper
+    , grenades
+    , handgun
+    , heavyMachineGun
+    , kineticSuperBooster
+    , machineGun
+    , magneticJammer
+    , mines
+    , miniGun
+    , molotovCocktails
+    , mortar
+    , nameToWeapon
+    , oilSlickDropper
+    , oneTwentyFiveMMCannon
+    , ram
+    , rockets
+    , rollDice
+    , smoke
+    , strToMountPoint
+    , thumper
+    , weaponCost
+    )
 
-import Model.Sponsors exposing (SponsorType(..))
 import Model.Shared exposing (..)
+import Model.Sponsors exposing (SponsorType(..))
 
 
 type alias Weapon =
@@ -27,6 +65,19 @@ type WeaponType
     | SmashType
 
 
+fromWeaponType : WeaponType -> String
+fromWeaponType wt =
+    case wt of
+        Shooting ->
+            "Shooting"
+
+        Dropped ->
+            "Dropped"
+
+        SmashType ->
+            "Smashing"
+
+
 type WeaponMounting
     = Full
     | Front
@@ -36,8 +87,8 @@ type WeaponMounting
     | CrewFired
 
 
-mountPointToString : WeaponMounting -> String
-mountPointToString point =
+fromWeaponMounting : WeaponMounting -> String
+fromWeaponMounting point =
     case point of
         Full ->
             "360° mounted"
@@ -92,9 +143,41 @@ type Range
     | SmashRange
 
 
+fromWeaponRange : Range -> String
+fromWeaponRange range =
+    case range of
+        Medium ->
+            "Medium"
+
+        Double ->
+            "Double"
+
+        TemplateLarge ->
+            "TemplateLarge"
+
+        BurstLarge ->
+            "BurstLarge"
+
+        BurstSmall ->
+            "BurstSmall"
+
+        SmashRange ->
+            "SmashRange"
+
+
 type WeaponStatus
     = WeaponReady
     | WeaponFired
+
+
+fromWeaponStatus : WeaponStatus -> String
+fromWeaponStatus status =
+    case status of
+        WeaponReady ->
+            "Ready"
+
+        WeaponFired ->
+            "Fired"
 
 
 type alias Dice =
@@ -258,15 +341,14 @@ miniGun =
         def =
             defaultWeapon
     in
-        { def
-            | name = "Mini-Gun"
-            , wtype = Shooting
-            , attack = Just (Dice 4 6)
-            , cost = 6
-            , range = Double
-            , slots = 1
-            , cost = 6
-        }
+    { def
+        | name = "Mini-Gun"
+        , wtype = Shooting
+        , attack = Just (Dice 4 6)
+        , cost = 6
+        , range = Double
+        , slots = 1
+    }
 
 
 oneTwentyFiveMMCannon : Weapon
@@ -542,6 +624,6 @@ weaponCost w =
                     (*) 1
 
         totalModifier =
-            mountModifier << ((*) 1)
+            mountModifier << (*) 1
     in
-        totalModifier <| baseCost
+    totalModifier <| baseCost
