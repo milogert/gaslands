@@ -50,14 +50,14 @@ update msg model =
             Update.Vehicle.update model event
 
         -- WEAPON.
-        AddWeapon v w ->
-            Update.Weapon.addWeapon model v w
+        AddWeapon key w ->
+            Update.Weapon.addWeapon model key w
 
-        DeleteWeapon v w ->
-            Update.Weapon.deleteWeapon model v w
+        DeleteWeapon key w ->
+            Update.Weapon.deleteWeapon model key w
 
-        UpdateAmmoUsed v w total strLeft ->
-            Update.Weapon.updateAmmoUsed model v w (total - (String.toInt strLeft |> Maybe.withDefault 1))
+        UpdateAmmoUsed key w index check ->
+            Update.Weapon.updateAmmoUsed model key w index check
 
         TmpWeaponUpdate name ->
             let

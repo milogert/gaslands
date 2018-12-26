@@ -1,5 +1,6 @@
 module Model.Encoders.Model exposing (modelEncoder)
 
+import Dict exposing (Dict)
 import Json.Encode exposing (..)
 import Model.Encoders.Settings exposing (settingsEncoder)
 import Model.Encoders.Sponsors exposing (sponsorEncoder, sponsorTypeEncoder)
@@ -21,7 +22,7 @@ modelEncoder model =
     object
         [ ( "pointsAllowed", int model.pointsAllowed )
         , ( "teamName", teamNameEncoder model.teamName )
-        , ( "vehicles", list object <| List.map vehicleEncoder model.vehicles )
+        , ( "vehicles", dict identity vehicleEncoder model.vehicles )
         , ( "sponsor", sponsor )
         , ( "settings", object <| settingsEncoder model.settings )
         ]

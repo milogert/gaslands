@@ -15,8 +15,12 @@ module View.Utils exposing
 
 import Bootstrap.Badge as Badge
 import Bootstrap.Form as Form
+import Bootstrap.Form.Checkbox as Checkbox
+import Bootstrap.Form.Fieldset as Fieldset
 import Bootstrap.Form.Input as Input
 import Bootstrap.Grid as Grid
+import Bootstrap.Grid.Col as Col
+import Bootstrap.Grid.Row as Row
 import Html
     exposing
         ( Html
@@ -68,69 +72,69 @@ detailSection currentView headerContents bodyContents =
         [ hr [] [], h5 [] headerContents, div [] bodyContents ]
 
 
-renderSpecial : Bool -> Maybe (Int -> String -> Msg) -> Int -> Special -> Html Msg
-renderSpecial isPreview ammoMsg ammoUsed s =
-    case s of
-        Ammo i ->
+renderSpecial : Bool -> Maybe (Int -> Bool -> Msg) -> Special -> Html Msg
+renderSpecial isPreview mMsg special =
+    case ( special, mMsg ) of
+        ( Ammo ammo, Just msg ) ->
             case isPreview of
                 True ->
-                    div [] [ text <| "Ammo: " ++ String.fromInt i ]
+                    div [] [ text <| "Ammo: " ++ (String.fromInt <| List.length ammo) ]
 
                 False ->
-                    Form.row []
-                        [ Form.colLabel [] [ text "Ammo: " ]
-                        , renderCountDown ammoMsg i ammoUsed
+                    Form.row [ Row.middleXs, Row.attrs [ class "mb-0" ] ]
+                        [ Form.colLabel [ Col.xsAuto ] [ text "Ammo: " ]
+                        , renderCountDown msg ammo
                         ]
 
-        HighlyExplosive ->
+        ( Ammo _, Nothing ) ->
+            text ""
+
+        ( HighlyExplosive, _ ) ->
             text "Highly Explosive"
 
-        TreacherousSurface ->
+        ( TreacherousSurface, _ ) ->
             text "The dropped template counts as a treacherous surface."
 
-        SpecialRule rule ->
+        ( SpecialRule rule, _ ) ->
             text rule
 
-        NamedSpecialRule name rule ->
+        ( NamedSpecialRule name rule, _ ) ->
             span [] [ b [] [ text <| name ++ ": " ], text rule ]
 
-        HandlingMod i ->
+        ( HandlingMod i, _ ) ->
             text <| "Handling modification: " ++ String.fromInt i
 
-        HullMod i ->
+        ( HullMod i, _ ) ->
             text <| "Hull modification: " ++ String.fromInt i
 
-        GearMod i ->
+        ( GearMod i, _ ) ->
             text <| "Gear modification: " ++ String.fromInt i
 
-        CrewMod i ->
+        ( CrewMod i, _ ) ->
             text <| "Crew modification: " ++ String.fromInt i
 
-        _ ->
-            text <| fromSpecial s
+        ( _, _ ) ->
+            text <| fromSpecial special
 
 
-renderCountDown : Maybe (Int -> String -> Msg) -> Int -> Int -> Form.Col Msg
-renderCountDown msg start current =
+renderCountDown : (Int -> Bool -> Msg) -> List Bool -> Form.Col Msg
+renderCountDown msg checks =
     let
-        baseAttr =
-            [ Input.small
-            , Input.value <| String.fromInt <| start - current
-            , Input.attrs
-                [ Html.Attributes.max <| String.fromInt start
-                , Html.Attributes.min "0"
+        checkboxFunc index check =
+            Checkbox.checkbox
+                [ Checkbox.id <| String.fromInt index
+                , Checkbox.inline
+                , Checkbox.checked check
+                , Checkbox.onCheck (msg index)
                 ]
-            ]
-
-        attr =
-            case msg of
-                Nothing ->
-                    baseAttr
-
-                Just m ->
-                    (Input.onInput <| m start) :: baseAttr
+                ""
     in
-    Form.col [] [ Input.number attr ]
+    Form.col []
+        [ Fieldset.config
+            |> Fieldset.children
+                (List.indexedMap checkboxFunc checks)
+            |> Fieldset.view
+        ]
 
 
 renderDice : Maybe Dice -> String

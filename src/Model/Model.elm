@@ -9,6 +9,7 @@ module Model.Model exposing
     , viewToStr
     )
 
+import Dict exposing (Dict)
 import Model.Settings exposing (..)
 import Model.Sponsors exposing (..)
 import Model.Upgrades exposing (..)
@@ -22,7 +23,7 @@ type alias Model =
     , teamName : Maybe String
     , pointsAllowed : Int
     , gearPhase : Int
-    , vehicles : List Vehicle
+    , vehicles : Dict String Vehicle
     , sponsor : Maybe SponsorType
     , tmpVehicle : Maybe Vehicle
     , tmpWeapon : Maybe Weapon
@@ -102,7 +103,10 @@ viewToStr model =
 
 totalPoints : Model -> Int
 totalPoints model =
-    List.sum <| List.map vehicleCost model.vehicles
+    model.vehicles
+        |> Dict.values
+        |> List.map vehicleCost
+        |> List.sum
 
 
 init : () -> ( Model, Cmd Msg )
@@ -112,7 +116,7 @@ init _ =
         Nothing
         50
         1
-        []
+        Dict.empty
         Nothing
         Nothing
         Nothing
@@ -132,17 +136,17 @@ type
       -- VEHICLE.
     | VehicleMsg VehicleEvent
       -- WEAPON.
-    | AddWeapon Vehicle Weapon
-    | DeleteWeapon Vehicle Weapon
-    | UpdateAmmoUsed Vehicle Weapon Int String
+    | AddWeapon String Weapon
+    | DeleteWeapon String Weapon
+    | UpdateAmmoUsed String Weapon Int Bool
     | TmpWeaponUpdate String
     | TmpWeaponMountPoint String
     | SetWeaponsReady
-    | SetWeaponFired Vehicle Weapon
-    | RollWeaponDie Vehicle Weapon Int
+    | SetWeaponFired String Weapon
+    | RollWeaponDie String Weapon Int
       -- UPGRADE.
-    | AddUpgrade Vehicle Upgrade
-    | DeleteUpgrade Vehicle Upgrade
+    | AddUpgrade String Upgrade
+    | DeleteUpgrade String Upgrade
     | TmpUpgradeUpdate String
     | UpdatePointsAllowed String
     | UpdateTeamName String

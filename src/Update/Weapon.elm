@@ -7,141 +7,179 @@ module Update.Weapon exposing
     , updateAmmoUsed
     )
 
+import Dict exposing (..)
+import List.Extra as ListE
 import Model.Model exposing (..)
+import Model.Shared exposing (..)
 import Model.Vehicles exposing (..)
 import Model.Weapons exposing (..)
 import Random
-import Update.Utils
+import Update.Utils exposing (doSaveModel)
 
 
-addWeapon : Model -> Vehicle -> Weapon -> ( Model, Cmd Msg )
-addWeapon model v w =
+addWeapon : Model -> String -> Weapon -> ( Model, Cmd Msg )
+addWeapon model key w =
+    case Dict.get key model.vehicles of
+        Nothing ->
+            ( model, Cmd.none )
+
+        Just vehicle ->
+            let
+                weaponList =
+                    vehicle.weapons ++ [ { w | id = List.length vehicle.weapons } ]
+
+                nv =
+                    { vehicle | weapons = weaponList }
+            in
+            case ( w.wtype, w.mountPoint ) of
+                ( _, Nothing ) ->
+                    ( { model | error = [ WeaponMountPointError ] }
+                    , Cmd.none
+                    )
+
+                ( _, _ ) ->
+                    ( { model
+                        | view = ViewDetails nv
+                        , error = []
+                        , vehicles = Dict.insert key nv model.vehicles
+                      }
+                    , doSaveModel
+                    )
+
+
+updateAmmoUsed : Model -> String -> Weapon -> Int -> Bool -> ( Model, Cmd Msg )
+updateAmmoUsed model key weapon index check =
     let
-        weaponList =
-            v.weapons ++ [ { w | id = List.length v.weapons } ]
-
-        pre =
-            List.take v.id model.vehicles
-
-        post =
-            List.drop (v.id + 1) model.vehicles
-
-        vehicleNew =
-            { v | weapons = weaponList }
-
-        newvehicles =
-            pre ++ vehicleNew :: post
+        ( mAmmoSpecialIndex, mAmmoSpecial ) =
+            Model.Shared.getAmmoClip weapon.specials
     in
-    case ( w.wtype, w.mountPoint ) of
-        ( _, Nothing ) ->
-            ( { model | error = [ WeaponMountPointError ] }
+    case ( mAmmoSpecial, mAmmoSpecialIndex, Dict.get key model.vehicles ) of
+        ( Just (Ammo clip), Just ammoIndex, Just vehicle ) ->
+            let
+                ammoUpdated =
+                    Ammo <| ListE.setAt index check clip
+
+                specialsUpdated =
+                    ListE.setAt ammoIndex ammoUpdated weapon.specials
+
+                weaponUpdated =
+                    { weapon | specials = specialsUpdated }
+
+                weaponsNew =
+                    vehicle.weapons
+                        |> ListE.setAt weapon.id weaponUpdated
+                        |> Update.Utils.correctIds
+
+                nv =
+                    { vehicle | weapons = weaponsNew }
+            in
+            ( { model
+                | view = ViewDetails nv
+                , vehicles = Dict.insert key nv model.vehicles
+              }
             , Cmd.none
             )
 
-        ( _, _ ) ->
-            ( { model | view = ViewDetails vehicleNew, error = [], vehicles = newvehicles }
+        ( _, _, _ ) ->
+            ( model, Cmd.none )
+
+
+setWeaponFired : Model -> String -> Weapon -> ( Model, Cmd Msg )
+setWeaponFired model key w =
+    case Dict.get key model.vehicles of
+        Nothing ->
+            ( model, Cmd.none )
+
+        Just vehicle ->
+            let
+                weaponUpdated =
+                    { w | status = WeaponFired }
+
+                weaponsNew =
+                    vehicle.weapons
+                        |> Update.Utils.replaceAtIndex w.id weaponUpdated
+                        |> Update.Utils.correctIds
+
+                nv =
+                    { vehicle | weapons = weaponsNew }
+
+                minRoll =
+                    case weaponUpdated.attack of
+                        Just dice ->
+                            dice.number
+
+                        Nothing ->
+                            0
+
+                maxRoll =
+                    case weaponUpdated.attack of
+                        Just dice ->
+                            dice.number * dice.die
+
+                        Nothing ->
+                            0
+            in
+            ( { model
+                | view = ViewDetails nv
+                , vehicles = Dict.insert key nv model.vehicles
+              }
+            , Random.generate (RollWeaponDie key weaponUpdated) (Random.int minRoll maxRoll)
+            )
+
+
+rollWeaponDie : Model -> String -> Weapon -> Int -> ( Model, Cmd Msg )
+rollWeaponDie model key w result =
+    case Dict.get key model.vehicles of
+        Nothing ->
+            ( model, Cmd.none )
+
+        Just vehicle ->
+            let
+                weaponUpdated =
+                    { w | attackRoll = result }
+
+                nv =
+                    Update.Utils.replaceWeaponInVehicle vehicle weaponUpdated
+            in
+            ( { model
+                | view = ViewDetails nv
+                , vehicles = Dict.insert key nv model.vehicles
+              }
             , Cmd.none
             )
 
 
-updateAmmoUsed : Model -> Vehicle -> Weapon -> Int -> ( Model, Cmd Msg )
-updateAmmoUsed model v w used =
-    let
-        weaponUpdated =
-            { w | ammoUsed = used }
+deleteWeapon : Model -> String -> Weapon -> ( Model, Cmd Msg )
+deleteWeapon model key w =
+    case Dict.get key model.vehicles of
+        Nothing ->
+            ( model, Cmd.none )
 
-        weaponsNew =
-            Update.Utils.replaceAtIndex w.id weaponUpdated v.weapons |> Update.Utils.correctIds
+        Just vehicle ->
+            let
+                weaponsNew =
+                    vehicle.weapons
+                        |> Update.Utils.deleteFromList w.id
+                        |> Update.Utils.correctIds
 
-        vehicleUpdated =
-            { v | weapons = weaponsNew }
-
-        vehiclesNew =
-            Update.Utils.replaceAtIndex v.id vehicleUpdated model.vehicles
-    in
-    ( { model | view = ViewDetails vehicleUpdated, vehicles = vehiclesNew }
-    , Cmd.none
-    )
-
-
-setWeaponFired : Model -> Vehicle -> Weapon -> ( Model, Cmd Msg )
-setWeaponFired model v w =
-    let
-        weaponUpdated =
-            { w | status = WeaponFired }
-
-        weaponsNew =
-            Update.Utils.replaceAtIndex w.id weaponUpdated v.weapons |> Update.Utils.correctIds
-
-        vehicleUpdated =
-            { v | weapons = weaponsNew }
-
-        vehiclesNew =
-            Update.Utils.replaceAtIndex v.id vehicleUpdated model.vehicles
-
-        minRoll =
-            case weaponUpdated.attack of
-                Just dice ->
-                    dice.number
-
-                Nothing ->
-                    0
-
-        maxRoll =
-            case weaponUpdated.attack of
-                Just dice ->
-                    dice.number * dice.die
-
-                Nothing ->
-                    0
-    in
-    ( { model
-        | view = ViewDetails vehicleUpdated
-        , vehicles = vehiclesNew
-      }
-    , Random.generate (RollWeaponDie v weaponUpdated) (Random.int minRoll maxRoll)
-    )
+                nv =
+                    { vehicle | weapons = weaponsNew }
+            in
+            ( { model
+                | view = ViewDetails nv
+                , vehicles = Dict.insert key nv model.vehicles
+              }
+            , doSaveModel
+            )
 
 
-rollWeaponDie : Model -> Vehicle -> Weapon -> Int -> ( Model, Cmd Msg )
-rollWeaponDie model v w result =
-    let
-        weaponUpdated =
-            { w | attackRoll = result }
+rollAttackDice : Model -> String -> Weapon -> ( Model, Cmd Msg )
+rollAttackDice model key w =
+    case Dict.get key model.vehicles of
+        Nothing ->
+            ( model, Cmd.none )
 
-        vehicleUpdated =
-            Update.Utils.replaceWeaponInVehicle v weaponUpdated
-
-        vehiclesNew =
-            Update.Utils.replaceAtIndex v.id vehicleUpdated model.vehicles
-    in
-    ( { model
-        | view = ViewDetails vehicleUpdated
-        , vehicles = vehiclesNew
-      }
-    , Cmd.none
-    )
-
-
-deleteWeapon : Model -> Vehicle -> Weapon -> ( Model, Cmd Msg )
-deleteWeapon model v w =
-    let
-        weaponsNew =
-            Update.Utils.deleteFromList w.id v.weapons |> Update.Utils.correctIds
-
-        vehicleUpdated =
-            { v | weapons = weaponsNew }
-
-        vehiclesNew =
-            Update.Utils.replaceAtIndex v.id vehicleUpdated model.vehicles
-    in
-    ( { model | view = ViewDetails vehicleUpdated, vehicles = vehiclesNew }
-    , Cmd.none
-    )
-
-
-rollAttackDice : Model -> Vehicle -> Weapon -> ( Model, Cmd Msg )
-rollAttackDice model v w =
-    ( model
-    , Cmd.none
-    )
+        Just vehicle ->
+            ( model
+            , Cmd.none
+            )

@@ -1,9 +1,9 @@
 module View.Upgrade exposing (render)
 
+import Bootstrap.Button as Btn
 import Html
     exposing
         ( Html
-        , button
         , div
         , h6
         , li
@@ -21,7 +21,7 @@ import Model.Model exposing (..)
 import Model.Upgrades exposing (..)
 import Model.Vehicles exposing (..)
 import View.EquipmentLayout
-import View.Utils
+import View.Utils exposing (icon, iconb)
 
 
 render : Model -> Vehicle -> Upgrade -> Html Msg
@@ -68,7 +68,7 @@ render model vehicle upgrade =
                 ]
 
         renderSpecialFunc special =
-            li [] [ View.Utils.renderSpecial isPreview Nothing 0 special ]
+            li [] [ View.Utils.renderSpecial isPreview Nothing special ]
 
         specials =
             case upgrade.specials of
@@ -84,12 +84,14 @@ render model vehicle upgrade =
             [ classList [ ( "form-inline", isPreview ) ] ]
             [ text <| upgrade.name ++ " "
             ]
-        , button
-            [ class "btn btn-sm btn-link"
-            , classList [ ( "d-none", isPreview ) ]
-            , onClick <| DeleteUpgrade vehicle upgrade
+        , Btn.button
+            [ Btn.onClick <| DeleteUpgrade vehicle.key upgrade
+            , Btn.outlineDanger
+            , Btn.small
+            , Btn.block
+            , Btn.attrs [ classList [ ( "d-none", isPreview ) ] ]
             ]
-            [ text "Remove Upgrade" ]
+            [ icon "trash-alt" ]
         ]
         [ factsHolder
         , specials

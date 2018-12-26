@@ -26,7 +26,7 @@ view model v =
                 Just w ->
                     button
                         [ class "form-control btn btn-primary mb-3"
-                        , onClick (AddWeapon v w)
+                        , onClick (AddWeapon v.key w)
                         ]
                         [ text "Add Weapon" ]
 

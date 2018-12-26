@@ -1,50 +1,54 @@
 module Update.Upgrade exposing (addUpgrade, deleteUpgrade)
 
+import Dict exposing (Dict)
 import Model.Model exposing (..)
 import Model.Upgrades exposing (..)
 import Model.Vehicles exposing (..)
 import Update.Utils
 
 
-addUpgrade : Model -> Vehicle -> Upgrade -> ( Model, Cmd Msg )
-addUpgrade model v u =
-    let
-        upgradeList =
-            v.upgrades ++ [ { u | id = List.length v.upgrades } ]
+addUpgrade : Model -> String -> Upgrade -> ( Model, Cmd Msg )
+addUpgrade model key u =
+    case Dict.get key model.vehicles of
+        Nothing ->
+            ( model, Cmd.none )
 
-        pre =
-            List.take v.id model.vehicles
+        Just vehicle ->
+            let
+                upgradeList =
+                    vehicle.upgrades ++ [ { u | id = List.length vehicle.upgrades } ]
 
-        post =
-            List.drop (v.id + 1) model.vehicles
-
-        vehicleNew =
-            { v | upgrades = upgradeList }
-
-        newvehicles =
-            pre ++ vehicleNew :: post
-    in
-    ( { model
-        | view = ViewDetails vehicleNew
-        , error = []
-        , vehicles = newvehicles
-      }
-    , Cmd.none
-    )
+                nv =
+                    { vehicle | upgrades = upgradeList }
+            in
+            ( { model
+                | view = ViewDetails nv
+                , error = []
+                , vehicles = Dict.insert key nv model.vehicles
+              }
+            , Cmd.none
+            )
 
 
-deleteUpgrade : Model -> Vehicle -> Upgrade -> ( Model, Cmd Msg )
-deleteUpgrade model v u =
-    let
-        upgradesNew =
-            Update.Utils.deleteFromList u.id v.upgrades |> Update.Utils.correctIds
+deleteUpgrade : Model -> String -> Upgrade -> ( Model, Cmd Msg )
+deleteUpgrade model key u =
+    case Dict.get key model.vehicles of
+        Nothing ->
+            ( model, Cmd.none )
 
-        vehicleUpdated =
-            { v | upgrades = upgradesNew }
+        Just vehicle ->
+            let
+                upgradesNew =
+                    vehicle.upgrades
+                        |> Update.Utils.deleteFromList u.id
+                        |> Update.Utils.correctIds
 
-        vehiclesNew =
-            Update.Utils.replaceAtIndex v.id vehicleUpdated model.vehicles
-    in
-    ( { model | view = ViewDetails vehicleUpdated, vehicles = vehiclesNew }
-    , Cmd.none
-    )
+                nv =
+                    { vehicle | upgrades = upgradesNew }
+            in
+            ( { model
+                | view = ViewDetails nv
+                , vehicles = Dict.insert key nv model.vehicles
+              }
+            , Cmd.none
+            )

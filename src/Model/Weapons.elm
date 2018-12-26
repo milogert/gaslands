@@ -54,7 +54,6 @@ type alias Weapon =
     , cost : Int
     , id : Int
     , status : WeaponStatus
-    , ammoUsed : Int
     , requiredSponsor : Maybe SponsorType
     }
 
@@ -153,16 +152,16 @@ fromWeaponRange range =
             "Double"
 
         TemplateLarge ->
-            "TemplateLarge"
+            "Large"
 
         BurstLarge ->
-            "BurstLarge"
+            "Large Burst"
 
         BurstSmall ->
-            "BurstSmall"
+            "Small Burst"
 
         SmashRange ->
-            "SmashRange"
+            "Smash"
 
 
 type WeaponStatus
@@ -296,7 +295,6 @@ defaultWeapon =
         0
         -1
         WeaponReady
-        0
         Nothing
 
 
@@ -360,7 +358,7 @@ oneTwentyFiveMMCannon =
         , range = Double
         , slots = 3
         , specials =
-            [ Ammo 3
+            [ Ammo [ False, False, False ]
             , SpecialRule "A tank gun is a ridiculous weapon for a civilian vehicle to carry. When fired, the active vehicle immediately gains +2 hazard tokens if it is not a Tank."
             ]
         , cost = 6
@@ -375,7 +373,7 @@ rockets =
         , attack = Just (Dice 6 6)
         , range = Double
         , slots = 2
-        , specials = [ Ammo 3, Blast, HighlyExplosive ]
+        , specials = [ Ammo [ False, False, False ], Blast, HighlyExplosive ]
         , cost = 4
     }
 
@@ -388,7 +386,7 @@ flamethrower =
         , attack = Just (Dice 6 6)
         , range = TemplateLarge
         , slots = 2
-        , specials = [ Ammo 3, Fire, Explosive ]
+        , specials = [ Ammo [ False, False, False ], Fire, Explosive ]
         , cost = 6
     }
 
@@ -401,7 +399,7 @@ mortar =
         , attack = Just (Dice 4 6)
         , range = Double
         , slots = 1
-        , specials = [ Ammo 3, SpecialRule "When making a shooting attack with the Mortar, the vehicle may ignore terrain and cover during the attack." ]
+        , specials = [ Ammo [ False, False, False ], SpecialRule "When making a shooting attack with the Mortar, the vehicle may ignore terrain and cover during the attack." ]
         , cost = 4
     }
 
@@ -414,7 +412,7 @@ grenades =
         , mountPoint = Just CrewFired
         , attack = Just (Dice 1 6)
         , range = Medium
-        , specials = [ Ammo 5, Blast, Explosive, Blitz ]
+        , specials = [ Ammo [ False, False, False, False, False ], Blast, Explosive, Blitz ]
         , cost = 1
     }
 
@@ -427,7 +425,7 @@ molotovCocktails =
         , mountPoint = Just CrewFired
         , attack = Just (Dice 1 6)
         , range = Medium
-        , specials = [ Ammo 5, Fire, Blitz ]
+        , specials = [ Ammo [ False, False, False, False, False ], Fire, Blitz ]
         , cost = 1
     }
 
@@ -438,7 +436,7 @@ oilSlickDropper =
         | name = "Oil Slick Dropper"
         , wtype = Dropped
         , range = BurstLarge
-        , specials = [ Ammo 3, TreacherousSurface ]
+        , specials = [ Ammo [ False, False, False ], TreacherousSurface ]
         , cost = 2
     }
 
@@ -451,7 +449,7 @@ caltropDropper =
         , range = BurstSmall
         , slots = 1
         , specials =
-            [ Ammo 3
+            [ Ammo [ False, False, False ]
             , TreacherousSurface
             , SpecialRule "If any part of a vehicle's maneuver template or final position overlaps the caltrops burst template, that vehicle immediately loses 2 hull points and then that caltrops template is removed."
             ]
@@ -467,7 +465,7 @@ glueDropper =
         , range = BurstLarge
         , slots = 1
         , specials =
-            [ Ammo 1
+            [ Ammo [ False ]
             , TreacherousSurface
             , SpecialRule "Any vehicle that either starts its activation touching the template, or whose maneuver template or final position overlaps the dropped weapon template during its activation, reduces its current gear by 2 at the end of their activation."
             ]
@@ -483,7 +481,7 @@ mines =
         , attack = Just (Dice 1 6)
         , range = BurstSmall
         , slots = 1
-        , specials = [ Ammo 1, Blast ]
+        , specials = [ Ammo [ False ], Blast ]
         , cost = 1
     }
 
@@ -494,7 +492,7 @@ smoke =
         | name = "Smoke"
         , wtype = Dropped
         , range = BurstLarge
-        , specials = [ Ammo 3, SpecialRule "The dropped weapon template for smoke counts as a rough surface, and counts as an obstruction for the purposes of determining cover." ]
+        , specials = [ Ammo [ False, False, False ], SpecialRule "The dropped weapon template for smoke counts as a rough surface, and counts as an obstruction for the purposes of determining cover." ]
         , cost = 1
     }
 
@@ -525,7 +523,7 @@ explodingRam =
         , range = SmashRange
         , slots = 1
         , specials =
-            [ Ammo 1
+            [ Ammo [ False ]
             , HighlyExplosive
             , SpecialRule "When involved in a collision on the declared facing, for the first time in a game, this vehicle must declare a smash attach (even if the collision is a tailgate) and this becomes an EXPLOSIVE SMASH ATTACK. When making an explosive smash attack this vehicle gains +6 attack dice. If any 1s or 2s are rolled on this vehicle's attack dice during this explosive smash attack, this vehicle immediately loses one hull point for each 1 or 2 rolled."
             , SpecialRule "A vehicle may only purchase one explosive ram. Bikes may not purchase this weapon."
@@ -543,7 +541,7 @@ thumper =
         , slots = 2
         , specials =
             [ Electrical
-            , Ammo 1
+            , Ammo [ False ]
             , SpecialRule "The Thumper is a powerful sonic device that emits a shock wave that hurls nearby vehicles into the air. When this vehicle declares an attack with the Thumper, every other vehicle (friend or foe) within medium range of this vehicle immeditaly makes a flip check, in which they count their current gear as 2 higher, up to a maximum of 6. The Thumper may only be fired once per turn."
             ]
         , cost = 4
@@ -561,7 +559,7 @@ arcLightningProjector =
         , slots = 2
         , specials =
             [ Electrical
-            , Ammo 1
+            , Ammo [ False ]
             , SpecialRule "The Arc Lightning Projector is a dangerous electrical weapon that can arc electricity across multiple conductive targets. After damaging a target, this vehicle must immediately attack another target within short range and a 360 degree arc of fire of the current target. This chain-reaction continues until the weapon fails to damage a target, or there are nor further viable targets. This vehicle can target friendly vehicles with the Arc Lightning Projector. This vehicle cannot target the same vehicle twice in a single attack step with the Arc Lightning Projetor."
             ]
         , cost = 6
@@ -579,7 +577,7 @@ kineticSuperBooster =
         , slots = 2
         , specials =
             [ Electrical
-            , Ammo 1
+            , Ammo [ False ]
             , SpecialRule "The Kinetic Super Booster is a bizarre electrical weapon that transfers a jolt of kinetic energy to the energy."
             , SpecialRule "The target of a Super Booster attack suffers no damage, but instread immediately increases its current gear by one for every successful hit, without gaining hazard tokens."
             , SpecialRule "The Super Booster may not increase a vehicle's current gar beyond its max gear."

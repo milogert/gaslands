@@ -116,7 +116,7 @@ view model =
     in
     Document
         (viewToStr model)
-        [ Grid.container []
+        [ Grid.containerFluid []
             [ CDN.stylesheet -- creates an inline style node with the Bootstrap CSS
             , Grid.row
                 [ Row.middleXs

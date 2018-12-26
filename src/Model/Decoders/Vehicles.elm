@@ -29,7 +29,7 @@ vehicleDecoder =
         |> required "upgrades" (list upgradeDecoder)
         |> required "notes" string
         |> required "cost" int
-        |> required "id" int
+        |> required "key" string
         |> required "specials" (list specialDecoder)
         |> required "perks" (list vehiclePerkDecoder)
         |> optional "requiredSponsor" (string |> andThen requiredSponsorDecoderHelper) Nothing

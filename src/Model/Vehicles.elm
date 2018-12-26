@@ -6,7 +6,6 @@ module Model.Vehicles exposing
     , VehicleEvent(..)
     , VehicleType(..)
     , WeightClass(..)
-    , allVehicleTypes
     , allVehicles
     , fromVehicleType
     , fromVehicleWeight
@@ -24,26 +23,26 @@ import Model.Weapons exposing (..)
 
 type VehicleEvent
     = AddVehicle
-    | DeleteVehicle Vehicle
+    | DeleteVehicle String
     | TmpName String
     | TmpVehicleType String
     | TmpNotes String
     | NextGearPhase
-    | UpdateActivated Vehicle Bool
-    | UpdateGear Vehicle String
-    | ShiftGear Vehicle Int Int Int
-    | UpdateHazards Vehicle String
-    | ShiftHazards Vehicle Int Int Int
-    | UpdateHull Vehicle String
-    | ShiftHull Vehicle Int Int Int
-    | UpdateCrew Vehicle String
-    | UpdateEquipment Vehicle String
-    | UpdateNotes Vehicle String
-    | SetPerkInVehicle Vehicle VehiclePerk Bool
-    | GetStream Vehicle
-    | TakePhoto Vehicle
+    | UpdateActivated String Bool
+    | UpdateGear String String
+    | ShiftGear String Int Int Int
+    | UpdateHazards String String
+    | ShiftHazards String Int Int Int
+    | UpdateHull String String
+    | ShiftHull String Int Int Int
+    | UpdateCrew String String
+    | UpdateEquipment String String
+    | UpdateNotes String String
+    | SetPerkInVehicle String VehiclePerk Bool
+    | GetStream String
+    | TakePhoto String
     | SetPhotoUrlCallback String
-    | DiscardPhoto Vehicle
+    | DiscardPhoto String
 
 
 type alias Vehicle =
@@ -63,7 +62,7 @@ type alias Vehicle =
     , upgrades : List Upgrade
     , notes : String
     , cost : Int
-    , id : Int
+    , key : String
     , specials : List Special
     , perks : List VehiclePerk
     , requiredSponsor : Maybe SponsorType
@@ -95,22 +94,6 @@ type alias GearTracker =
     { current : Int
     , max : Int
     }
-
-
-allVehicleTypes : List VehicleType
-allVehicleTypes =
-    [ Bike
-    , Buggy
-    , Car
-    , PerformanceCar
-    , PickupTruck
-    , MonsterTruck
-    , Bus
-    , WarRig
-    , Tank
-    , Gyrocopter
-    , Helicopter
-    ]
 
 
 vehicleCost : Vehicle -> Int
@@ -197,7 +180,7 @@ defaultVehicle =
         []
         ""
         0
-        0
+        ""
         []
         []
         Nothing
@@ -209,7 +192,7 @@ bike =
         | vtype = Bike
         , gear = GearTracker 1 6
         , handling = 5
-        , hull = HullHolder 1 4
+        , hull = HullHolder 0 4
         , crew = 1
         , equipment = 1
         , weight = Light
@@ -227,7 +210,7 @@ buggy =
         | vtype = Buggy
         , gear = GearTracker 1 6
         , handling = 4
-        , hull = HullHolder 1 6
+        , hull = HullHolder 0 6
         , crew = 2
         , equipment = 2
         , weight = Light
@@ -244,7 +227,7 @@ car =
         | vtype = Car
         , gear = GearTracker 1 5
         , handling = 3
-        , hull = HullHolder 1 10
+        , hull = HullHolder 0 10
         , crew = 2
         , equipment = 2
         , weight = Middle
@@ -258,7 +241,7 @@ performanceCar =
         | vtype = PerformanceCar
         , gear = GearTracker 1 6
         , handling = 4
-        , hull = HullHolder 1 8
+        , hull = HullHolder 0 8
         , crew = 1
         , equipment = 2
         , weight = Middle
@@ -276,7 +259,7 @@ pickupTruck =
         | vtype = PickupTruck
         , gear = GearTracker 1 4
         , handling = 2
-        , hull = HullHolder 1 12
+        , hull = HullHolder 0 12
         , crew = 3
         , equipment = 3
         , weight = Middle
@@ -290,7 +273,7 @@ monsterTruck =
         | vtype = MonsterTruck
         , gear = GearTracker 1 4
         , handling = 3
-        , hull = HullHolder 1 10
+        , hull = HullHolder 0 10
         , crew = 2
         , equipment = 2
         , weight = Heavy
@@ -308,7 +291,7 @@ bus =
         | vtype = Bus
         , gear = GearTracker 1 3
         , handling = 2
-        , hull = HullHolder 1 16
+        , hull = HullHolder 0 16
         , crew = 8
         , equipment = 3
         , weight = Heavy
@@ -322,7 +305,7 @@ warRig =
         | vtype = WarRig
         , gear = GearTracker 1 4
         , handling = 2
-        , hull = HullHolder 1 20
+        , hull = HullHolder 0 20
         , crew = 5
         , equipment = 5
         , weight = Heavy
@@ -337,7 +320,7 @@ tank =
         | vtype = Tank
         , gear = GearTracker 1 3
         , handling = 4
-        , hull = HullHolder 1 20
+        , hull = HullHolder 0 20
         , crew = 3
         , equipment = 4
         , weight = Heavy
@@ -357,7 +340,7 @@ gyrocopter =
         | vtype = Gyrocopter
         , gear = GearTracker 1 3
         , handling = 4
-        , hull = HullHolder 1 4
+        , hull = HullHolder 0 4
         , crew = 1
         , equipment = 0
         , weight = Airborne
@@ -377,7 +360,7 @@ helicopter =
         | vtype = Helicopter
         , gear = GearTracker 1 4
         , handling = 3
-        , hull = HullHolder 1 8
+        , hull = HullHolder 0 8
         , crew = 2
         , equipment = 4
         , weight = Airborne

@@ -8,8 +8,8 @@ import Model.Sponsors exposing (SponsorType, fromSponsorType)
 specialEncoder : Special -> List ( String, Value )
 specialEncoder s =
     case s of
-        Ammo i ->
-            ammoEncoder i
+        Ammo ammo ->
+            ammoEncoder ammo
 
         SpecialRule t ->
             specialRuleEncoder t
@@ -51,9 +51,9 @@ specialEncoder s =
             modEncoder s i
 
 
-ammoEncoder : Int -> List ( String, Value )
-ammoEncoder i =
-    [ ( "type", string "Ammo" ), ( "count", int i ) ]
+ammoEncoder : List Bool -> List ( String, Value )
+ammoEncoder clip =
+    [ ( "type", string "Ammo" ), ( "clip", list bool clip ) ]
 
 
 specialRuleEncoder : String -> List ( String, Value )

@@ -20,8 +20,7 @@ weaponDecoder =
         |> required "cost" int
         |> required "id" int
         |> hardcoded WeaponReady
-        |> hardcoded 0
-        |> required "requiredSponsor" (string |> andThen requiredSponsorDecoderHelper)
+        |> optional "requiredSponsor" (string |> andThen requiredSponsorDecoderHelper) Nothing
 
 
 mountPointDecoder : Decoder WeaponMounting
@@ -33,23 +32,23 @@ mountPointDecoder =
 mountPointDecoderHelper : String -> Decoder WeaponMounting
 mountPointDecoderHelper mountPointString =
     case mountPointString of
-        "Full" ->
-            succeed <| Full
+        "360° mounted" ->
+            succeed Full
 
-        "Front" ->
-            succeed <| Front
+        "Front mounted" ->
+            succeed Front
 
-        "LeftSide" ->
-            succeed <| LeftSide
+        "Left mounted" ->
+            succeed LeftSide
 
-        "RightSide" ->
-            succeed <| RightSide
+        "Right mounted" ->
+            succeed RightSide
 
-        "Rear" ->
-            succeed <| Rear
+        "Rear mounted" ->
+            succeed Rear
 
-        "CrewFired" ->
-            succeed <| CrewFired
+        "Crew fired" ->
+            succeed CrewFired
 
         _ ->
             fail <| mountPointString ++ " is not a valid mount point type"

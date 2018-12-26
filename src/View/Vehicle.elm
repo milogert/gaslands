@@ -103,7 +103,7 @@ configure model currentView v =
                     [ Btn.primary
                     , Btn.small
                     , Btn.block
-                    , Btn.onClick <| VehicleMsg <| UpdateActivated v (not v.activated)
+                    , Btn.onClick <| VehicleMsg <| UpdateActivated v.key (not v.activated)
                     , Btn.disabled <| not canActivate || v.activated
                     ]
                     [ text activatedText ]
@@ -125,7 +125,17 @@ configure model currentView v =
                 [ View.Photo.view model v ]
 
         stats =
-            div [] [ activateButton, factsHolder ]
+            Grid.simpleRow
+                [ Grid.col
+                    [ Col.xs3
+                    , Col.lg2
+                    , Col.attrs
+                        [ classList [ ( "d-none", currentView /= ViewDetails v ) ] ]
+                    ]
+                    [ photoPlus ]
+                , Grid.col [ Col.xs ]
+                    [ activateButton, factsHolder ]
+                ]
 
         gearCounter =
             case wrecked of
@@ -138,9 +148,9 @@ configure model currentView v =
                         1
                         (totalGear v)
                         v.gear.current
-                        (ShiftGear v -1)
-                        (ShiftGear v 1)
-                        (UpdateGear v)
+                        (ShiftGear v.key -1)
+                        (ShiftGear v.key 1)
+                        (UpdateGear v.key)
 
         hazardCounter =
             div []
@@ -149,9 +159,9 @@ configure model currentView v =
                     0
                     6
                     v.hazards
-                    (ShiftHazards v -1)
-                    (ShiftHazards v 1)
-                    (UpdateHazards v)
+                    (ShiftHazards v.key -1)
+                    (ShiftHazards v.key 1)
+                    (UpdateHazards v.key)
                 ]
 
         hullCounter =
@@ -160,9 +170,9 @@ configure model currentView v =
                 0
                 (totalHull v)
                 v.hull.current
-                (ShiftHull v -1)
-                (ShiftHull v 1)
-                (UpdateHull v)
+                (ShiftHull v.key -1)
+                (ShiftHull v.key 1)
+                (UpdateHull v.key)
 
         counterHolder =
             div []
@@ -172,7 +182,7 @@ configure model currentView v =
                 ]
 
         renderSpecialFunc special =
-            li [] [ View.Utils.renderSpecial False Nothing 0 special ]
+            li [] [ View.Utils.renderSpecial False Nothing special ]
 
         specials =
             case v.specials of
@@ -191,7 +201,7 @@ configure model currentView v =
                 , classList [ ( "d-none", currentView == ViewDashboard ) ]
                 ]
                 [ Textarea.textarea
-                    [ Textarea.onInput <| VehicleMsg << UpdateNotes v
+                    [ Textarea.onInput <| VehicleMsg << UpdateNotes v.key
                     , Textarea.attrs [ placeholder "Notes" ]
                     , Textarea.value v.notes
                     ]
@@ -234,7 +244,7 @@ configure model currentView v =
                     , Btn.button
                         [ Btn.roleLink
                         , Btn.small
-                        , Btn.onClick <| AddWeapon v handgun
+                        , Btn.onClick <| AddWeapon v.key handgun
                         ]
                         [ icon "plus", text "Handgun" ]
                     ]
@@ -303,6 +313,7 @@ configure model currentView v =
         header =
             text v.name
 
+        body : List (Html Msg)
         body =
             [ stats
             , counterHolder
@@ -321,7 +332,7 @@ configure model currentView v =
                 [ Btn.button
                     [ Btn.danger
                     , Btn.small
-                    , Btn.onClick <| VehicleMsg <| DeleteVehicle v
+                    , Btn.onClick <| VehicleMsg <| DeleteVehicle v.key
                     ]
                     [ icon "trash-alt" ]
                 , Btn.button
@@ -419,7 +430,7 @@ renderPreview model currentView v =
             div [] [ text <| "Hull Max: " ++ String.fromInt (totalHull v) ]
 
         renderSpecialFunc special =
-            li [] [ View.Utils.renderSpecial True Nothing 0 special ]
+            li [] [ View.Utils.renderSpecial True Nothing special ]
 
         specials =
             case v.specials of

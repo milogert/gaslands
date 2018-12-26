@@ -1,5 +1,6 @@
 module Update.Vehicle exposing (update)
 
+import Dict exposing (Dict)
 import Model.Model exposing (..)
 import Model.Sponsors exposing (..)
 import Model.Vehicles exposing (..)
@@ -14,8 +15,8 @@ update model event =
         AddVehicle ->
             addVehicle model
 
-        DeleteVehicle v ->
-            deleteVehicle model v
+        DeleteVehicle key ->
+            deleteVehicle model key
 
         NextGearPhase ->
             let
@@ -23,12 +24,12 @@ update model event =
                     \w -> { w | status = WeaponReady, attackRoll = 0 }
 
                 vehicleFunc =
-                    \v -> { v | weapons = v.weapons |> List.map weaponFunc }
+                    \k v -> { v | weapons = v.weapons |> List.map weaponFunc }
 
                 vs =
                     model.vehicles
-                        |> List.map vehicleFunc
-                        |> List.map (\v -> { v | activated = False })
+                        |> Dict.map vehicleFunc
+                        |> Dict.map (\k v -> { v | activated = False })
 
                 gearPhase =
                     if model.gearPhase < 6 then
@@ -72,26 +73,44 @@ update model event =
                     , Cmd.none
                     )
 
-        UpdateActivated v activated ->
-            updateActivated model v activated
+        UpdateActivated key activated ->
+            updateActivated model key activated
 
-        UpdateGear v strCurrent ->
-            updateGear model v (String.toInt strCurrent |> Maybe.withDefault 1)
+        UpdateGear key strCurrent ->
+            updateGear model key (String.toInt strCurrent |> Maybe.withDefault 1)
 
-        ShiftGear v mod min max ->
-            updateGear model v <| clamp min max <| v.gear.current + mod
+        ShiftGear key mod min max ->
+            case Dict.get key model.vehicles of
+                Nothing ->
+                    ( model, Cmd.none )
+
+                Just vehicle ->
+                    updateGear model key <| clamp min max <| vehicle.gear.current + mod
 
         UpdateHazards v strCurrent ->
             updateHazards model v (String.toInt strCurrent |> Maybe.withDefault 1)
 
-        ShiftHazards v mod min max ->
-            updateHazards model v <| clamp min max <| v.hazards + mod
+        ShiftHazards key mod min max ->
+            case Dict.get key model.vehicles of
+                Nothing ->
+                    ( model, Cmd.none )
+
+                Just vehicle ->
+                    updateHazards model key <| clamp min max <| vehicle.hazards + mod
 
         UpdateHull v strCurrent ->
             updateHull model v (String.toInt strCurrent |> Maybe.withDefault 1)
 
-        ShiftHull v mod min max ->
-            updateHull model v <| clamp min max <| v.hull.current + mod
+        ShiftHull key mod min max ->
+            case Dict.get key model.vehicles of
+                Nothing ->
+                    ( model, Cmd.none )
+
+                Just vehicle ->
+                    vehicle.hull.current
+                        + mod
+                        |> clamp min max
+                        |> updateHull model key
 
         UpdateCrew v strCurrent ->
             updateCrew model v strCurrent
@@ -99,22 +118,22 @@ update model event =
         UpdateEquipment v strCurrent ->
             updateEquipment model v strCurrent
 
-        UpdateNotes v notes ->
-            updateNotes model v notes
+        UpdateNotes key notes ->
+            updateNotes model key notes
 
         SetPerkInVehicle vehicle perk isSet ->
             setPerkInVehicle model vehicle perk isSet
 
-        GetStream v ->
-            getStream model v
+        GetStream key ->
+            getStream model key
 
-        TakePhoto v ->
-            takePhoto model v
+        TakePhoto key ->
+            takePhoto model key
 
         SetPhotoUrlCallback url ->
             case model.view of
                 ViewDetails vehicle ->
-                    setUrlForVehicle model vehicle url
+                    setUrlForVehicle model vehicle.key url
 
                 _ ->
                     ( model, Cmd.none )
@@ -126,12 +145,18 @@ update model event =
 addVehicle : Model -> ( Model, Cmd Msg )
 addVehicle model =
     case model.tmpVehicle of
-        Just vehicleTmp ->
+        Just vehicle ->
             let
-                oldl =
-                    model.vehicles
+                key =
+                    vehicle.name ++ String.fromInt (Dict.size model.vehicles)
+
+                newDict =
+                    Dict.insert
+                        key
+                        { vehicle | key = key }
+                        model.vehicles
             in
-            case ( vehicleTmp.vtype, vehicleTmp.name ) of
+            case ( vehicle.vtype, vehicle.name ) of
                 ( _, "" ) ->
                     ( { model | error = VehicleNameError :: model.error }
                     , Cmd.none
@@ -140,7 +165,7 @@ addVehicle model =
                 ( _, _ ) ->
                     ( { model
                         | view = ViewDashboard
-                        , vehicles = oldl ++ [ { vehicleTmp | id = List.length oldl } ]
+                        , vehicles = newDict
                         , tmpVehicle = Nothing
                         , error = []
                       }
@@ -155,294 +180,205 @@ addVehicle model =
 
 setTmpVehicleType : Model -> Int -> ( Model, Cmd Msg )
 setTmpVehicleType model index =
-    let
-        tailVehicles =
-            List.drop (index + 1)
-
-        name =
-            case model.tmpVehicle of
-                Just v ->
-                    v.name
-
-                Nothing ->
-                    ""
-
-        vtype =
-            Maybe.withDefault Bike <| strToVT vtstr
-
-        gear =
-            GearTracker 1 (typeToGearMax vtype)
-
-        handling =
-            typeToHandling vtype
-
-        hull =
-            HullHolder 0 (typeToHullMax vtype)
-
-        crew =
-            typeToCrewMax vtype
-
-        equipment =
-            typeToEquipmentMax vtype
-
-        weight =
-            typeToWeight vtype
-
-        weapons =
-            case model.tmpVehicle of
-                Just v ->
-                    v.weapons
-
-                Nothing ->
-                    []
-
-        upgrades =
-            case model.tmpVehicle of
-                Just v ->
-                    v.upgrades
-
-                Nothing ->
-                    []
-
-        notes =
-            case model.tmpVehicle of
-                Just v ->
-                    v.notes
-
-                Nothing ->
-                    ""
-
-        cost =
-            typeToCost vtype
-
-        specials =
-            typeToSpecials vtype
-
-        requiredSponsor =
-            typeToSponsorReq vtype
-
-        newtv =
-            Vehicle
-                name
-                Nothing
-                vtype
-                gear
-                0
-                handling
-                []
-                hull
-                crew
-                equipment
-                weight
-                False
-                weapons
-                upgrades
-                notes
-                cost
-                -1
-                specials
-                []
-                requiredSponsor
-    in
-    ( { model | tmpVehicle = Just newtv }
+    ( { model
+        | tmpVehicle =
+            allVehicles
+                |> List.drop (index + 1)
+                |> List.head
+      }
     , Cmd.none
     )
 
 
-updateActivated : Model -> Vehicle -> Bool -> ( Model, Cmd Msg )
-updateActivated model v activated =
-    let
-        pre =
-            List.take v.id model.vehicles
+updateActivated : Model -> String -> Bool -> ( Model, Cmd Msg )
+updateActivated model key activated =
+    case Dict.get key model.vehicles of
+        Nothing ->
+            ( model, Cmd.none )
 
-        nv =
-            { v | activated = activated }
+        Just vehicle ->
+            let
+                nv =
+                    { vehicle | activated = activated }
 
-        post =
-            List.drop (v.id + 1) model.vehicles
+                newView =
+                    case model.view of
+                        ViewDetails currentVehicle ->
+                            ViewDetails nv
 
-        newView =
-            case model.view of
-                ViewDetails currentVehicle ->
-                    ViewDetails nv
+                        _ ->
+                            model.view
+            in
+            ( { model
+                | view = newView
+                , vehicles = Dict.insert key nv model.vehicles
+              }
+            , Cmd.none
+            )
 
-                _ ->
-                    model.view
-    in
-    ( { model | view = newView, vehicles = pre ++ nv :: post }
+
+updateGear : Model -> String -> Int -> ( Model, Cmd Msg )
+updateGear model key newGear =
+    case Dict.get key model.vehicles of
+        Nothing ->
+            ( model, Cmd.none )
+
+        Just vehicle ->
+            let
+                nv =
+                    { vehicle
+                        | gear = GearTracker newGear vehicle.gear.max
+                    }
+
+                newView =
+                    case model.view of
+                        ViewDetails _ ->
+                            ViewDetails nv
+
+                        _ ->
+                            model.view
+            in
+            ( { model | view = newView, vehicles = Dict.insert key nv model.vehicles }
+            , Cmd.none
+            )
+
+
+updateHazards : Model -> String -> Int -> ( Model, Cmd Msg )
+updateHazards model key newHazards =
+    case Dict.get key model.vehicles of
+        Nothing ->
+            ( model, Cmd.none )
+
+        Just vehicle ->
+            let
+                nv =
+                    { vehicle | hazards = newHazards }
+
+                newView =
+                    case model.view of
+                        ViewDetails _ ->
+                            ViewDetails nv
+
+                        _ ->
+                            model.view
+            in
+            ( { model
+                | view = newView
+                , vehicles = Dict.insert key nv model.vehicles
+              }
+            , Cmd.none
+            )
+
+
+updateHull : Model -> String -> Int -> ( Model, Cmd Msg )
+updateHull model key currentHull =
+    case Dict.get key model.vehicles of
+        Nothing ->
+            ( model, Cmd.none )
+
+        Just vehicle ->
+            let
+                nhull =
+                    vehicle.hull
+
+                nv =
+                    { vehicle | hull = { nhull | current = currentHull } }
+
+                newView =
+                    case model.view of
+                        ViewDetails _ ->
+                            ViewDetails nv
+
+                        _ ->
+                            model.view
+            in
+            ( { model
+                | view = newView
+                , vehicles = Dict.insert key nv model.vehicles
+              }
+            , Cmd.none
+            )
+
+
+updateCrew : Model -> String -> String -> ( Model, Cmd Msg )
+updateCrew model key strCurrent =
+    case Dict.get key model.vehicles of
+        Nothing ->
+            ( model, Cmd.none )
+
+        Just vehicle ->
+            let
+                current =
+                    String.toInt strCurrent |> Maybe.withDefault 0
+
+                nv =
+                    { vehicle | crew = current }
+            in
+            ( { model | vehicles = Dict.insert key nv model.vehicles }
+            , Cmd.none
+            )
+
+
+updateEquipment : Model -> String -> String -> ( Model, Cmd Msg )
+updateEquipment model key strCurrent =
+    case Dict.get key model.vehicles of
+        Nothing ->
+            ( model, Cmd.none )
+
+        Just vehicle ->
+            let
+                current =
+                    String.toInt strCurrent |> Maybe.withDefault 0
+
+                nv =
+                    { vehicle | equipment = current }
+            in
+            ( { model | vehicles = Dict.insert key nv model.vehicles }
+            , Cmd.none
+            )
+
+
+updateNotes : Model -> String -> String -> ( Model, Cmd Msg )
+updateNotes model key notes =
+    case Dict.get key model.vehicles of
+        Nothing ->
+            ( model, Cmd.none )
+
+        Just vehicle ->
+            ( { model
+                | vehicles = Dict.insert key { vehicle | notes = notes } model.vehicles
+              }
+            , Cmd.none
+            )
+
+
+deleteVehicle : Model -> String -> ( Model, Cmd Msg )
+deleteVehicle model key =
+    ( { model
+        | view = ViewDashboard
+        , vehicles = Dict.remove key model.vehicles
+      }
     , Cmd.none
     )
 
 
-updateGear : Model -> Vehicle -> Int -> ( Model, Cmd Msg )
-updateGear model v newGear =
-    let
-        newGearTracker =
-            GearTracker newGear v.gear.max
+rollSkidDice : Model -> String -> List SkidResult -> ( Model, Cmd Msg )
+rollSkidDice model key skidResults =
+    case Dict.get key model.vehicles of
+        Nothing ->
+            ( model, Cmd.none )
 
-        vehicleUpdated =
-            { v | gear = newGearTracker }
-
-        newView =
-            case model.view of
-                ViewDetails _ ->
-                    ViewDetails vehicleUpdated
-
-                _ ->
-                    model.view
-
-        vehiclesList =
-            Update.Utils.replaceAtIndex v.id vehicleUpdated model.vehicles
-    in
-    ( { model | view = newView, vehicles = vehiclesList }
-    , Cmd.none
-    )
-
-
-updateHazards : Model -> Vehicle -> Int -> ( Model, Cmd Msg )
-updateHazards model v newHazards =
-    let
-        vehicleUpdated =
-            { v | hazards = newHazards }
-
-        newView =
-            case model.view of
-                ViewDetails _ ->
-                    ViewDetails vehicleUpdated
-
-                _ ->
-                    model.view
-
-        vehiclesList =
-            Update.Utils.replaceAtIndex v.id vehicleUpdated model.vehicles
-    in
-    ( { model | view = newView, vehicles = vehiclesList }
-    , Cmd.none
-    )
-
-
-updateHull : Model -> Vehicle -> Int -> ( Model, Cmd Msg )
-updateHull model v currentHull =
-    let
-        pre =
-            List.take v.id model.vehicles
-
-        nhull =
-            v.hull
-
-        nv =
-            { v | hull = { nhull | current = currentHull } }
-
-        post =
-            List.drop (v.id + 1) model.vehicles
-
-        newView =
-            case model.view of
-                ViewDetails _ ->
-                    ViewDetails nv
-
-                _ ->
-                    model.view
-    in
-    ( { model | view = newView, vehicles = pre ++ nv :: post }
-    , Cmd.none
-    )
-
-
-updateCrew : Model -> Vehicle -> String -> ( Model, Cmd Msg )
-updateCrew model v strCurrent =
-    let
-        pre =
-            List.take v.id model.vehicles
-
-        current =
-            String.toInt strCurrent |> Maybe.withDefault 0
-
-        nv =
-            { v | crew = current }
-
-        post =
-            List.drop (v.id + 1) model.vehicles
-    in
-    ( { model | vehicles = pre ++ nv :: post }
-    , Cmd.none
-    )
-
-
-updateEquipment : Model -> Vehicle -> String -> ( Model, Cmd Msg )
-updateEquipment model v strCurrent =
-    let
-        pre =
-            List.take v.id model.vehicles
-
-        current =
-            String.toInt strCurrent |> Maybe.withDefault 0
-
-        nv =
-            { v | equipment = current }
-
-        post =
-            List.drop (v.id + 1) model.vehicles
-    in
-    ( { model | vehicles = pre ++ nv :: post }
-    , Cmd.none
-    )
-
-
-updateNotes : Model -> Vehicle -> String -> ( Model, Cmd Msg )
-updateNotes model v notes =
-    let
-        vehiclesNew =
-            Update.Utils.replaceAtIndex v.id { v | notes = notes } model.vehicles
-    in
-    ( { model | vehicles = vehiclesNew }
-    , Cmd.none
-    )
-
-
-updateAmmoUsed : Model -> Vehicle -> Weapon -> Int -> ( Model, Cmd Msg )
-updateAmmoUsed model v w used =
-    let
-        weaponUpdated =
-            { w | ammoUsed = used }
-
-        weaponsNew =
-            Update.Utils.replaceAtIndex w.id weaponUpdated v.weapons |> Update.Utils.correctIds
-
-        vehicleUpdated =
-            { v | weapons = weaponsNew }
-
-        vehiclesNew =
-            Update.Utils.replaceAtIndex v.id vehicleUpdated model.vehicles
-    in
-    ( { model | view = ViewDetails vehicleUpdated, vehicles = vehiclesNew }
-    , Cmd.none
-    )
-
-
-deleteVehicle : Model -> Vehicle -> ( Model, Cmd Msg )
-deleteVehicle model v =
-    let
-        newvehicles =
-            Update.Utils.deleteFromList v.id model.vehicles |> Update.Utils.correctIds
-    in
-    ( { model | view = ViewDashboard, vehicles = newvehicles }
-    , Cmd.none
-    )
-
-
-rollSkidDice : Model -> Vehicle -> List SkidResult -> ( Model, Cmd Msg )
-rollSkidDice model v skidResults =
-    let
-        vehicleUpdated =
-            { v | skidResults = skidResults }
-
-        vehiclesNew =
-            Update.Utils.replaceAtIndex v.id vehicleUpdated model.vehicles
-    in
-    ( { model | view = ViewDetails vehicleUpdated, vehicles = vehiclesNew }
-    , Cmd.none
-    )
+        Just vehicle ->
+            let
+                nv =
+                    { vehicle | skidResults = skidResults }
+            in
+            ( { model
+                | view = ViewDetails nv
+                , vehicles = Dict.insert key nv model.vehicles
+              }
+            , Cmd.none
+            )
 
 
 replaceWeaponInVehicle : Vehicle -> Weapon -> Vehicle
@@ -454,68 +390,83 @@ replaceWeaponInVehicle v w =
     { v | weapons = weaponsNew }
 
 
-setPerkInVehicle : Model -> Vehicle -> VehiclePerk -> Bool -> ( Model, Cmd Msg )
-setPerkInVehicle model v perk isSet =
-    let
-        perkList =
-            case ( isSet, List.member perk v.perks ) of
-                ( True, False ) ->
-                    perk :: v.perks
+setPerkInVehicle : Model -> String -> VehiclePerk -> Bool -> ( Model, Cmd Msg )
+setPerkInVehicle model key perk isSet =
+    case Dict.get key model.vehicles of
+        Nothing ->
+            ( model, Cmd.none )
 
-                ( False, _ ) ->
-                    List.filter (\s -> s /= perk) v.perks
+        Just vehicle ->
+            let
+                perkList =
+                    case ( isSet, List.member perk vehicle.perks ) of
+                        ( True, False ) ->
+                            perk :: vehicle.perks
 
-                _ ->
-                    v.perks
+                        ( False, _ ) ->
+                            List.filter (\s -> s /= perk) vehicle.perks
 
-        vehicleUpdated =
-            { v | perks = perkList }
+                        _ ->
+                            vehicle.perks
 
-        vehiclesNew =
-            Update.Utils.replaceAtIndex v.id vehicleUpdated model.vehicles
-    in
-    ( { model | view = ViewDetails vehicleUpdated, vehicles = vehiclesNew }
-    , Cmd.none
-    )
+                nv =
+                    { vehicle | perks = perkList }
+            in
+            ( { model
+                | view = ViewDetails nv
+                , vehicles = Dict.insert key nv model.vehicles
+              }
+            , Cmd.none
+            )
 
 
-getStream : Model -> Vehicle -> ( Model, Cmd Msg )
-getStream model v =
+getStream : Model -> String -> ( Model, Cmd Msg )
+getStream model key =
     ( model
     , Ports.Photo.getStream ""
     )
 
 
-takePhoto : Model -> Vehicle -> ( Model, Cmd Msg )
-takePhoto model v =
+takePhoto : Model -> String -> ( Model, Cmd Msg )
+takePhoto model key =
     ( model
     , Ports.Photo.takePhoto ""
     )
 
 
-setUrlForVehicle : Model -> Vehicle -> String -> ( Model, Cmd Msg )
-setUrlForVehicle model v url =
-    let
-        vehicleUpdated =
-            { v | photo = Just url }
+setUrlForVehicle : Model -> String -> String -> ( Model, Cmd Msg )
+setUrlForVehicle model key url =
+    case Dict.get key model.vehicles of
+        Nothing ->
+            ( model, Cmd.none )
 
-        vehiclesNew =
-            Update.Utils.replaceAtIndex v.id vehicleUpdated model.vehicles
-    in
-    ( { model | view = ViewDetails vehicleUpdated, vehicles = vehiclesNew }
-    , Ports.Photo.destroyStream ""
-    )
+        Just vehicle ->
+            let
+                nv =
+                    { vehicle | photo = Just url }
+            in
+            ( { model
+                | view = ViewDetails nv
+                , vehicles = Dict.insert key nv model.vehicles
+              }
+            , Ports.Photo.destroyStream ""
+            )
 
 
-discardPhoto : Model -> Vehicle -> ( Model, Cmd Msg )
-discardPhoto model v =
-    let
-        vehicleUpdated =
-            { v | photo = Nothing }
+discardPhoto : Model -> String -> ( Model, Cmd Msg )
+discardPhoto model key =
+    case Dict.get key model.vehicles of
+        Nothing ->
+            ( model, Cmd.none )
 
-        vehiclesNew =
-            Update.Utils.replaceAtIndex v.id vehicleUpdated model.vehicles
-    in
-    ( { model | view = ViewDetails vehicleUpdated, vehicles = vehiclesNew }
-    , Ports.Photo.getStream ""
-    )
+        Just vehicle ->
+            let
+                nv =
+                    { vehicle | photo = Nothing }
+            in
+            ( { model
+                | view = ViewDetails nv
+                , vehicles = Dict.insert key nv model.vehicles
+              }
+            , Ports.Photo.getStream ""
+            )

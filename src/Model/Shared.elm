@@ -1,8 +1,14 @@
-module Model.Shared exposing (Special(..), fromSpecial)
+module Model.Shared exposing
+    ( Special(..)
+    , fromSpecial
+    , getAmmoClip
+    )
+
+import List.Extra as ListE
 
 
 type Special
-    = Ammo Int
+    = Ammo (List Bool)
     | SpecialRule String
     | NamedSpecialRule String String
     | TreacherousSurface
@@ -21,8 +27,8 @@ type Special
 fromSpecial : Special -> String
 fromSpecial special =
     case special of
-        Ammo i ->
-            "Ammo " ++ String.fromInt i
+        Ammo count ->
+            "Ammo " ++ String.fromInt (List.length count)
 
         SpecialRule s ->
             "SpecialRule " ++ s
@@ -62,3 +68,27 @@ fromSpecial special =
 
         CrewMod i ->
             "CrewMod " ++ String.fromInt i
+
+
+getAmmoClip : List Special -> ( Maybe Int, Maybe Special )
+getAmmoClip specials =
+    let
+        ammoFinder special =
+            case special of
+                Ammo _ ->
+                    True
+
+                _ ->
+                    False
+
+        mAmmoSpecial =
+            ListE.find
+                ammoFinder
+                specials
+
+        mAmmoSpecialIndex =
+            ListE.findIndex
+                ammoFinder
+                specials
+    in
+    ( mAmmoSpecialIndex, mAmmoSpecial )

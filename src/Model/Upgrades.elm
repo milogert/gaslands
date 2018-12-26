@@ -46,7 +46,7 @@ nitroBooster : Upgrade
 nitroBooster =
     Upgrade "Nitro Booster"
         0
-        [ Ammo 1
+        [ Ammo [ False ]
         , SpecialRule "This vehicle may declare that it is using this item at the start of an activation. This vehicle activates twice during this activation."
         , SpecialRule "During its first activation, this vehicle may only select the long straight template as its maneuver, does not make a skit check and must skip its attack step."
         , SpecialRule "After the first activation, this vehicle gains hazard tokens until it has 5 hazard tokens."

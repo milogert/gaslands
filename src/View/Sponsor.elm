@@ -107,7 +107,7 @@ renderVehiclePerk : Vehicle -> VehiclePerk -> Html Msg
 renderVehiclePerk vehicle perk =
     Checkbox.checkbox
         [ Checkbox.id perk.name
-        , Checkbox.onCheck <| VehicleMsg << SetPerkInVehicle vehicle perk
+        , Checkbox.onCheck <| VehicleMsg << SetPerkInVehicle vehicle.key perk
         , Checkbox.checked <| List.member perk vehicle.perks
         ]
     <|

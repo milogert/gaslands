@@ -17,7 +17,6 @@ weaponEncoder w =
     , ( "cost", int w.cost )
     , ( "id", int w.id )
     , ( "status", weaponStatusEncoder w.status )
-    , ( "ammoUsed", int w.ammoUsed )
     , ( "requiredSponsor", requiredSponsorEncoder w.requiredSponsor )
     ]
 

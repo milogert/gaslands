@@ -1,16 +1,15 @@
 module View.Weapon exposing (render)
 
+import Bootstrap.Button as Btn
+import Bootstrap.Form.Select as Select
 import Bootstrap.Grid as Grid
 import Bootstrap.Grid.Col as Col
 import Html
     exposing
         ( Html
-        , button
         , div
         , h6
         , li
-        , option
-        , select
         , span
         , text
         , ul
@@ -20,11 +19,11 @@ import Html.Attributes
         ( class
         , classList
         , disabled
-        , id
         , value
         )
 import Html.Events exposing (onClick, onInput)
 import Model.Model exposing (..)
+import Model.Shared
 import Model.Utils exposing (..)
 import Model.Vehicles exposing (..)
 import Model.Weapons exposing (..)
@@ -46,10 +45,10 @@ render model vehicle weapon =
         firingToggle =
             case weapon.status of
                 WeaponReady ->
-                    SetWeaponFired vehicle weapon
+                    SetWeaponFired vehicle.key weapon
 
                 WeaponFired ->
-                    SetWeaponFired vehicle weapon
+                    SetWeaponFired vehicle.key weapon
 
         crewAvailable =
             View.Utils.crewUsed vehicle < totalCrew vehicle
@@ -74,15 +73,19 @@ render model vehicle weapon =
                     text <| " (rolled " ++ String.fromInt i ++ ")"
 
         fireButton =
-            button
-                [ class "btn btn-sm mr-2 btn-block"
-                , classList
-                    [ ( "btn-secondary", weapon.status == WeaponFired )
-                    , ( "btn-primary", weapon.status == WeaponReady )
-                    , ( "d-none", isPreview )
+            Btn.button
+                [ Btn.small
+                , Btn.block
+                , Btn.disabled <| not canFire
+                , Btn.onClick firingToggle
+                , Btn.attrs
+                    [ class "mr-2"
+                    , classList
+                        [ ( "btn-secondary", weapon.status == WeaponFired )
+                        , ( "btn-primary", weapon.status == WeaponReady )
+                        , ( "d-none", isPreview )
+                        ]
                     ]
-                , disabled <| not canFire
-                , onClick firingToggle
                 ]
                 [ icon "crosshairs"
                 , span [ classList [ ( "d-none", weapon.attack == Nothing ) ] ]
@@ -113,15 +116,15 @@ render model vehicle weapon =
 
                 ( _, True ) ->
                     div [ class "mr-2" ]
-                        [ select
-                            [ class "form-control form-control-sm"
-                            , onInput TmpWeaponMountPoint
-                            , id mountPointId
+                        [ Select.select
+                            [ Select.small
+                            , Select.onChange TmpWeaponMountPoint
+                            , Select.id mountPointId
                             ]
-                            (option [ value "" ] [ text "" ]
+                            (Select.item [ value "" ] [ text "" ]
                                 :: List.map
                                     (\m ->
-                                        option
+                                        Select.item
                                             [ value <| fromWeaponMounting m ]
                                             [ text <| fromWeaponMounting m ]
                                     )
@@ -180,8 +183,18 @@ render model vehicle weapon =
                 , pointBadge
                 ]
 
+        ( _, mCurrentClip ) =
+            Model.Shared.getAmmoClip weapon.specials
+
         renderSpecialFunc special =
-            li [] [ View.Utils.renderSpecial isPreview (Just <| UpdateAmmoUsed vehicle weapon) weapon.ammoUsed special ]
+            let
+                renderedSpecial =
+                    View.Utils.renderSpecial
+                        isPreview
+                        (Just <| UpdateAmmoUsed vehicle.key weapon)
+                        special
+            in
+            li [] [ renderedSpecial ]
 
         specials =
             case weapon.specials of
@@ -198,10 +211,15 @@ render model vehicle weapon =
                 [ h6 [] [ text <| weapon.name ++ " " ] ]
             , Grid.col [ Col.xsAuto, Col.md12 ] [ fireButton ]
             , Grid.col [ Col.xsAuto, Col.md12 ]
-                [ button
-                    [ class "btn btn-sm btn-danger btn-block"
-                    , classList [ ( "d-none", isPreview ) ]
-                    , onClick <| DeleteWeapon vehicle weapon
+                [ Btn.button
+                    [ Btn.small
+                    , Btn.outlineDanger
+                    , Btn.block
+                    , Btn.onClick <| DeleteWeapon vehicle.key weapon
+                    , Btn.attrs
+                        [ classList [ ( "d-none", isPreview ) ]
+                        , class "mt-2"
+                        ]
                     ]
                     [ icon "trash-alt" ]
                 ]

@@ -14,7 +14,7 @@ view model v =
             a
                 [ href "#"
                 , class "text-danger"
-                , onClick <| VehicleMsg <| DiscardPhoto v
+                , onClick <| VehicleMsg <| DiscardPhoto v.key
                 ]
                 [ text "(Re)Take Photo" ]
 
@@ -29,7 +29,7 @@ view model v =
         videoDisplay =
             video
                 [ autoplay True
-                , onClick <| VehicleMsg <| TakePhoto v
+                , onClick <| VehicleMsg <| TakePhoto v.key
                 , style "max-width" "100%"
                 , classList [ ( "d-none", not displayStream ) ]
                 ]

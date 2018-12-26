@@ -15,7 +15,7 @@ modelDecoder =
         |> optional "teamName" (nullable string) Nothing
         |> required "pointsAllowed" int
         |> hardcoded 0
-        |> required "vehicles" (list vehicleDecoder)
+        |> required "vehicles" (dict vehicleDecoder)
         |> optional "sponsor" (nullable (string |> andThen sponsorTypeDecoderHelper)) Nothing
         |> hardcoded Nothing
         |> hardcoded Nothing

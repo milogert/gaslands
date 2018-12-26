@@ -62,7 +62,7 @@ specialDecoderHelper str =
 
 ammoDecoder : Decoder Special
 ammoDecoder =
-    map Ammo (field "count" int)
+    map Ammo (field "clip" (list bool))
 
 
 specialRuleDecoder : Decoder Special
