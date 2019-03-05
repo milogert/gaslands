@@ -6,7 +6,8 @@ import Model.Decoders.Shared exposing (..)
 import Model.Decoders.Sponsors exposing (..)
 import Model.Decoders.Upgrades exposing (..)
 import Model.Decoders.Weapons exposing (..)
-import Model.Vehicles exposing (..)
+import Model.Vehicle.Common exposing (..)
+import Model.Vehicle.Model exposing (..)
 
 
 vehicleDecoder : Decoder Vehicle
@@ -33,6 +34,7 @@ vehicleDecoder =
         |> required "specials" (list specialDecoder)
         |> required "perks" (list vehiclePerkDecoder)
         |> optional "requiredSponsor" (string |> andThen requiredSponsorDecoderHelper) Nothing
+        |> required "expansion" expansionDecoder
 
 
 vtypeDecoder : Decoder VehicleType

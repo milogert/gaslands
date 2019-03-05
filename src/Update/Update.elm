@@ -3,8 +3,9 @@ module Update.Update exposing (update)
 import Model.Model exposing (..)
 import Model.Settings exposing (..)
 import Model.Sponsors exposing (..)
-import Model.Upgrades exposing (..)
-import Model.Weapons exposing (..)
+import Model.Upgrade.Common exposing (..)
+import Model.Upgrade.Model exposing (..)
+import Model.Weapon.Common exposing (..)
 import Ports.Photo
 import Ports.Storage
 import Task

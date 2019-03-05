@@ -1,12 +1,19 @@
 module View.NewVehicle exposing (view)
 
+import Bootstrap.Button as Button
+import Bootstrap.Form.Select as Select
 import Bootstrap.Grid as Grid
 import Bootstrap.Grid.Col as Col
-import Html exposing (Html, button, div, h1, h2, h3, h4, h5, h6, img, input, label, li, node, option, p, select, small, span, text, textarea, ul)
-import Html.Attributes exposing (checked, class, disabled, for, href, id, max, min, multiple, placeholder, rel, size, src, type_, value)
-import Html.Events exposing (onClick, onInput)
+import Html exposing (Html, text)
+import Html.Attributes
+    exposing
+        ( class
+        , size
+        , value
+        )
 import Model.Model exposing (..)
-import Model.Vehicles exposing (..)
+import Model.Vehicle.Common exposing (..)
+import Model.Vehicle.Model exposing (..)
 import View.Utils
 import View.Vehicle
 
@@ -49,11 +56,26 @@ view model =
                     "Select Vehicle"
 
         addButton =
-            button
-                [ onClick <| VehicleMsg AddVehicle
-                , class "btn btn-primary btn-block mb-3"
-                , disabled disabledButton
-                ]
+            let
+                event =
+                    case model.tmpVehicle of
+                        Nothing ->
+                            []
+
+                        Just v ->
+                            [ Button.onClick <| VehicleMsg (AddVehicle v) ]
+
+                attrs =
+                    List.append
+                        event
+                        [ Button.primary
+                        , Button.block
+                        , Button.attrs [ class "mb-3" ]
+                        , Button.disabled disabledButton
+                        ]
+            in
+            Button.button
+                attrs
                 [ text buttonText ]
 
         options =
@@ -62,24 +84,23 @@ view model =
                 |> List.indexedMap vehicleOption
 
         selectList =
-            select
-                [ onInput <| VehicleMsg << TmpVehicleType
-                , class "form-control mb-3"
-                , size 8
+            Select.select
+                [ Select.onChange <| VehicleMsg << TmpVehicleType
+                , Select.attrs
+                    [ class "mb-3"
+                    , size 8
+                    ]
                 ]
                 options
     in
     Grid.row []
-        [ Grid.col [ Col.md3 ]
-            [ addButton
-            , selectList
-            ]
+        [ Grid.col [ Col.md3 ] [ addButton, selectList ]
         , Grid.col [ Col.md9 ] [ body ]
         ]
 
 
-vehicleOption : Int -> Vehicle -> Html Msg
+vehicleOption : Int -> Vehicle -> Select.Item Msg
 vehicleOption i vt =
-    option
+    Select.item
         [ value <| String.fromInt i ]
         [ text <| fromVehicleType vt.vtype ]

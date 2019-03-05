@@ -1,8 +1,14 @@
-module Model.Utils exposing (totalCrew, totalGear, totalHandling, totalHull)
+module Model.Utils exposing
+    ( modToInt
+    , totalCrew
+    , totalGear
+    , totalHandling
+    , totalHull
+    )
 
 import Model.Shared exposing (..)
-import Model.Upgrades exposing (..)
-import Model.Vehicles exposing (..)
+import Model.Upgrade.Model exposing (..)
+import Model.Vehicle.Model exposing (..)
 
 
 modToInt : Special -> Int

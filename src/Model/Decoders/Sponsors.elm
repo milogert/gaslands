@@ -2,6 +2,7 @@ module Model.Decoders.Sponsors exposing (perkClassDecoderHelper, sponsorDecoder,
 
 import Json.Decode as D exposing (Decoder, succeed)
 import Json.Decode.Pipeline exposing (hardcoded, required)
+import Model.Decoders.Shared exposing (expansionDecoder)
 import Model.Sponsors exposing (..)
 
 
@@ -12,6 +13,7 @@ sponsorDecoder =
         |> required "description" D.string
         |> required "perks" (D.list teamPerkDecoder)
         |> required "grantedClasses" (D.list (D.string |> D.andThen perkClassDecoderHelper))
+        |> required "expansion" expansionDecoder
 
 
 sponsorTypeDecoderHelper : String -> Decoder SponsorType

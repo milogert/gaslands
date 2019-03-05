@@ -1,13 +1,17 @@
 module View.NewWeapon exposing (view)
 
+import Bootstrap.Button as Button
+import Bootstrap.Form.Select as Select
 import Bootstrap.Grid as Grid
 import Bootstrap.Grid.Col as Col
-import Html exposing (Html, button, div, h1, h2, h3, h4, h5, h6, img, input, label, li, node, option, p, select, small, span, text, textarea, ul)
-import Html.Attributes exposing (checked, class, disabled, for, href, id, max, min, multiple, placeholder, rel, size, src, type_, value)
+import Html exposing (Html, text)
+import Html.Attributes exposing (class, size, value)
 import Html.Events exposing (onClick, onInput)
 import Model.Model exposing (..)
-import Model.Vehicles exposing (..)
-import Model.Weapons exposing (..)
+import Model.Shared exposing (..)
+import Model.Vehicle.Common exposing (..)
+import Model.Vehicle.Model exposing (..)
+import Model.Weapon.Common exposing (..)
 import View.Utils
 import View.Weapon
 
@@ -15,25 +19,21 @@ import View.Weapon
 view : Model -> Vehicle -> Html Msg
 view model v =
     let
-        crewLeft =
-            v.crew - View.Utils.crewUsed v
-
-        isCrewFree =
-            crewLeft > 0
-
         addButton =
             case model.tmpWeapon of
                 Just w ->
-                    button
-                        [ class "form-control btn btn-primary mb-3"
-                        , onClick (AddWeapon v.key w)
+                    Button.button
+                        [ Button.primary
+                        , Button.attrs [ class "mb-3" ]
+                        , Button.onClick (AddWeapon v.key w)
                         ]
                         [ text "Add Weapon" ]
 
                 Nothing ->
-                    button
-                        [ class "form-control btn btn-primary mb-3"
-                        , disabled True
+                    Button.button
+                        [ Button.primary
+                        , Button.attrs [ class "mb-3" ]
+                        , Button.disabled True
                         ]
                         [ text "Select Weapon" ]
 
@@ -51,21 +51,28 @@ view model v =
                     (\x -> x.slots <= slotsRemaining v)
                 |> List.filter (\x -> x.name /= handgun.name)
                 |> List.filter (View.Utils.weaponSponsorFilter model)
-                |> List.map .name
-                |> List.map (\t -> option [ value t ] [ text t ])
+                |> List.map
+                    (\w ->
+                        ( w.name, fromExpansionAbbrev w.expansion )
+                    )
+                |> List.map
+                    (\( name, exp ) ->
+                        Select.item
+                            [ value name ]
+                            [ text <| name ++ " (" ++ exp ++ ")" ]
+                    )
 
         selectList =
-            select
-                [ onInput TmpWeaponUpdate
-                , class "form-control mb-3"
-                , size 8
+            Select.select
+                [ Select.onChange TmpWeaponUpdate
+                , Select.attrs
+                    [ class "form-control mb-3"
+                    , size 8
+                    ]
                 ]
                 options
     in
     Grid.row []
-        [ Grid.col [ Col.md3 ]
-            [ addButton
-            , selectList
-            ]
+        [ Grid.col [ Col.md3 ] [ addButton, selectList ]
         , Grid.col [ Col.md9 ] [ body ]
         ]

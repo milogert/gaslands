@@ -4,9 +4,11 @@ import Bootstrap.Button as Btn
 import Html
     exposing
         ( Html
+        , br
         , div
         , h6
         , li
+        , small
         , span
         , text
         , ul
@@ -18,8 +20,9 @@ import Html.Attributes
         )
 import Html.Events exposing (onClick, onInput)
 import Model.Model exposing (..)
-import Model.Upgrades exposing (..)
-import Model.Vehicles exposing (..)
+import Model.Shared exposing (..)
+import Model.Upgrade.Model exposing (..)
+import Model.Vehicle.Model exposing (..)
 import View.EquipmentLayout
 import View.Utils exposing (icon, iconb)
 
@@ -82,7 +85,10 @@ render model vehicle upgrade =
         (not isPreview)
         [ h6
             [ classList [ ( "form-inline", isPreview ) ] ]
-            [ text <| upgrade.name ++ " "
+            [ text <| upgrade.name
+            ]
+        , h6 []
+            [ small [] [ text <| fromExpansion upgrade.expansion ]
             ]
         , Btn.button
             [ Btn.onClick <| DeleteUpgrade vehicle.key upgrade

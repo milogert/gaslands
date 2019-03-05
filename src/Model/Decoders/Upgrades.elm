@@ -2,8 +2,8 @@ module Model.Decoders.Upgrades exposing (upgradeDecoder)
 
 import Json.Decode as D exposing (Decoder)
 import Json.Decode.Pipeline exposing (hardcoded, required)
-import Model.Decoders.Shared exposing (specialDecoder)
-import Model.Upgrades exposing (Upgrade)
+import Model.Decoders.Shared exposing (expansionDecoder, specialDecoder)
+import Model.Upgrade.Model exposing (Upgrade)
 
 
 upgradeDecoder : Decoder Upgrade
@@ -13,4 +13,4 @@ upgradeDecoder =
         |> required "slots" D.int
         |> required "specials" (D.list specialDecoder)
         |> required "cost" D.int
-        |> required "id" D.int
+        |> required "expansion" expansionDecoder

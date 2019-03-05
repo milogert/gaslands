@@ -1,5 +1,10 @@
 module Model.Shared exposing
-    ( Special(..)
+    ( Expansion(..)
+    , Special(..)
+    , ammoInit
+    , expansionFilter
+    , fromExpansion
+    , fromExpansionAbbrev
     , fromSpecial
     , getAmmoClip
     )
@@ -22,6 +27,13 @@ type Special
     | HullMod Int
     | GearMod Int
     | CrewMod Int
+    | Specialist
+    | Entangle
+
+
+ammoInit : Int -> Special
+ammoInit clip =
+    Ammo <| List.repeat clip False
 
 
 fromSpecial : Special -> String
@@ -69,6 +81,12 @@ fromSpecial special =
         CrewMod i ->
             "CrewMod " ++ String.fromInt i
 
+        Specialist ->
+            "Specialist"
+
+        Entangle ->
+            "Entangle"
+
 
 getAmmoClip : List Special -> ( Maybe Int, Maybe Special )
 getAmmoClip specials =
@@ -92,3 +110,33 @@ getAmmoClip specials =
                 specials
     in
     ( mAmmoSpecialIndex, mAmmoSpecial )
+
+
+type Expansion
+    = BaseGame
+    | TX Int
+
+
+fromExpansion : Expansion -> String
+fromExpansion expansion =
+    case expansion of
+        BaseGame ->
+            "Base Game"
+
+        TX i ->
+            "Time Extended " ++ String.fromInt i
+
+
+fromExpansionAbbrev : Expansion -> String
+fromExpansionAbbrev expansion =
+    case expansion of
+        BaseGame ->
+            "BG"
+
+        TX i ->
+            "TX#" ++ String.fromInt i
+
+
+expansionFilter : List Expansion -> { a | expansion : Expansion } -> Bool
+expansionFilter allowedExpansions { expansion } =
+    List.member expansion allowedExpansions

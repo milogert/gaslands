@@ -2,6 +2,7 @@ module View.Settings exposing (view)
 
 import Bootstrap.Button as Btn
 import Bootstrap.Form as Form
+import Bootstrap.Form.Checkbox as Checkbox
 import Bootstrap.Form.Input as Input
 import Bootstrap.Form.Textarea as Textarea
 import Bootstrap.Grid as Grid
@@ -19,10 +20,17 @@ import Html
         , text
         , ul
         )
-import Html.Attributes exposing (class, classList, for, href, id, placeholder, rows, style, type_, value)
+import Html.Attributes
+    exposing
+        ( class
+        , for
+        , href
+        , style
+        )
 import Html.Events exposing (onClick, onInput)
 import Model.Model exposing (..)
 import Model.Settings exposing (..)
+import Model.Shared exposing (..)
 import View.Settings.SquadGeneration
 import View.Utils exposing (icon, iconb)
 
@@ -33,6 +41,7 @@ view model =
         List.intersperse
             (hr [] [])
             [ renderGameSettings model
+            , renderExpansionSettings model
             , renderAppSettings model.settings
             , renderImportExport model
             , renderAbout
@@ -62,6 +71,32 @@ renderGameSettings model =
                     ]
                 ]
             ]
+        ]
+
+
+renderExpansionSettings : Model -> Html Msg
+renderExpansionSettings model =
+    let
+        expansionCheck : Expansion -> Html Msg
+        expansionCheck e =
+            Checkbox.checkbox
+                [ Checkbox.id <| fromExpansionAbbrev e
+                , Checkbox.checked <| List.member e model.settings.expansions.enabled
+                , Checkbox.onCheck <| SettingsMsg << EnableExpansion e
+                , Checkbox.disabled <| e == BaseGame
+                , Checkbox.inline
+                ]
+                (fromExpansion e)
+
+        expansionChecks : List (Html Msg)
+        expansionChecks =
+            model.settings.expansions.available
+                |> List.map expansionCheck
+    in
+    Grid.row []
+        [ Grid.col [] <|
+            [ h3 [] [ text "Expansion Settings" ] ]
+                ++ expansionChecks
         ]
 
 

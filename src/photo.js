@@ -59,4 +59,4 @@ var photo = {
     }
 }
 
-export { photo, stream };
+export { photo };

@@ -11,8 +11,8 @@ import Dict exposing (..)
 import List.Extra as ListE
 import Model.Model exposing (..)
 import Model.Shared exposing (..)
-import Model.Vehicles exposing (..)
-import Model.Weapons exposing (..)
+import Model.Vehicle.Model exposing (..)
+import Model.Weapon.Model exposing (..)
 import Random
 import Update.Utils exposing (doSaveModel)
 
@@ -26,7 +26,7 @@ addWeapon model key w =
         Just vehicle ->
             let
                 weaponList =
-                    vehicle.weapons ++ [ { w | id = List.length vehicle.weapons } ]
+                    vehicle.weapons ++ [ w ]
 
                 nv =
                     { vehicle | weapons = weaponList }
@@ -66,9 +66,7 @@ updateAmmoUsed model key weapon index check =
                     { weapon | specials = specialsUpdated }
 
                 weaponsNew =
-                    vehicle.weapons
-                        |> ListE.setAt weapon.id weaponUpdated
-                        |> Update.Utils.correctIds
+                    ListE.setIf (\wil -> weapon == wil) weaponUpdated vehicle.weapons
 
                 nv =
                     { vehicle | weapons = weaponsNew }
@@ -96,9 +94,7 @@ setWeaponFired model key w =
                     { w | status = WeaponFired }
 
                 weaponsNew =
-                    vehicle.weapons
-                        |> Update.Utils.replaceAtIndex w.id weaponUpdated
-                        |> Update.Utils.correctIds
+                    ListE.setIf (\wil -> w == wil) weaponUpdated vehicle.weapons
 
                 nv =
                     { vehicle | weapons = weaponsNew }
@@ -138,8 +134,11 @@ rollWeaponDie model key w result =
                 weaponUpdated =
                     { w | attackRoll = result }
 
+                newWeapons =
+                    ListE.setIf (\wil -> w == wil) weaponUpdated vehicle.weapons
+
                 nv =
-                    Update.Utils.replaceWeaponInVehicle vehicle weaponUpdated
+                    { vehicle | weapons = newWeapons }
             in
             ( { model
                 | view = ViewDetails nv
@@ -159,8 +158,7 @@ deleteWeapon model key w =
             let
                 weaponsNew =
                     vehicle.weapons
-                        |> Update.Utils.deleteFromList w.id
-                        |> Update.Utils.correctIds
+                        |> ListE.remove w
 
                 nv =
                     { vehicle | weapons = weaponsNew }

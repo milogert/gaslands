@@ -25,16 +25,20 @@ import Html.Attributes
         )
 import Html.Events exposing (onClick, onInput)
 import Model.Model exposing (..)
-import Model.Vehicles exposing (..)
+import Model.Upgrade.Common as UpgradeC
+import Model.Vehicle.Common as VehicleC
+import Model.Vehicle.Model exposing (..)
+import Model.Weapon.Common as WeaponC
 import View.Dashboard
 import View.Details
-import View.NewUpgrade
+import View.New
 import View.NewVehicle
-import View.NewWeapon
 import View.Settings
 import View.Sponsor
 import View.SponsorSelect
+import View.Upgrade
 import View.Utils exposing (..)
+import View.Weapon
 
 
 view : Model -> Document Msg
@@ -116,7 +120,7 @@ view model =
     in
     Document
         (viewToStr model)
-        [ Grid.containerFluid []
+        [ Grid.container []
             [ CDN.stylesheet -- creates an inline style node with the Bootstrap CSS
             , Grid.row
                 [ Row.middleXs
@@ -170,10 +174,34 @@ render model =
             View.NewVehicle.view model
 
         ViewAddingWeapon v ->
-            View.NewWeapon.view model v
+            View.New.view
+                model
+                v
+                model.tmpWeapon
+                AddWeapon
+                View.Weapon.render
+                (WeaponC.allWeaponsList
+                    |> List.filter
+                        (\x -> x.slots <= VehicleC.slotsRemaining v)
+                    |> List.filter
+                        (\x -> x.name /= WeaponC.handgun.name)
+                    |> List.filter
+                        (View.Utils.weaponSponsorFilter model)
+                )
+                TmpWeaponUpdate
 
         ViewAddingUpgrade v ->
-            View.NewUpgrade.view model v
+            View.New.view
+                model
+                v
+                model.tmpUpgrade
+                AddUpgrade
+                View.Upgrade.render
+                (UpgradeC.allUpgradesList
+                    |> List.filter
+                        (\x -> x.slots <= VehicleC.slotsRemaining v)
+                )
+                TmpUpgradeUpdate
 
         ViewSettings ->
             View.Settings.view model

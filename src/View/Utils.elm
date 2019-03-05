@@ -37,8 +37,8 @@ import Html.Events exposing (onInput)
 import Model.Model exposing (..)
 import Model.Shared exposing (..)
 import Model.Sponsors exposing (..)
-import Model.Vehicles exposing (..)
-import Model.Weapons exposing (..)
+import Model.Vehicle.Model exposing (..)
+import Model.Weapon.Model exposing (..)
 
 
 icon : String -> Html Msg

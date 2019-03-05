@@ -1,9 +1,18 @@
-module Model.Decoders.Weapons exposing (diceDecoder, mountPointDecoder, mountPointDecoderHelper, rangeDecoder, rangeHelper, weaponDecoder, wtypeDecoder)
+module Model.Decoders.Weapons exposing
+    ( diceDecoder
+    , mountPointDecoder
+    , mountPointDecoderHelper
+    , rangeDecoder
+    , rangeHelper
+    , weaponDecoder
+    , wtypeDecoder
+    )
 
 import Json.Decode exposing (..)
 import Json.Decode.Pipeline exposing (..)
 import Model.Decoders.Shared exposing (..)
-import Model.Weapons exposing (..)
+import Model.Weapon.Common exposing (..)
+import Model.Weapon.Model exposing (..)
 
 
 weaponDecoder : Decoder Weapon
@@ -18,9 +27,9 @@ weaponDecoder =
         |> required "slots" int
         |> required "specials" (list specialDecoder)
         |> required "cost" int
-        |> required "id" int
         |> hardcoded WeaponReady
         |> optional "requiredSponsor" (string |> andThen requiredSponsorDecoderHelper) Nothing
+        |> required "expansion" expansionDecoder
 
 
 mountPointDecoder : Decoder WeaponMounting

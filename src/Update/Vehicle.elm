@@ -3,8 +3,9 @@ module Update.Vehicle exposing (update)
 import Dict exposing (Dict)
 import Model.Model exposing (..)
 import Model.Sponsors exposing (..)
-import Model.Vehicles exposing (..)
-import Model.Weapons exposing (..)
+import Model.Vehicle.Common exposing (..)
+import Model.Vehicle.Model exposing (..)
+import Model.Weapon.Model exposing (..)
 import Ports.Photo
 import Update.Utils exposing (..)
 
@@ -12,8 +13,8 @@ import Update.Utils exposing (..)
 update : Model -> VehicleEvent -> ( Model, Cmd Msg )
 update model event =
     case event of
-        AddVehicle ->
-            addVehicle model
+        AddVehicle vehicle ->
+            addVehicle model vehicle
 
         DeleteVehicle key ->
             deleteVehicle model key
@@ -88,7 +89,9 @@ update model event =
                     updateGear model key <| clamp min max <| vehicle.gear.current + mod
 
         UpdateHazards v strCurrent ->
-            updateHazards model v (String.toInt strCurrent |> Maybe.withDefault 1)
+            String.toInt strCurrent
+                |> Maybe.withDefault 1
+                |> updateHazards model v
 
         ShiftHazards key mod min max ->
             case Dict.get key model.vehicles of
@@ -96,10 +99,15 @@ update model event =
                     ( model, Cmd.none )
 
                 Just vehicle ->
-                    updateHazards model key <| clamp min max <| vehicle.hazards + mod
+                    vehicle.hazards
+                        + mod
+                        |> clamp min max
+                        |> updateHazards model key
 
         UpdateHull v strCurrent ->
-            updateHull model v (String.toInt strCurrent |> Maybe.withDefault 1)
+            String.toInt strCurrent
+                |> Maybe.withDefault 1
+                |> updateHull model v
 
         ShiftHull key mod min max ->
             case Dict.get key model.vehicles of
@@ -112,11 +120,11 @@ update model event =
                         |> clamp min max
                         |> updateHull model key
 
-        UpdateCrew v strCurrent ->
-            updateCrew model v strCurrent
+        UpdateCrew vkey strCurrent ->
+            updateCrew model vkey strCurrent
 
-        UpdateEquipment v strCurrent ->
-            updateEquipment model v strCurrent
+        UpdateEquipment vkey strCurrent ->
+            updateEquipment model vkey strCurrent
 
         UpdateNotes key notes ->
             updateNotes model key notes
@@ -142,39 +150,32 @@ update model event =
             discardPhoto model vehicle
 
 
-addVehicle : Model -> ( Model, Cmd Msg )
-addVehicle model =
-    case model.tmpVehicle of
-        Just vehicle ->
-            let
-                key =
-                    vehicle.name ++ String.fromInt (Dict.size model.vehicles)
+addVehicle : Model -> Vehicle -> ( Model, Cmd Msg )
+addVehicle model vehicle =
+    let
+        key =
+            vehicle.name ++ String.fromInt (Dict.size model.vehicles)
 
-                newDict =
-                    Dict.insert
-                        key
-                        { vehicle | key = key }
-                        model.vehicles
-            in
-            case ( vehicle.vtype, vehicle.name ) of
-                ( _, "" ) ->
-                    ( { model | error = VehicleNameError :: model.error }
-                    , Cmd.none
-                    )
-
-                ( _, _ ) ->
-                    ( { model
-                        | view = ViewDashboard
-                        , vehicles = newDict
-                        , tmpVehicle = Nothing
-                        , error = []
-                      }
-                    , doSaveModel
-                    )
-
-        Nothing ->
-            ( model
+        newDict =
+            Dict.insert
+                key
+                { vehicle | key = key }
+                model.vehicles
+    in
+    case ( vehicle.vtype, vehicle.name ) of
+        ( _, "" ) ->
+            ( { model | error = VehicleNameError :: model.error }
             , Cmd.none
+            )
+
+        ( _, _ ) ->
+            ( { model
+                | view = ViewDashboard
+                , vehicles = newDict
+                , tmpVehicle = Nothing
+                , error = []
+              }
+            , doSaveModel
             )
 
 
@@ -379,15 +380,6 @@ rollSkidDice model key skidResults =
               }
             , Cmd.none
             )
-
-
-replaceWeaponInVehicle : Vehicle -> Weapon -> Vehicle
-replaceWeaponInVehicle v w =
-    let
-        weaponsNew =
-            Update.Utils.replaceAtIndex w.id w v.weapons |> Update.Utils.correctIds
-    in
-    { v | weapons = weaponsNew }
 
 
 setPerkInVehicle : Model -> String -> VehiclePerk -> Bool -> ( Model, Cmd Msg )

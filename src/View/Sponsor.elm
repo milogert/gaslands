@@ -11,6 +11,7 @@ import Html
         , h6
         , li
         , p
+        , small
         , span
         , text
         , ul
@@ -23,6 +24,7 @@ import Html.Attributes
         )
 import Html.Events exposing (onCheck, onClick)
 import Model.Model exposing (..)
+import Model.Shared exposing (fromExpansion)
 import Model.Sponsors
     exposing
         ( PerkClass
@@ -35,14 +37,18 @@ import Model.Sponsors
         , getClassPerks
         , typeToSponsor
         )
-import Model.Vehicles exposing (..)
+import Model.Vehicle.Model exposing (..)
 import View.Utils exposing (icon)
 
 
 render : Sponsor -> Html Msg
-render { name, description, perks, grantedClasses } =
+render { name, description, perks, grantedClasses, expansion } =
     div []
-        [ h3 [] [ name |> fromSponsorType |> text ]
+        [ h3 []
+            [ name |> fromSponsorType |> text
+            , text " "
+            , small [] [ text <| fromExpansion expansion ]
+            ]
         , p [] [ text description ]
         , ul [] <| renderPerks perks
         , p [] <|

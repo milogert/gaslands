@@ -6,7 +6,7 @@ import Html exposing (Html, a, button, div, img, text, video)
 import Html.Attributes exposing (autoplay, class, classList, href, src, style)
 import Html.Events exposing (onClick)
 import Model.Model exposing (..)
-import Model.Vehicles exposing (..)
+import Model.Vehicle.Model exposing (..)
 
 
 view : Model -> Vehicle -> Html Msg

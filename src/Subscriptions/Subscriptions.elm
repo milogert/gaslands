@@ -1,7 +1,7 @@
 module Subscriptions.Subscriptions exposing (subscriptions)
 
 import Model.Model exposing (..)
-import Model.Vehicles exposing (..)
+import Model.Vehicle.Model exposing (..)
 import Ports.Photo
 import Ports.Storage
 

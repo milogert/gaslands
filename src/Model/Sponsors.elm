@@ -11,20 +11,15 @@ module Model.Sponsors exposing
     , fromPerkClass
     , fromSponsorType
     , getClassPerks
-    , idris
     , military
-    , mishkin
-    , miyazaki
     , precision
-    , prisonCars
-    , rutherford
-    , slime
     , speed
     , stringToSponsor
     , technology
     , typeToSponsor
-    , warden
     )
+
+import Model.Shared exposing (Expansion(..))
 
 
 type alias Sponsor =
@@ -32,6 +27,7 @@ type alias Sponsor =
     , description : String
     , perks : List TeamPerk
     , grantedClasses : List PerkClass
+    , expansion : Expansion
     }
 
 
@@ -42,6 +38,7 @@ type SponsorType
     | Idris
     | Slime
     | Warden
+    | ScarlettAnnie
 
 
 fromSponsorType : SponsorType -> String
@@ -65,6 +62,9 @@ fromSponsorType sponsorType =
         Warden ->
             "Warden"
 
+        ScarlettAnnie ->
+            "Scarlett Annie"
+
 
 type PerkClass
     = Aggression
@@ -75,6 +75,7 @@ type PerkClass
     | Speed
     | Technology
     | PrisonCars
+    | Tuning
 
 
 fromPerkClass : PerkClass -> String
@@ -104,6 +105,9 @@ fromPerkClass perkClass =
         PrisonCars ->
             "PrisonCars"
 
+        Tuning ->
+            "Tuning"
+
 
 type alias TeamPerk =
     { name : String
@@ -126,6 +130,7 @@ allSponsors =
     , idris
     , slime
     , warden
+    , scarlettAnnie
     ]
 
 
@@ -156,6 +161,9 @@ getClassPerks perkClass =
         PrisonCars ->
             prisonCars
 
+        Tuning ->
+            tuning
+
 
 typeToSponsor : SponsorType -> Sponsor
 typeToSponsor type_ =
@@ -177,6 +185,9 @@ typeToSponsor type_ =
 
         Warden ->
             warden
+
+        ScarlettAnnie ->
+            scarlettAnnie
 
 
 stringToSponsor : String -> Maybe Sponsor
@@ -200,6 +211,9 @@ stringToSponsor str =
         "Warden" ->
             Just warden
 
+        "Scarlett Annie" ->
+            Just scarlettAnnie
+
         _ ->
             Nothing
 
@@ -208,96 +222,144 @@ stringToSponsor str =
 -- SPONSORS.
 
 
-rutherford : Sponsor
-rutherford =
+defaultSponsor : Sponsor
+defaultSponsor =
     Sponsor
         Rutherford
-        "Grant Rutherford is the son of a militaristic American oil baron. He is aggressive, rich and uncompromising. His beaming face, beneath his trademark cream Stetson, adorns billboard advertisements for his high-quality and high-priced Rutherford brand weaponry. Teams sponsored by Rutherford get access to military surplus, missile launchers, tanks and helicopters and as much ammo as they can carry. After his team won in 2016, he was only too happy to kiss the Earth goodbye and now runs his company from his highly exclusive Martian office."
-        [ TeamPerk "Military Hardware"
-            "This team may purchase a single Tank. This team may purchase a single Helicopter."
-        , TeamPerk "Well Stocked"
-            "This team considers any weapon with the ammo 3 special rule to instead have the ammo 4 special rule when purchased."
-        , TeamPerk "Might Is Right"
-            "This team may not purchase lightweight vehicles."
-        , TeamPerk "Televised Carnage"
-            "If a vehicle in this team causes 6 or more hits in a single attack step, before evades, this team gains +1 audience votes."
-        ]
-        [ Badass, Military ]
+        ""
+        []
+        []
+        BaseGame
+
+
+rutherford : Sponsor
+rutherford =
+    { defaultSponsor
+        | name = Rutherford
+        , description = "Grant Rutherford is the son of a militaristic American oil baron. He is aggressive, rich and uncompromising. His beaming face, beneath his trademark cream Stetson, adorns billboard advertisements for his high-quality and high-priced Rutherford brand weaponry. Teams sponsored by Rutherford get access to military surplus, missile launchers, tanks and helicopters and as much ammo as they can carry. After his team won in 2016, he was only too happy to kiss the Earth goodbye and now runs his company from his highly exclusive Martian office."
+        , perks =
+            [ TeamPerk "Military Hardware"
+                "This team may purchase a single Tank. This team may purchase a single Helicopter."
+            , TeamPerk "Well Stocked"
+                "This team considers any weapon with the ammo 3 special rule to instead have the ammo 4 special rule when purchased."
+            , TeamPerk "Might Is Right"
+                "This team may not purchase lightweight vehicles."
+            , TeamPerk "Televised Carnage"
+                "If a vehicle in this team causes 6 or more hits in a single attack step, before evades, this team gains +1 audience votes."
+            ]
+        , grantedClasses = [ Badass, Military ]
+        , expansion = BaseGame
+    }
 
 
 miyazaki : Sponsor
 miyazaki =
-    Sponsor
-        Miyazaki
-        "Yuri Miyazaki grew up in the rubble of Tokyo, fighting her way to the top of the speedway circuit with incredible feats of daring and vehicular agility. She has a small fleet of elite couriers who run jobs for the wealthiest or most desperate clients. It is whispered that she also runs guns for the Pro-Earth Resistance, but no one who spreads that rumour lives long enough to spread it far. Miyazaki's drivers are unsurpassed in their skill and finesse."
-        [ TeamPerk "Virtuoso"
-            "The first time each vehicle in this team uses push it in an activation they may push it without gaining a hazard token."
-        , TeamPerk "Evasive Maneuvers"
-            "Before making an evade roll, vehicles in this team may gain any number of hazard tokens to add +1 to each of their evade dice for each hazard token gained. A roll of \"1\" on an evade dice always counts as a failure."
-        , TeamPerk "Elegance"
-            "Teams sponsored by Miyazaki may not purchase Pickup Trucks, Buses or War Rigs."
-        , TeamPerk "Showing Off"
-            "Once per gear phase, if all of this team's in-play vehicles activated, resolved at least on un-canceled spin result, resolved at least one un-canceled slide result, resolved at least on stick-shift, and did not wipe out, this team gains +1 audience vote for each of this team's in-play vehicles."
-        ]
-        [ Daring, Precision ]
+    { defaultSponsor
+        | name = Miyazaki
+        , description = "Yuri Miyazaki grew up in the rubble of Tokyo, fighting her way to the top of the speedway circuit with incredible feats of daring and vehicular agility. She has a small fleet of elite couriers who run jobs for the wealthiest or most desperate clients. It is whispered that she also runs guns for the Pro-Earth Resistance, but no one who spreads that rumour lives long enough to spread it far. Miyazaki's drivers are unsurpassed in their skill and finesse."
+        , perks =
+            [ TeamPerk "Virtuoso"
+                "The first time each vehicle in this team uses push it in an activation they may push it without gaining a hazard token."
+            , TeamPerk "Evasive Maneuvers"
+                "Before making an evade roll, vehicles in this team may gain any number of hazard tokens to add +1 to each of their evade dice for each hazard token gained. A roll of \"1\" on an evade dice always counts as a failure."
+            , TeamPerk "Elegance"
+                "Teams sponsored by Miyazaki may not purchase Pickup Trucks, Buses or War Rigs."
+            , TeamPerk "Showing Off"
+                "Once per gear phase, if all of this team's in-play vehicles activated, resolved at least on un-canceled spin result, resolved at least one un-canceled slide result, resolved at least on stick-shift, and did not wipe out, this team gains +1 audience vote for each of this team's in-play vehicles."
+            ]
+        , grantedClasses = [ Daring, Precision ]
+        , expansion = BaseGame
+    }
 
 
 mishkin : Sponsor
 mishkin =
-    Sponsor
-        Mishkin
-        "Andre Mishkin is not a natural sportsman. However, the brilliant Russian engineer and inventor proves in 2010 that technology is just as solid an answer as skill or ferocity on the track. From his research and development facility on Mars he continues to send designs for unusual and devastating weapons and sleep, hi-tech vehicles to Earth for field-testing by the teams he sponsors."
-        [ TeamPerk "Thumpermonkey"
-            "This team may purchase electrical weapons and upgrades."
-        , TeamPerk "Dynamo"
-            "After activating in gear Phase 4, 5 or 6, this vehicle may add +1 ammo tokens to a single electrical weapon or upgrade on that vehicle."
-        , TeamPerk "All the Toys"
-            "Whenever a vehicle in this team attack with a named weapon that has not been attacked with by any vehicle during this game yet this team gains +1 audience vote."
-        ]
-        [ Military, Technology ]
+    { defaultSponsor
+        | name = Mishkin
+        , description = "Andre Mishkin is not a natural sportsman. However, the brilliant Russian engineer and inventor proves in 2010 that technology is just as solid an answer as skill or ferocity on the track. From his research and development facility on Mars he continues to send designs for unusual and devastating weapons and sleep, hi-tech vehicles to Earth for field-testing by the teams he sponsors."
+        , perks =
+            [ TeamPerk "Thumpermonkey"
+                "This team may purchase electrical weapons and upgrades."
+            , TeamPerk "Dynamo"
+                "After activating in gear Phase 4, 5 or 6, this vehicle may add +1 ammo tokens to a single electrical weapon or upgrade on that vehicle."
+            , TeamPerk "All the Toys"
+                "Whenever a vehicle in this team attack with a named weapon that has not been attacked with by any vehicle during this game yet this team gains +1 audience vote."
+            ]
+        , grantedClasses = [ Military, Technology ]
+        , expansion = BaseGame
+    }
 
 
 idris : Sponsor
 idris =
-    Sponsor
-        Idris
-        "Yandi Idris is an addict. From the first time the hot and sweet fumes of a singing petrol engine filled his nose he could find no other joy. He said that the first time he pressed that nitro-oxide button was like touching the face of God. Mystical, irrational and dangerous, the Cult of Speed spread like wildfire after Idris' meteoric rise during the 2012 Gaslands season. He crossed the final finishing line in a ball of fire and his body was never found. His fanatical followers say that at 201mph you can hear his sonorous voice on the rushing head wind."
-        [ TeamPerk "N2O Addict"
-            "This team may purchase the Nitro upgrade at half the listed cost."
-        , TeamPerk "Speed Demon"
-            "When using Nitro, vehicles in this team only gain hazard tokens until they have 3 hazard tokens after each of the two activation, rather than the normal 5."
-        , TeamPerk "Cult of Speed"
-            "If a vehicle in this team selects the long straight maneuver template in movement step 1.1 during gear phase 1, 2 or 3, this team gains +1 audience vote."
-        , TeamPerk "Kiss My Asphalt"
-            "This team may not purchase Gyrocopters."
-        ]
-        [ Precision, Speed ]
+    { defaultSponsor
+        | name = Idris
+        , description = "Yandi Idris is an addict. From the first time the hot and sweet fumes of a singing petrol engine filled his nose he could find no other joy. He said that the first time he pressed that nitro-oxide button was like touching the face of God. Mystical, irrational and dangerous, the Cult of Speed spread like wildfire after Idris' meteoric rise during the 2012 Gaslands season. He crossed the final finishing line in a ball of fire and his body was never found. His fanatical followers say that at 201mph you can hear his sonorous voice on the rushing head wind."
+        , perks =
+            [ TeamPerk "N2O Addict"
+                "This team may purchase the Nitro upgrade at half the listed cost."
+            , TeamPerk "Speed Demon"
+                "When using Nitro, vehicles in this team only gain hazard tokens until they have 3 hazard tokens after each of the two activation, rather than the normal 5."
+            , TeamPerk "Cult of Speed"
+                "If a vehicle in this team selects the long straight maneuver template in movement step 1.1 during gear phase 1, 2 or 3, this team gains +1 audience vote."
+            , TeamPerk "Kiss My Asphalt"
+                "This team may not purchase Gyrocopters."
+            ]
+        , grantedClasses = [ Precision, Speed ]
+        , expansion = BaseGame
+    }
 
 
 slime : Sponsor
 slime =
-    Sponsor
-        Slime
-        "Slime rules a wild and feral city in the Australian wastes known as Anarchy. Young people crawled out of the wreckage of the scorched earth in their thousands to rally round her ragged banner. The wild-eyed and whooping joyful gangs of Anarchy are led by Slime's henchwomen, the Chooks, who seek fame and adoration from the global Gaslands audience."
-        [ TeamPerk "Live Fast"
-            "If a vehicle in this tam begins the wipeout step with more hazard tokens than hull points during its own activation this team gains +1 audience vote."
-        , TeamPerk "Pinball"
-            "If a vehicle in this team is involved in a sideswipe smash attack during its activation, immediately resolve another movement step with that vehicle after the current movement step."
-        ]
-        [ Aggression, Speed ]
+    { defaultSponsor
+        | name = Slime
+        , description = "Slime rules a wild and feral city in the Australian wastes known as Anarchy. Young people crawled out of the wreckage of the scorched earth in their thousands to rally round her ragged banner. The wild-eyed and whooping joyful gangs of Anarchy are led by Slime's henchwomen, the Chooks, who seek fame and adoration from the global Gaslands audience."
+        , perks =
+            [ TeamPerk "Live Fast"
+                "If a vehicle in this tam begins the wipeout step with more hazard tokens than hull points during its own activation this team gains +1 audience vote."
+            , TeamPerk "Pinball"
+                "If a vehicle in this team is involved in a sideswipe smash attack during its activation, immediately resolve another movement step with that vehicle after the current movement step."
+            ]
+        , grantedClasses = [ Aggression, Speed ]
+        , expansion = BaseGame
+    }
 
 
 warden : Sponsor
 warden =
-    Sponsor
-        Warden
-        "Warden Cadeila is proud to live in Sao Paulo, a shining hub of humanity and relatively untouched by the war. The Sao Paulo People's Penitentiary has three of Gaslands' top ten teams in the past decade, and the Warden continues to grant her prisoners a chance at freedom as long as the Gaslands franchise continues to deliver the sponsorship deals. The deal isn't great from the damned souls who are welded into the Warden's solid steel \"coffin cars\", but it's better than the alternative."
-        [ TeamPerk "Prison Cars"
-            "Vehicles in this team may purchase the Prison Cars upgrade."
-        , TeamPerk "Fireworks"
-            "If a vehicle belonging to this team explodes, gain +1 audience vote if it was middleweight or +2 audience votes if it was heavyweight in addition to any votes gained for being wrecked, and then discard all ammo tokens from the wreck."
-        ]
-        [ Aggression, Badass, PrisonCars ]
+    { defaultSponsor
+        | name = Warden
+        , description = "Warden Cadeila is proud to live in Sao Paulo, a shining hub of humanity and relatively untouched by the war. The Sao Paulo People's Penitentiary has three of Gaslands' top ten teams in the past decade, and the Warden continues to grant her prisoners a chance at freedom as long as the Gaslands franchise continues to deliver the sponsorship deals. The deal isn't great from the damned souls who are welded into the Warden's solid steel \"coffin cars\", but it's better than the alternative."
+        , perks =
+            [ TeamPerk "Prison Cars"
+                "Vehicles in this team may purchase the Prison Cars upgrade."
+            , TeamPerk "Fireworks"
+                "If a vehicle belonging to this team explodes, gain +1 audience vote if it was middleweight or +2 audience votes if it was heavyweight in addition to any votes gained for being wrecked, and then discard all ammo tokens from the wreck."
+            ]
+        , grantedClasses = [ Aggression, Badass, PrisonCars ]
+        , expansion = BaseGame
+    }
+
+
+scarlettAnnie : Sponsor
+scarlettAnnie =
+    { defaultSponsor
+        | name = ScarlettAnnie
+        , description = "Gaslands is able to support a vast ecosystem of villainous and scurvy raiders, picking off richer teams as their rigs roll from one televised race to the next. Many of these self-styled pirate crews have gained renown, but none have rivalled the infamy or showmanship of Scarlett Annie. A dashing and flamboyant buccaneer, her cult following is likely more to do with her canny association with the long-running \"Death Valley Death Run\" documentary TV series than any particular skill at dust bowl piracy."
+        , perks =
+            [ TeamPerk "Crew Quarters"
+                "This team may purchase the Extra Crewmember upgrade at half the listed cost."
+            , TeamPerk "Raiders"
+                "At the end of the attack step, this vehicle may permanently reduce its crew value by any number, to a minimum of 0 crew: remove 1 hull point from any vehicle in base contact for each crew removed in this way."
+            , TeamPerk "Rais the Sails"
+                "After rolling skid dice, this vehicle may permanently  reduce its crew value by 1, to a minimum of 0 crew to add 1 free shift result to the skid dice result."
+            , TeamPerk "Press Gang or Keelhaul"
+                "When another vehicle in contact with this vehicle is wrecked, this vehicle may gain either 1 crew or 2 audience votes."
+            ]
+        , grantedClasses = [ Tuning, Aggression ]
+        , expansion = TX 2
+    }
 
 
 
@@ -386,4 +448,27 @@ prisonCars =
     [ VehiclePerk "Prison Car"
         0
         "Reduce the cost of this vehicle by 4 Cans. Reduce the hull value of this vehicle by 2. May only be purchased by middleweight vehicles."
+    ]
+
+
+tuning : List VehiclePerk
+tuning =
+    [ VehiclePerk "Fenderkiss"
+        2
+        "Reduce the number of attack dice rolled for smash attacks by 2 for all vehicles in collisions involving this vehicle."
+    , VehiclePerk "Rear Drive"
+        2
+        "This vehicle may pivot about the centre of its front edge, rather than the centre of the vehicle, when resolving Spin results."
+    , VehiclePerk "Delicate Touch"
+        3
+        "This vehicle ignores the hazard icons on maneuver templates."
+    , VehiclePerk "Purring"
+        6
+        "This vehicle does not receive more than 1 hazard token from Spin results each turn. This vehicle does not receive more than 1 hazard token from Slide results each turn. This vehicle does not receive more than 1 hazard token from Hazard results each turn. Excess hazards are ignored. This vehicle may still elect to resolve multiple copies of each result."
+    , VehiclePerk "Skiing"
+        6
+        "May only be taken on a Bike, Buggy, Car, or Performance Car. This vehicle may take 3 hazard tokens at the end of its activation to be ignored by other vehicles during their movement steps until the start of this vehicle’s next activation. If, by ignoring this vehicle in this way, a vehicle’s final position would overlap it, move that vehicle backwards along their maneuver template by the minimum amount to avoid overlapping any obstruction."
+    , VehiclePerk "Momentum"
+        3
+        "When resolving a skid check, this vehicle may set aside any number of slide results to re-roll 1 non-slide result for each slide result set aside. When resolving a skid check, this vehicle may set aside any number for each spin results to re-roll 1 non-spin result for each spin result set aside. Set aside results must be resolved."
     ]

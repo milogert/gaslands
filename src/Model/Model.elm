@@ -3,6 +3,7 @@ module Model.Model exposing
     , ErrorType(..)
     , Model
     , Msg(..)
+    , defaultModel
     , errorToStr
     , init
     , totalPoints
@@ -11,10 +12,14 @@ module Model.Model exposing
 
 import Dict exposing (Dict)
 import Model.Settings exposing (..)
+import Model.Shared exposing (..)
 import Model.Sponsors exposing (..)
-import Model.Upgrades exposing (..)
-import Model.Vehicles exposing (..)
-import Model.Weapons exposing (..)
+import Model.Upgrade.Common exposing (..)
+import Model.Upgrade.Model exposing (..)
+import Model.Vehicle.Common exposing (..)
+import Model.Vehicle.Model exposing (..)
+import Model.Weapon.Common exposing (..)
+import Model.Weapon.Model exposing (..)
 import Ports.Storage exposing (StorageEntry)
 
 
@@ -109,9 +114,9 @@ totalPoints model =
         |> List.sum
 
 
-init : () -> ( Model, Cmd Msg )
-init _ =
-    ( Model
+defaultModel : Model
+defaultModel =
+    Model
         ViewDashboard
         Nothing
         50
@@ -125,6 +130,11 @@ init _ =
         ""
         []
         Model.Settings.init
+
+
+init : () -> ( Model, Cmd Msg )
+init _ =
+    ( defaultModel
     , Cmd.none
     )
 

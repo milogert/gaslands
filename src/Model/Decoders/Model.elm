@@ -14,7 +14,7 @@ modelDecoder =
         |> hardcoded ViewDashboard
         |> optional "teamName" (nullable string) Nothing
         |> required "pointsAllowed" int
-        |> hardcoded 0
+        |> hardcoded 1
         |> required "vehicles" (dict vehicleDecoder)
         |> optional "sponsor" (nullable (string |> andThen sponsorTypeDecoderHelper)) Nothing
         |> hardcoded Nothing

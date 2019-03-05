@@ -1,4 +1,8 @@
-module Model.Decoders.Shared exposing (requiredSponsorDecoderHelper, specialDecoder)
+module Model.Decoders.Shared exposing
+    ( expansionDecoder
+    , requiredSponsorDecoderHelper
+    , specialDecoder
+    )
 
 import Json.Decode exposing (..)
 import Model.Shared exposing (..)
@@ -137,3 +141,22 @@ requiredSponsorDecoderHelper str =
 
         Nothing ->
             fail <| str ++ " is not a valid sponsor type"
+
+
+expansionDecoder : Decoder Expansion
+expansionDecoder =
+    field "type" string
+        |> andThen expansionDecoderHelper
+
+
+expansionDecoderHelper : String -> Decoder Expansion
+expansionDecoderHelper type_ =
+    case type_ of
+        "Base Game" ->
+            succeed BaseGame
+
+        "Time Extended" ->
+            map TX (field "number" int)
+
+        _ ->
+            fail <| type_ ++ " is not a valid expansion."

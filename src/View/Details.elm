@@ -2,10 +2,9 @@ module View.Details exposing (view)
 
 import Bootstrap.Grid as Grid
 import Bootstrap.Grid.Col as Col
-import Html exposing (Html, button, div, h1, h2, h3, h4, h5, h6, img, input, label, li, node, option, p, select, small, span, text, textarea, ul)
+import Html exposing (Html)
 import Model.Model exposing (..)
-import Model.Vehicles exposing (..)
-import View.Utils
+import Model.Vehicle.Model exposing (..)
 import View.Vehicle
 
 

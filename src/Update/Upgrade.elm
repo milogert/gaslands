@@ -1,9 +1,10 @@
 module Update.Upgrade exposing (addUpgrade, deleteUpgrade)
 
 import Dict exposing (Dict)
+import List.Extra
 import Model.Model exposing (..)
-import Model.Upgrades exposing (..)
-import Model.Vehicles exposing (..)
+import Model.Upgrade.Model exposing (..)
+import Model.Vehicle.Common exposing (..)
 import Update.Utils
 
 
@@ -16,7 +17,7 @@ addUpgrade model key u =
         Just vehicle ->
             let
                 upgradeList =
-                    vehicle.upgrades ++ [ { u | id = List.length vehicle.upgrades } ]
+                    vehicle.upgrades ++ [ u ]
 
                 nv =
                     { vehicle | upgrades = upgradeList }
@@ -40,8 +41,7 @@ deleteUpgrade model key u =
             let
                 upgradesNew =
                     vehicle.upgrades
-                        |> Update.Utils.deleteFromList u.id
-                        |> Update.Utils.correctIds
+                        |> List.Extra.remove u
 
                 nv =
                     { vehicle | upgrades = upgradesNew }

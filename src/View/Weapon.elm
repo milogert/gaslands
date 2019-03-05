@@ -10,6 +10,7 @@ import Html
         , div
         , h6
         , li
+        , small
         , span
         , text
         , ul
@@ -25,8 +26,9 @@ import Html.Events exposing (onClick, onInput)
 import Model.Model exposing (..)
 import Model.Shared
 import Model.Utils exposing (..)
-import Model.Vehicles exposing (..)
-import Model.Weapons exposing (..)
+import Model.Vehicle.Model exposing (..)
+import Model.Weapon.Common exposing (..)
+import Model.Weapon.Model exposing (..)
 import View.EquipmentLayout
 import View.Utils exposing (icon)
 
@@ -101,9 +103,6 @@ render model vehicle weapon =
                 ]
                 [ text <| View.Utils.renderDice weapon.attack ++ " damage" ]
 
-        mountPointId =
-            "mountPoint-" ++ String.fromInt weapon.id
-
         mountPoint =
             case ( weapon.mountPoint, isPreview ) of
                 ( Just CrewFired, _ ) ->
@@ -119,7 +118,6 @@ render model vehicle weapon =
                         [ Select.select
                             [ Select.small
                             , Select.onChange TmpWeaponMountPoint
-                            , Select.id mountPointId
                             ]
                             (Select.item [ value "" ] [ text "" ]
                                 :: List.map
@@ -208,7 +206,11 @@ render model vehicle weapon =
         (not isPreview)
         [ Grid.row []
             [ Grid.col [ Col.xs, Col.md12 ]
-                [ h6 [] [ text <| weapon.name ++ " " ] ]
+                [ h6 [] [ text <| weapon.name ++ " " ]
+                , h6 []
+                    [ small [] [ text <| Model.Shared.fromExpansion weapon.expansion ]
+                    ]
+                ]
             , Grid.col [ Col.xsAuto, Col.md12 ] [ fireButton ]
             , Grid.col [ Col.xsAuto, Col.md12 ]
                 [ Btn.button

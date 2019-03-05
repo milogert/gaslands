@@ -26,7 +26,7 @@ build: FORCE
 deploy: build
 	$(YARN) gh-pages -d build
 
-test:
+test: FORCE
 	$(YARN) elm-test
 
 FORCE: ;

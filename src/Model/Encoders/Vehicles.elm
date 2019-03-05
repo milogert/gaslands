@@ -5,14 +5,15 @@ import Model.Encoders.Shared exposing (..)
 import Model.Encoders.Sponsors exposing (vehiclePerkEncoder)
 import Model.Encoders.Upgrades exposing (upgradeEncoder)
 import Model.Encoders.Weapons exposing (weaponEncoder)
-import Model.Vehicles exposing (..)
+import Model.Vehicle.Common exposing (..)
+import Model.Vehicle.Model exposing (..)
 
 
 vehicleEncoder : Vehicle -> Value
 vehicleEncoder v =
     object
         [ ( "name", string v.name )
-        , ( "photo", string <| photoEncoder v.photo )
+        , ( "photo", photoEncoder v.photo )
         , ( "vtype", string <| fromVehicleType v.vtype )
         , ( "gear", object <| gearEncoder v.gear )
         , ( "handling", int v.handling )
@@ -29,12 +30,18 @@ vehicleEncoder v =
         , ( "specials", list object <| List.map specialEncoder v.specials )
         , ( "perks", list object <| List.map vehiclePerkEncoder v.perks )
         , ( "requiredSponsor", requiredSponsorEncoder v.requiredSponsor )
+        , ( "expansion", object <| expansionEncoder v.expansion )
         ]
 
 
-photoEncoder : Maybe String -> String
+photoEncoder : Maybe String -> Value
 photoEncoder ms =
-    Maybe.withDefault "" ms
+    case ms of
+        Nothing ->
+            null
+
+        Just s ->
+            string s
 
 
 gearEncoder : GearTracker -> List ( String, Value )

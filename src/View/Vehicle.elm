@@ -32,10 +32,12 @@ import Html.Attributes
         )
 import Html.Events exposing (onClick, onInput)
 import Model.Model exposing (..)
+import Model.Shared
 import Model.Sponsors exposing (..)
 import Model.Utils exposing (..)
-import Model.Vehicles exposing (..)
-import Model.Weapons exposing (handgun)
+import Model.Vehicle.Common exposing (..)
+import Model.Vehicle.Model exposing (..)
+import Model.Weapon.Common exposing (handgun)
 import View.Photo
 import View.Sponsor
 import View.Upgrade
@@ -310,8 +312,14 @@ configure model currentView v =
                     ++ " build "
                     ++ slots
 
+        expansion =
+            Model.Shared.fromExpansionAbbrev v.expansion
+
         header =
-            text v.name
+            span []
+                [ text v.name
+                , small [] [ text <| " " ++ expansion ]
+                ]
 
         body : List (Html Msg)
         body =
@@ -450,7 +458,10 @@ renderPreview model currentView v =
             weaponsUsingSlots + upgradeUsingSlots
 
         header =
-            h4 [ class "form-inline card-title" ] [ name ]
+            h4 [ class "form-inline card-title" ]
+                [ name
+                , small [] [ text <| Model.Shared.fromExpansion v.expansion ]
+                ]
 
         pointsCostBadge =
             View.Utils.factBadge <|

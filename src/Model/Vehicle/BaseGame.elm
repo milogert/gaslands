@@ -1,152 +1,12 @@
-module Model.Vehicles exposing
-    ( GearTracker
-    , HullHolder
-    , SkidResult(..)
-    , Vehicle
-    , VehicleEvent(..)
-    , VehicleType(..)
-    , WeightClass(..)
-    , allVehicles
-    , fromVehicleType
-    , fromVehicleWeight
-    , slotsRemaining
-    , slotsUsed
-    , strToVT
-    , vehicleCost
-    )
+module Model.Vehicle.BaseGame exposing (vehicles)
 
 import Model.Shared exposing (..)
 import Model.Sponsors exposing (..)
-import Model.Upgrades exposing (..)
-import Model.Weapons exposing (..)
+import Model.Vehicle.Model exposing (..)
 
 
-type VehicleEvent
-    = AddVehicle
-    | DeleteVehicle String
-    | TmpName String
-    | TmpVehicleType String
-    | TmpNotes String
-    | NextGearPhase
-    | UpdateActivated String Bool
-    | UpdateGear String String
-    | ShiftGear String Int Int Int
-    | UpdateHazards String String
-    | ShiftHazards String Int Int Int
-    | UpdateHull String String
-    | ShiftHull String Int Int Int
-    | UpdateCrew String String
-    | UpdateEquipment String String
-    | UpdateNotes String String
-    | SetPerkInVehicle String VehiclePerk Bool
-    | GetStream String
-    | TakePhoto String
-    | SetPhotoUrlCallback String
-    | DiscardPhoto String
-
-
-type alias Vehicle =
-    { name : String
-    , photo : Maybe String
-    , vtype : VehicleType
-    , gear : GearTracker
-    , hazards : Int
-    , handling : Int
-    , skidResults : List SkidResult
-    , hull : HullHolder
-    , crew : Int
-    , equipment : Int
-    , weight : WeightClass
-    , activated : Bool
-    , weapons : List Weapon
-    , upgrades : List Upgrade
-    , notes : String
-    , cost : Int
-    , key : String
-    , specials : List Special
-    , perks : List VehiclePerk
-    , requiredSponsor : Maybe SponsorType
-    }
-
-
-type VehicleType
-    = Bike
-    | Buggy
-    | Car
-    | PerformanceCar
-    | PickupTruck
-    | MonsterTruck
-    | Bus
-    | WarRig
-    | Tank
-    | Gyrocopter
-    | Helicopter
-
-
-type SkidResult
-    = Hazard
-    | Spin
-    | Slide
-    | Shift
-
-
-type alias GearTracker =
-    { current : Int
-    , max : Int
-    }
-
-
-vehicleCost : Vehicle -> Int
-vehicleCost v =
-    List.sum
-        [ v.cost
-        , List.sum <| List.map weaponCost v.weapons
-        , List.sum <| List.map .cost v.upgrades
-        , List.sum <| List.map .cost v.perks
-        ]
-
-
-type WeightClass
-    = Light
-    | Middle
-    | Heavy
-    | Airborne
-
-
-fromVehicleWeight : WeightClass -> String
-fromVehicleWeight weight =
-    case weight of
-        Light ->
-            "Light"
-
-        Middle ->
-            "Middle"
-
-        Heavy ->
-            "Heavy"
-
-        Airborne ->
-            "Airborne"
-
-
-type alias HullHolder =
-    { current : Int
-    , max : Int
-    }
-
-
-slotsUsed : Vehicle -> Int
-slotsUsed v =
-    List.sum <| List.map .slots v.weapons ++ List.map .slots v.upgrades
-
-
-slotsRemaining : Vehicle -> Int
-slotsRemaining v =
-    v.equipment - slotsUsed v
-
-
-allVehicles : List Vehicle
-allVehicles =
+vehicles : List Vehicle
+vehicles =
     [ bike
     , buggy
     , car
@@ -159,31 +19,6 @@ allVehicles =
     , gyrocopter
     , helicopter
     ]
-
-
-defaultVehicle : Vehicle
-defaultVehicle =
-    Vehicle
-        ""
-        Nothing
-        Bike
-        (GearTracker 0 0)
-        0
-        0
-        []
-        (HullHolder 0 0)
-        0
-        0
-        Light
-        False
-        []
-        []
-        ""
-        0
-        ""
-        []
-        []
-        Nothing
 
 
 bike : Vehicle

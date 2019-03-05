@@ -1,4 +1,8 @@
-module Model.Encoders.Shared exposing (requiredSponsorEncoder, specialEncoder)
+module Model.Encoders.Shared exposing
+    ( expansionEncoder
+    , requiredSponsorEncoder
+    , specialEncoder
+    )
 
 import Json.Encode exposing (..)
 import Model.Shared exposing (..)
@@ -17,27 +21,6 @@ specialEncoder s =
         NamedSpecialRule t1 t2 ->
             namedSpecialRuleEncoder t1 t2
 
-        TreacherousSurface ->
-            genericEncoder s
-
-        Blast ->
-            genericEncoder s
-
-        Fire ->
-            genericEncoder s
-
-        Explosive ->
-            genericEncoder s
-
-        Blitz ->
-            genericEncoder s
-
-        HighlyExplosive ->
-            genericEncoder s
-
-        Electrical ->
-            genericEncoder s
-
         HandlingMod i ->
             modEncoder s i
 
@@ -49,6 +32,9 @@ specialEncoder s =
 
         CrewMod i ->
             modEncoder s i
+
+        _ ->
+            genericEncoder s
 
 
 ammoEncoder : List Bool -> List ( String, Value )
@@ -106,3 +92,15 @@ requiredSponsorEncoder mst =
 
         Just st ->
             string <| fromSponsorType st
+
+
+expansionEncoder : Expansion -> List ( String, Value )
+expansionEncoder expansion =
+    case expansion of
+        BaseGame ->
+            [ ( "type", string "Base Game" ) ]
+
+        TX i ->
+            [ ( "type", string "Time Extended" )
+            , ( "number", int i )
+            ]
