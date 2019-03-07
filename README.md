@@ -1,3 +1,5 @@
+![Travis Build Status](https://travis-ci.org/milogert/glom.svg?branch=master)
+
 # GlOM
 
 Or, *G*as*l*ands *O*ffline *M*anager, a fully offline Gaslands (https://gaslands.com/) vehicle squad manager.
