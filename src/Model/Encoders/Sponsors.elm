@@ -1,6 +1,7 @@
-module Model.Encoders.Sponsors exposing (sponsorEncoder, sponsorTypeEncoder, vehiclePerkEncoder)
+module Model.Encoders.Sponsors exposing (sponsorEncoder, vehiclePerkEncoder)
 
 import Json.Encode exposing (..)
+import Model.Encoders.Shared exposing (..)
 import Model.Sponsors exposing (..)
 
 
@@ -12,16 +13,12 @@ sponsorEncoder msponsor =
 
         Just sponsor ->
             object
-                [ ( "name", string <| fromSponsorType sponsor.name )
+                [ ( "name", string sponsor.name )
                 , ( "description", string sponsor.description )
                 , ( "perks", list object <| List.map teamPerkEncoder sponsor.perks )
                 , ( "grantedClasses", list string <| List.map (\s -> s |> fromPerkClass) sponsor.grantedClasses )
+                , ( "expansion", object <| expansionEncoder sponsor.expansion )
                 ]
-
-
-sponsorTypeEncoder : SponsorType -> Value
-sponsorTypeEncoder sponsorType =
-    string <| fromSponsorType sponsorType
 
 
 teamPerkEncoder : TeamPerk -> List ( String, Value )

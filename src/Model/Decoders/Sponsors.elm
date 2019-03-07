@@ -1,4 +1,9 @@
-module Model.Decoders.Sponsors exposing (perkClassDecoderHelper, sponsorDecoder, sponsorTypeDecoderHelper, teamPerkDecoder, vehiclePerkDecoder)
+module Model.Decoders.Sponsors exposing
+    ( perkClassDecoderHelper
+    , sponsorDecoder
+    , teamPerkDecoder
+    , vehiclePerkDecoder
+    )
 
 import Json.Decode as D exposing (Decoder, succeed)
 import Json.Decode.Pipeline exposing (hardcoded, required)
@@ -9,36 +14,11 @@ import Model.Sponsors exposing (..)
 sponsorDecoder : Decoder Sponsor
 sponsorDecoder =
     succeed Sponsor
-        |> required "name" (D.string |> D.andThen sponsorTypeDecoderHelper)
+        |> required "name" D.string
         |> required "description" D.string
         |> required "perks" (D.list teamPerkDecoder)
         |> required "grantedClasses" (D.list (D.string |> D.andThen perkClassDecoderHelper))
         |> required "expansion" expansionDecoder
-
-
-sponsorTypeDecoderHelper : String -> Decoder SponsorType
-sponsorTypeDecoderHelper s =
-    case s of
-        "Rutherford" ->
-            D.succeed Rutherford
-
-        "Miyazaki" ->
-            D.succeed Miyazaki
-
-        "Mishkin" ->
-            D.succeed Mishkin
-
-        "Idris" ->
-            D.succeed Idris
-
-        "Slime" ->
-            D.succeed Slime
-
-        "Warden" ->
-            D.succeed Warden
-
-        _ ->
-            D.fail <| s ++ " is not a valid weapon type"
 
 
 teamPerkDecoder : Decoder TeamPerk

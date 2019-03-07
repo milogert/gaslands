@@ -1,4 +1,10 @@
-module Model.Decoders.Vehicles exposing (gearDecoder, hullDecoder, skidResultDecoder, skidResultHelper, vehicleDecoder, vtypeDecoder, weightDecoder)
+module Model.Decoders.Vehicles exposing
+    ( gearDecoder
+    , hullDecoder
+    , vehicleDecoder
+    , vtypeDecoder
+    , weightDecoder
+    )
 
 import Json.Decode exposing (Decoder, andThen, bool, fail, int, list, nullable, string, succeed)
 import Json.Decode.Pipeline exposing (hardcoded, optional, required)
@@ -19,7 +25,6 @@ vehicleDecoder =
         |> required "gear" gearDecoder
         |> hardcoded 0
         |> required "handling" int
-        --|> required "skidResults" (list skidResultDecoder)
         |> hardcoded []
         |> required "hull" hullDecoder
         |> required "crew" int
@@ -90,28 +95,3 @@ hullDecoder =
     succeed HullHolder
         |> hardcoded 0
         |> required "max" int
-
-
-skidResultDecoder : Decoder SkidResult
-skidResultDecoder =
-    string
-        |> andThen skidResultHelper
-
-
-skidResultHelper : String -> Decoder SkidResult
-skidResultHelper s =
-    case s of
-        "Hazard" ->
-            succeed Hazard
-
-        "Spin" ->
-            succeed Spin
-
-        "Slide" ->
-            succeed Slide
-
-        "Shift" ->
-            succeed Shift
-
-        _ ->
-            fail <| s ++ " is not a valid skid result."

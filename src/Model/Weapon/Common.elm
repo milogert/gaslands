@@ -13,7 +13,6 @@ module Model.Weapon.Common exposing
 
 import Dict
 import Model.Shared exposing (..)
-import Model.Sponsors exposing (SponsorType(..))
 import Model.Weapon.BaseGame
 import Model.Weapon.Model exposing (..)
 import Model.Weapon.TimeExtended2

@@ -13,6 +13,7 @@ import Html
         , div
         , h2
         , hr
+        , pre
         , span
         , text
         )
@@ -153,7 +154,7 @@ displayAlert model =
     model.error
         |> List.map
             (\x ->
-                Grid.simpleRow [ Grid.col [] [ text <| errorToStr x ] ]
+                Grid.simpleRow [ Grid.col [] [ pre [] [ text <| errorToStr x ] ] ]
             )
         |> div []
 

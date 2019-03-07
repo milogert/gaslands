@@ -2,8 +2,20 @@ module View.SponsorSelect exposing (view)
 
 import Bootstrap.Grid as Grid
 import Bootstrap.Grid.Col as Col
-import Html exposing (Html, button, div, h1, h2, h3, h4, h5, h6, img, input, label, li, node, option, p, select, small, span, text, textarea, ul)
-import Html.Attributes exposing (checked, class, disabled, for, href, id, max, min, multiple, placeholder, rel, selected, size, src, type_, value)
+import Html
+    exposing
+        ( Html
+        , option
+        , select
+        , text
+        )
+import Html.Attributes
+    exposing
+        ( class
+        , selected
+        , size
+        , value
+        )
 import Html.Events exposing (onClick, onInput)
 import Model.Model exposing (..)
 import Model.Sponsors exposing (..)
@@ -17,7 +29,7 @@ view model =
         body =
             case model.sponsor of
                 Just s ->
-                    View.Sponsor.render <| Model.Sponsors.typeToSponsor s
+                    View.Sponsor.render s
 
                 Nothing ->
                     text "Select a sponsor."
@@ -28,7 +40,7 @@ view model =
                     ""
 
                 Just s ->
-                    fromSponsorType s
+                    s.name
 
         optionFunc t =
             option
@@ -48,7 +60,6 @@ view model =
                 option [] [ text "No Sponsor" ]
                     :: (allSponsors
                             |> List.map .name
-                            |> List.map fromSponsorType
                             |> List.map optionFunc
                        )
             ]

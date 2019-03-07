@@ -29,7 +29,7 @@ type alias Model =
     , pointsAllowed : Int
     , gearPhase : Int
     , vehicles : Dict String Vehicle
-    , sponsor : Maybe SponsorType
+    , sponsor : Maybe Sponsor
     , tmpVehicle : Maybe Vehicle
     , tmpWeapon : Maybe Weapon
     , tmpUpgrade : Maybe Upgrade

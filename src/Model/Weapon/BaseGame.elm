@@ -1,7 +1,7 @@
 module Model.Weapon.BaseGame exposing (handgun, weapons)
 
 import Model.Shared exposing (..)
-import Model.Sponsors exposing (SponsorType(..))
+import Model.Sponsors exposing (stringToSponsor)
 import Model.Weapon.Model exposing (..)
 
 
@@ -278,7 +278,7 @@ thumper =
             , SpecialRule "The Thumper is a powerful sonic device that emits a shock wave that hurls nearby vehicles into the air. When this vehicle declares an attack with the Thumper, every other vehicle (friend or foe) within medium range of this vehicle immeditaly makes a flip check, in which they count their current gear as 2 higher, up to a maximum of 6. The Thumper may only be fired once per turn."
             ]
         , cost = 4
-        , requiredSponsor = Just Mishkin
+        , requiredSponsor = stringToSponsor "Mishkin"
     }
 
 
@@ -296,7 +296,7 @@ arcLightningProjector =
             , SpecialRule "The Arc Lightning Projector is a dangerous electrical weapon that can arc electricity across multiple conductive targets. After damaging a target, this vehicle must immediately attack another target within short range and a 360 degree arc of fire of the current target. This chain-reaction continues until the weapon fails to damage a target, or there are nor further viable targets. This vehicle can target friendly vehicles with the Arc Lightning Projector. This vehicle cannot target the same vehicle twice in a single attack step with the Arc Lightning Projetor."
             ]
         , cost = 6
-        , requiredSponsor = Just Mishkin
+        , requiredSponsor = stringToSponsor "Mishkin"
     }
 
 
@@ -316,7 +316,7 @@ kineticSuperBooster =
             , SpecialRule "The Super Booster may not increase a vehicle's current gar beyond its max gear."
             ]
         , cost = 6
-        , requiredSponsor = Just Mishkin
+        , requiredSponsor = stringToSponsor "Mishkin"
     }
 
 
@@ -331,7 +331,7 @@ magneticJammer =
             , SpecialRule "The target vehicle may not discard ammo tokens during its next activation."
             ]
         , cost = 2
-        , requiredSponsor = Just Mishkin
+        , requiredSponsor = stringToSponsor "Mishkin"
     }
 
 

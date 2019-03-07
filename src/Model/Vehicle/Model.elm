@@ -61,7 +61,7 @@ type alias Vehicle =
     , key : String
     , specials : List Special
     , perks : List VehiclePerk
-    , requiredSponsor : Maybe SponsorType
+    , requiredSponsor : Maybe Sponsor
     , expansion : Expansion
     }
 

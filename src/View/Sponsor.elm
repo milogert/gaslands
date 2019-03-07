@@ -29,13 +29,10 @@ import Model.Sponsors
     exposing
         ( PerkClass
         , Sponsor
-        , SponsorType
         , TeamPerk
         , VehiclePerk
         , fromPerkClass
-        , fromSponsorType
         , getClassPerks
-        , typeToSponsor
         )
 import Model.Vehicle.Model exposing (..)
 import View.Utils exposing (icon)
@@ -45,7 +42,7 @@ render : Sponsor -> Html Msg
 render { name, description, perks, grantedClasses, expansion } =
     div []
         [ h3 []
-            [ name |> fromSponsorType |> text
+            [ text name
             , text " "
             , small [] [ text <| fromExpansion expansion ]
             ]
@@ -76,7 +73,7 @@ renderTeamPerk { name, description } =
         ]
 
 
-renderBadge : Maybe SponsorType -> Html Msg
+renderBadge : Maybe Sponsor -> Html Msg
 renderBadge ms =
     let
         ( name, description ) =
@@ -85,7 +82,7 @@ renderBadge ms =
                     ( "No Sponsor", "" )
 
                 Just sponsor ->
-                    ( fromSponsorType sponsor, sponsor |> typeToSponsor |> .description )
+                    ( sponsor.name, sponsor.description )
     in
     span [ class "sponsor-badge" ]
         [ a

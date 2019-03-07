@@ -23,7 +23,7 @@ type alias Weapon =
     , specials : List Special
     , cost : Int
     , status : WeaponStatus
-    , requiredSponsor : Maybe SponsorType
+    , requiredSponsor : Maybe Sponsor
     , expansion : Expansion
     }
 

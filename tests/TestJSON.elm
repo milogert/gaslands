@@ -12,6 +12,7 @@ import Model.Encoders.Upgrades exposing (upgradeEncoder)
 import Model.Encoders.Vehicles exposing (vehicleEncoder)
 import Model.Encoders.Weapons exposing (weaponEncoder)
 import Model.Model exposing (defaultModel)
+import Model.Sponsors exposing (allSponsors)
 import Model.Upgrade.Model exposing (Upgrade, defaultUpgrade)
 import Model.Vehicle.Model exposing (defaultVehicle)
 import Model.Weapon.Model exposing (defaultWeapon)
@@ -25,7 +26,9 @@ suite =
             \_ ->
                 let
                     expected =
-                        defaultModel
+                        { defaultModel
+                            | sponsor = List.head allSponsors
+                        }
 
                     decodedActual =
                         expected

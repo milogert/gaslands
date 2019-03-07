@@ -165,7 +165,7 @@ tank =
             , NamedSpecialRule "Crush Attack" "After resolving a collision with a Bike, Buggy, Car, Pickup Truck, Performance Car, Lightweight Obstacle or Middleweight Obstacle during movement step 1.7, this vehicle may ignore the obstruction for the remainder of its movement step, as it drives right over the top of it."
             , NamedSpecialRule "All Terrain" "This vehicle may ignore the penalties for rough and treacherous surfaces."
             ]
-        , requiredSponsor = Just Rutherford
+        , requiredSponsor = stringToSponsor "Rutherford"
     }
 
 
@@ -206,7 +206,7 @@ helicopter =
             , SpecialRule "Other vehicles ignore this vehicle at all times, except that other vehicles may target this vehicle during their attack steps. This vehicle cannot be involved in collisions."
             , NamedSpecialRule "Bombs Away" "When purchasing weapons, this vehicle may count dropped weapons as requiring 0 build slots."
             ]
-        , requiredSponsor = Just Rutherford
+        , requiredSponsor = stringToSponsor "Rutherford"
     }
 
 

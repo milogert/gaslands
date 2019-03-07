@@ -282,11 +282,10 @@ configure model currentView v =
                     View.Utils.detailSection
                         currentView
                         [ text "Perks Available from "
-                        , text <| fromSponsorType sponsor
+                        , text sponsor.name
                         ]
                         [ div [ class "row" ]
                             (sponsor
-                                |> Model.Sponsors.typeToSponsor
                                 |> .grantedClasses
                                 |> List.map (View.Sponsor.renderPerkClass v)
                             )

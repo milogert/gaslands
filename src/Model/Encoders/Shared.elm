@@ -6,7 +6,7 @@ module Model.Encoders.Shared exposing
 
 import Json.Encode exposing (..)
 import Model.Shared exposing (..)
-import Model.Sponsors exposing (SponsorType, fromSponsorType)
+import Model.Sponsors exposing (Sponsor)
 
 
 specialEncoder : Special -> List ( String, Value )
@@ -84,14 +84,14 @@ modEncoderHelper s =
             ""
 
 
-requiredSponsorEncoder : Maybe SponsorType -> Value
-requiredSponsorEncoder mst =
-    case mst of
+requiredSponsorEncoder : Maybe Sponsor -> Value
+requiredSponsorEncoder mSponsor =
+    case mSponsor of
         Nothing ->
             null
 
-        Just st ->
-            string <| fromSponsorType st
+        Just sponsor ->
+            string <| sponsor.name
 
 
 expansionEncoder : Expansion -> List ( String, Value )

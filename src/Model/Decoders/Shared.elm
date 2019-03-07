@@ -6,7 +6,7 @@ module Model.Decoders.Shared exposing
 
 import Json.Decode exposing (..)
 import Model.Shared exposing (..)
-import Model.Sponsors exposing (SponsorType)
+import Model.Sponsors exposing (Sponsor)
 
 
 specialDecoder : Decoder Special
@@ -129,7 +129,7 @@ crewModDecoder =
     map CrewMod (field "modifier" int)
 
 
-requiredSponsorDecoderHelper : String -> Decoder (Maybe SponsorType)
+requiredSponsorDecoderHelper : String -> Decoder (Maybe Sponsor)
 requiredSponsorDecoderHelper str =
     let
         mSponsor =
@@ -137,7 +137,7 @@ requiredSponsorDecoderHelper str =
     in
     case mSponsor of
         Just sponsor ->
-            succeed <| Just sponsor.name
+            succeed <| Just sponsor
 
         Nothing ->
             fail <| str ++ " is not a valid sponsor type"

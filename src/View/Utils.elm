@@ -172,7 +172,7 @@ weaponSponsorFilter model weapon =
     sponsorFilter_ model weapon.requiredSponsor
 
 
-sponsorFilter_ : Model -> Maybe SponsorType -> Bool
+sponsorFilter_ : Model -> Maybe Sponsor -> Bool
 sponsorFilter_ model mst =
     case ( model.sponsor, mst ) of
         ( _, Nothing ) ->

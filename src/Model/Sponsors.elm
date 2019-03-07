@@ -1,69 +1,32 @@
 module Model.Sponsors exposing
     ( PerkClass(..)
     , Sponsor
-    , SponsorType(..)
     , TeamPerk
     , VehiclePerk
     , aggression
     , allSponsors
     , badass
     , daring
+    , defaultSponsor
     , fromPerkClass
-    , fromSponsorType
     , getClassPerks
     , military
     , precision
     , speed
     , stringToSponsor
     , technology
-    , typeToSponsor
     )
 
 import Model.Shared exposing (Expansion(..))
 
 
 type alias Sponsor =
-    { name : SponsorType
+    { name : String
     , description : String
     , perks : List TeamPerk
     , grantedClasses : List PerkClass
     , expansion : Expansion
     }
-
-
-type SponsorType
-    = Rutherford
-    | Miyazaki
-    | Mishkin
-    | Idris
-    | Slime
-    | Warden
-    | ScarlettAnnie
-
-
-fromSponsorType : SponsorType -> String
-fromSponsorType sponsorType =
-    case sponsorType of
-        Rutherford ->
-            "Rutherford"
-
-        Miyazaki ->
-            "Miyazaki"
-
-        Mishkin ->
-            "Mishkin"
-
-        Idris ->
-            "Idris"
-
-        Slime ->
-            "Slime"
-
-        Warden ->
-            "Warden"
-
-        ScarlettAnnie ->
-            "Scarlett Annie"
 
 
 type PerkClass
@@ -165,57 +128,11 @@ getClassPerks perkClass =
             tuning
 
 
-typeToSponsor : SponsorType -> Sponsor
-typeToSponsor type_ =
-    case type_ of
-        Rutherford ->
-            rutherford
-
-        Miyazaki ->
-            miyazaki
-
-        Mishkin ->
-            mishkin
-
-        Idris ->
-            idris
-
-        Slime ->
-            slime
-
-        Warden ->
-            warden
-
-        ScarlettAnnie ->
-            scarlettAnnie
-
-
 stringToSponsor : String -> Maybe Sponsor
-stringToSponsor str =
-    case str of
-        "Rutherford" ->
-            Just rutherford
-
-        "Miyazaki" ->
-            Just miyazaki
-
-        "Mishkin" ->
-            Just mishkin
-
-        "Idris" ->
-            Just idris
-
-        "Slime" ->
-            Just slime
-
-        "Warden" ->
-            Just warden
-
-        "Scarlett Annie" ->
-            Just scarlettAnnie
-
-        _ ->
-            Nothing
+stringToSponsor name =
+    allSponsors
+        |> List.filter (\sp -> sp.name == name)
+        |> List.head
 
 
 
@@ -225,7 +142,7 @@ stringToSponsor str =
 defaultSponsor : Sponsor
 defaultSponsor =
     Sponsor
-        Rutherford
+        ""
         ""
         []
         []
@@ -235,7 +152,7 @@ defaultSponsor =
 rutherford : Sponsor
 rutherford =
     { defaultSponsor
-        | name = Rutherford
+        | name = "Rutherford"
         , description = "Grant Rutherford is the son of a militaristic American oil baron. He is aggressive, rich and uncompromising. His beaming face, beneath his trademark cream Stetson, adorns billboard advertisements for his high-quality and high-priced Rutherford brand weaponry. Teams sponsored by Rutherford get access to military surplus, missile launchers, tanks and helicopters and as much ammo as they can carry. After his team won in 2016, he was only too happy to kiss the Earth goodbye and now runs his company from his highly exclusive Martian office."
         , perks =
             [ TeamPerk "Military Hardware"
@@ -255,7 +172,7 @@ rutherford =
 miyazaki : Sponsor
 miyazaki =
     { defaultSponsor
-        | name = Miyazaki
+        | name = "Miyazaki"
         , description = "Yuri Miyazaki grew up in the rubble of Tokyo, fighting her way to the top of the speedway circuit with incredible feats of daring and vehicular agility. She has a small fleet of elite couriers who run jobs for the wealthiest or most desperate clients. It is whispered that she also runs guns for the Pro-Earth Resistance, but no one who spreads that rumour lives long enough to spread it far. Miyazaki's drivers are unsurpassed in their skill and finesse."
         , perks =
             [ TeamPerk "Virtuoso"
@@ -275,7 +192,7 @@ miyazaki =
 mishkin : Sponsor
 mishkin =
     { defaultSponsor
-        | name = Mishkin
+        | name = "Mishkin"
         , description = "Andre Mishkin is not a natural sportsman. However, the brilliant Russian engineer and inventor proves in 2010 that technology is just as solid an answer as skill or ferocity on the track. From his research and development facility on Mars he continues to send designs for unusual and devastating weapons and sleep, hi-tech vehicles to Earth for field-testing by the teams he sponsors."
         , perks =
             [ TeamPerk "Thumpermonkey"
@@ -293,7 +210,7 @@ mishkin =
 idris : Sponsor
 idris =
     { defaultSponsor
-        | name = Idris
+        | name = "Idris"
         , description = "Yandi Idris is an addict. From the first time the hot and sweet fumes of a singing petrol engine filled his nose he could find no other joy. He said that the first time he pressed that nitro-oxide button was like touching the face of God. Mystical, irrational and dangerous, the Cult of Speed spread like wildfire after Idris' meteoric rise during the 2012 Gaslands season. He crossed the final finishing line in a ball of fire and his body was never found. His fanatical followers say that at 201mph you can hear his sonorous voice on the rushing head wind."
         , perks =
             [ TeamPerk "N2O Addict"
@@ -313,7 +230,7 @@ idris =
 slime : Sponsor
 slime =
     { defaultSponsor
-        | name = Slime
+        | name = "Slime"
         , description = "Slime rules a wild and feral city in the Australian wastes known as Anarchy. Young people crawled out of the wreckage of the scorched earth in their thousands to rally round her ragged banner. The wild-eyed and whooping joyful gangs of Anarchy are led by Slime's henchwomen, the Chooks, who seek fame and adoration from the global Gaslands audience."
         , perks =
             [ TeamPerk "Live Fast"
@@ -329,7 +246,7 @@ slime =
 warden : Sponsor
 warden =
     { defaultSponsor
-        | name = Warden
+        | name = "Warden"
         , description = "Warden Cadeila is proud to live in Sao Paulo, a shining hub of humanity and relatively untouched by the war. The Sao Paulo People's Penitentiary has three of Gaslands' top ten teams in the past decade, and the Warden continues to grant her prisoners a chance at freedom as long as the Gaslands franchise continues to deliver the sponsorship deals. The deal isn't great from the damned souls who are welded into the Warden's solid steel \"coffin cars\", but it's better than the alternative."
         , perks =
             [ TeamPerk "Prison Cars"
@@ -345,7 +262,7 @@ warden =
 scarlettAnnie : Sponsor
 scarlettAnnie =
     { defaultSponsor
-        | name = ScarlettAnnie
+        | name = "Scarlett Annie"
         , description = "Gaslands is able to support a vast ecosystem of villainous and scurvy raiders, picking off richer teams as their rigs roll from one televised race to the next. Many of these self-styled pirate crews have gained renown, but none have rivalled the infamy or showmanship of Scarlett Annie. A dashing and flamboyant buccaneer, her cult following is likely more to do with her canny association with the long-running \"Death Valley Death Run\" documentary TV series than any particular skill at dust bowl piracy."
         , perks =
             [ TeamPerk "Crew Quarters"
