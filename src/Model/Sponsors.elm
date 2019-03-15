@@ -39,6 +39,7 @@ type PerkClass
     | Technology
     | PrisonCars
     | Tuning
+    | Pursuit
 
 
 fromPerkClass : PerkClass -> String
@@ -70,6 +71,9 @@ fromPerkClass perkClass =
 
         Tuning ->
             "Tuning"
+
+        Pursuit ->
+            "Pursuit"
 
 
 type alias TeamPerk =
@@ -126,6 +130,9 @@ getClassPerks perkClass =
 
         Tuning ->
             tuning
+
+        Pursuit ->
+            pursuit
 
 
 stringToSponsor : String -> Maybe Sponsor
@@ -388,4 +395,27 @@ tuning =
     , VehiclePerk "Momentum"
         3
         "When resolving a skid check, this vehicle may set aside any number of slide results to re-roll 1 non-slide result for each slide result set aside. When resolving a skid check, this vehicle may set aside any number for each spin results to re-roll 1 non-spin result for each spin result set aside. Set aside results must be resolved."
+    ]
+
+
+pursuit : List VehiclePerk
+pursuit =
+    [ VehiclePerk "On Your Tail"
+        2
+        "When an enemy vehicle resolves a spin or slide move that ends within short range of this vehicle, that vehicle gains +1 hazard token."
+    , VehiclePerk "Schadenfreude"
+        2
+        "If another vehicle within short range of this vehicle resolves a wipe out, (either before or after any flip), remove all hazard tokens from this vehicle."
+    , VehiclePerk "Taunt"
+        2
+        "At the start of this vehicle’s attack step, roll a skid die. If you roll something other than a SHIFT result, you may place that skid die result onto the dashboard of a target vehicle within short range. This skid die result must be resolved during that vehicle’s next skid check, and may not be re-rolled."
+    , VehiclePerk "Out Run"
+        2
+        "At the start of this vehicle’s attack step, all vehicles within short range of this vehicle and in a current, lower gear than this vehicle gain +1 hazard token."
+    , VehiclePerk "PIT"
+        4
+        "If this vehicle is involved in a collision with an enemy vehicle during its activation that is not head-on, it may declare a “Pursuit Intervention Technique” (PIT) against the enemy vehicle instead of declaring a SMASH ATTACK or an evade. If this vehicle declares a PIT, it may select any maneuver template the target vehicle considers hazardous in its current gear. The target vehicle must immediately resolve a movement step, during which it is forced to must use the maneuver template selected for it and may not roll any skid dice."
+    , VehiclePerk "Unnerving Eye Contact"
+        5
+        "Enemy vehicles within short range of this vehicle may not use shift results to remove hazard tokens from their dashboard."
     ]

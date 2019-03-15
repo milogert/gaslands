@@ -99,22 +99,25 @@ rangeDecoder =
 rangeHelper : String -> Decoder Range
 rangeHelper str =
     case str of
+        "Short" ->
+            succeed Short
+
         "Medium" ->
             succeed Medium
 
         "Double" ->
             succeed Double
 
-        "TemplateLarge" ->
+        "Large" ->
             succeed TemplateLarge
 
-        "BurstLarge" ->
+        "Large Burst" ->
             succeed BurstLarge
 
-        "BurstSmall" ->
+        "Small Burst" ->
             succeed BurstSmall
 
-        "SmashRange" ->
+        "Smash" ->
             succeed SmashRange
 
         _ ->

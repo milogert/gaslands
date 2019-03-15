@@ -27,7 +27,7 @@ specialDecoderHelper str =
         "NamedSpecialRule" ->
             namedSpecialRuleDecoder
 
-        "TrecherousSurface" ->
+        "TreacherousSurface" ->
             succeed TreacherousSurface
 
         "Blast" ->
@@ -59,6 +59,12 @@ specialDecoderHelper str =
 
         "CrewMod" ->
             crewModDecoder
+
+        "Specialist" ->
+            specialistDecoder
+
+        "Entangle" ->
+            entangleDecoder
 
         _ ->
             fail <| str ++ " is not a valid special type"
@@ -127,6 +133,16 @@ gearModDecoder =
 crewModDecoder : Decoder Special
 crewModDecoder =
     map CrewMod (field "modifier" int)
+
+
+specialistDecoder : Decoder Special
+specialistDecoder =
+    succeed Specialist
+
+
+entangleDecoder : Decoder Special
+entangleDecoder =
+    succeed Entangle
 
 
 requiredSponsorDecoderHelper : String -> Decoder (Maybe Sponsor)
