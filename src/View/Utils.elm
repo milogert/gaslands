@@ -32,7 +32,7 @@ import Html
         , span
         , text
         )
-import Html.Attributes exposing (class, classList)
+import Html.Attributes exposing (class, classList, hidden)
 import Html.Events exposing (onInput)
 import Model.Model exposing (..)
 import Model.Shared exposing (..)
@@ -68,7 +68,7 @@ mapClassList classes =
 
 detailSection : CurrentView -> List (Html Msg) -> List (Html Msg) -> Html Msg
 detailSection currentView headerContents bodyContents =
-    div [ classList [ ( "d-none", currentView == ViewDashboard ) ] ]
+    div [ hidden (currentView == ViewDashboard || currentView == ViewAddingVehicle) ]
         [ hr [] [], h5 [] headerContents, div [] bodyContents ]
 
 

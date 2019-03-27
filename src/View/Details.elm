@@ -12,5 +12,5 @@ view : Model -> Vehicle -> Html Msg
 view model v =
     Grid.row []
         [ Grid.col [ Col.xs12 ]
-            [ View.Vehicle.renderDetails model (ViewDetails v) v ]
+            [ View.Vehicle.renderDetails model v ]
         ]

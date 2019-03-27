@@ -17,17 +17,9 @@ view : Model -> Html Msg
 view model =
     Grid.row []
         [ Grid.col [ Col.xs12 ]
-            {--[ Grid.simpleRow
-                (model.vehicles
-                    |> List.map (View.Vehicle.renderCard model model.view)
-                    |> List.map (\c -> Card.view c)
-                    |> List.map (\cv -> Grid.col [ Col.md6 ] [ cv ])
-                )
-            ]
-            --}
             [ model.vehicles
                 |> Dict.values
-                |> List.map (View.Vehicle.renderCard model model.view)
+                |> List.map (View.Vehicle.renderCard model)
                 |> Card.columns
             ]
         , Grid.col [ Col.xs12 ]

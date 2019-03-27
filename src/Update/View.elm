@@ -51,3 +51,8 @@ update model currentView =
             ( { model | view = ViewSettings }
             , Ports.Storage.getKeys ""
             )
+
+        ViewPrinterFriendly v ->
+            ( { model | view = ViewPrinterFriendly v }
+            , Cmd.none
+            )

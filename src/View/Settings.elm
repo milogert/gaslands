@@ -1,6 +1,6 @@
 module View.Settings exposing (view)
 
-import Bootstrap.Button as Btn
+import Bootstrap.Button as Button
 import Bootstrap.Form as Form
 import Bootstrap.Form.Checkbox as Checkbox
 import Bootstrap.Form.Input as Input
@@ -51,9 +51,11 @@ view model =
 renderGameSettings : Model -> Html Msg
 renderGameSettings model =
     Grid.row []
-        [ Grid.col []
+        [ Grid.col [ Col.md12 ]
             [ h3 [] [ text "Game Settings" ]
-            , Form.group []
+            ]
+        , Grid.col []
+            [ Form.group []
                 [ Form.label [ for "teamName" ] [ text "Team Name" ]
                 , Input.text
                     [ Input.id "teamName"
@@ -123,31 +125,31 @@ renderImportExport model =
     Grid.row []
         [ Grid.col [ Col.xs12 ] [ h3 [] [ text "Import/Export" ] ]
         , Grid.col [ Col.md4, Col.xs12 ]
-            [ Btn.button
-                [ Btn.primary
-                , Btn.block
-                , Btn.attrs [ class "mb-2" ]
-                , Btn.onClick SaveModel
+            [ Button.button
+                [ Button.primary
+                , Button.block
+                , Button.attrs [ class "mb-2" ]
+                , Button.onClick SaveModel
                 ]
                 [ icon "download"
                 , text <| " Save Team \"" ++ teamName ++ "\""
                 ]
             ]
         , Grid.col [ Col.md4, Col.xs12 ]
-            [ Btn.button
-                [ Btn.primary
-                , Btn.block
-                , Btn.attrs [ class "mb-2" ]
-                , Btn.onClick Share
+            [ Button.button
+                [ Button.primary
+                , Button.block
+                , Button.attrs [ class "mb-2" ]
+                , Button.onClick Share
                 ]
                 [ icon "share", text " Share" ]
             ]
         , Grid.col [ Col.md4, Col.xs12 ]
-            [ Btn.button
-                [ Btn.primary
-                , Btn.block
-                , Btn.attrs [ class "mb-2" ]
-                , Btn.onClick Import
+            [ Button.button
+                [ Button.primary
+                , Button.block
+                , Button.attrs [ class "mb-2" ]
+                , Button.onClick Import
                 ]
                 [ icon "upload", text " Import" ]
             ]
@@ -191,13 +193,13 @@ renderAbout =
 storageMapper : String -> Html Msg
 storageMapper s =
     li []
-        [ Btn.button
-            [ Btn.roleLink, Btn.onClick <| LoadModel s ]
+        [ Button.button
+            [ Button.roleLink, Button.onClick <| LoadModel s ]
             [ text s ]
-        , Btn.button
-            [ Btn.danger
-            , Btn.small
-            , Btn.onClick <| DeleteItem s
+        , Button.button
+            [ Button.danger
+            , Button.small
+            , Button.onClick <| DeleteItem s
             ]
             [ icon "trash-alt" ]
         ]

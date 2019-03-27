@@ -34,6 +34,7 @@ import View.Dashboard
 import View.Details
 import View.New
 import View.NewVehicle
+import View.PrinterFriendly
 import View.Settings
 import View.Sponsor
 import View.SponsorSelect
@@ -51,6 +52,9 @@ view model =
                     To <| ViewDetails v
 
                 ViewAddingUpgrade v ->
+                    To <| ViewDetails v
+
+                ViewPrinterFriendly v ->
                     To <| ViewDetails v
 
                 _ ->
@@ -206,6 +210,9 @@ render model =
 
         ViewSettings ->
             View.Settings.view model
+
+        ViewPrinterFriendly v ->
+            View.PrinterFriendly.view model v
 
 
 sizeShower : Html Msg
