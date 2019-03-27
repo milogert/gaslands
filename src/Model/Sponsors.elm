@@ -12,9 +12,12 @@ module Model.Sponsors exposing
     , getClassPerks
     , military
     , precision
+    , prisonCars
+    , pursuit
     , speed
     , stringToSponsor
     , technology
+    , tuning
     )
 
 import Model.Shared exposing (Expansion(..))

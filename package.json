@@ -12,7 +12,8 @@
       "start": "yarn elm-app start",
       "build": "yarn elm-app build",
       "deploy": "yarn build && yarn gh-pages -d build",
-      "test": "yarn elm-test"
+      "test": "yarn elm-test",
+      "coverage": "yarn elm-coverage"
   },
   "dependencies": {
     "bootstrap": "^4.1.3",
