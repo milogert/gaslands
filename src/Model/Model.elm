@@ -48,7 +48,7 @@ type CurrentView
     | ViewAddingWeapon Vehicle
     | ViewAddingUpgrade Vehicle
     | ViewSettings
-    | ViewPrinterFriendly Vehicle
+    | ViewPrinterFriendly (List Vehicle)
 
 
 type ErrorType
@@ -106,8 +106,8 @@ viewToStr model =
         ViewSettings ->
             "Settings"
 
-        ViewPrinterFriendly v ->
-            "Printing " ++ v.name
+        ViewPrinterFriendly lv ->
+            "Printing " ++ String.fromInt (List.length lv) ++ " vehicle(s)"
 
 
 totalPoints : Model -> Int

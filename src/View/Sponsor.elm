@@ -1,6 +1,8 @@
 module View.Sponsor exposing (render, renderBadge, renderPerkClass)
 
 import Bootstrap.Form.Checkbox as Checkbox
+import Bootstrap.Grid as Grid
+import Bootstrap.Grid.Col as Col
 import Html
     exposing
         ( Html
@@ -97,11 +99,23 @@ renderBadge ms =
         ]
 
 
-renderPerkClass : Vehicle -> PerkClass -> Html Msg
-renderPerkClass vehicle perkClass =
-    div [ class "col-md-6" ] <|
+renderPerkClass : CurrentView -> Vehicle -> PerkClass -> Grid.Column Msg
+renderPerkClass currentView vehicle perkClass =
+    Grid.col [ Col.md6 ] <|
         [ h6 [] [ text <| fromPerkClass perkClass ] ]
             ++ (getClassPerks perkClass
+                    |> List.filter
+                        (\perk ->
+                            case ( List.member perk vehicle.perks, currentView ) of
+                                ( True, _ ) ->
+                                    True
+
+                                ( False, ViewPrinterFriendly _ ) ->
+                                    False
+
+                                ( False, _ ) ->
+                                    True
+                        )
                     |> List.map (renderVehiclePerk vehicle)
                )
 
@@ -117,5 +131,5 @@ renderVehiclePerk vehicle perk =
         perk.name
             ++ " ("
             ++ String.fromInt perk.cost
-            ++ ") "
+            ++ "): "
             ++ perk.description

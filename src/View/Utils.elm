@@ -72,15 +72,18 @@ detailSection currentView headerContents bodyContents =
         [ hr [] [], h5 [] headerContents, div [] bodyContents ]
 
 
-renderSpecial : Bool -> Maybe (Int -> Bool -> Msg) -> Special -> Html Msg
-renderSpecial isPreview mMsg special =
+renderSpecial : Bool -> Bool -> Maybe (Int -> Bool -> Msg) -> Special -> Html Msg
+renderSpecial isPreview isPrinting mMsg special =
     case ( special, mMsg ) of
         ( Ammo ammo, Just msg ) ->
-            case isPreview of
-                True ->
+            case ( isPreview, isPrinting ) of
+                ( True, _ ) ->
                     div [] [ text <| "Ammo: " ++ (String.fromInt <| List.length ammo) ]
 
-                False ->
+                ( _, True ) ->
+                    div [] (text "Ammo:" :: List.repeat (List.length ammo) (div [ class "hazard-check" ] []))
+
+                ( False, False ) ->
                     Form.row [ Row.middleXs, Row.attrs [ class "mb-0" ] ]
                         [ Form.colLabel [ Col.xsAuto ] [ text "Ammo: " ]
                         , renderCountDown msg ammo

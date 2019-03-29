@@ -346,8 +346,13 @@ updateNotes model key notes =
             ( model, Cmd.none )
 
         Just vehicle ->
+            let
+                newVehicle =
+                    { vehicle | notes = notes }
+            in
             ( { model
-                | vehicles = Dict.insert key { vehicle | notes = notes } model.vehicles
+                | vehicles = Dict.insert key newVehicle model.vehicles
+                , view = ViewDetails newVehicle
               }
             , Cmd.none
             )

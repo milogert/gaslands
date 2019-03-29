@@ -1,0 +1,24 @@
+.print-icon {
+    height: 2rem;
+    width: 2rem;
+    text-align: center;
+}
+
+.hazard-check {
+    height: 2rem;
+    width: 2rem;
+    border: rgb(206, 212, 218) solid 1px;
+    border-radius: .2rem;
+    display: inline-block;
+    margin-right: .25rem !important;
+}
+
+.gear-die {
+    height: 4rem;
+    width: 4rem;
+    border: rgb(206, 212, 218) solid 1px;
+    border-radius: .2rem;
+    padding: auto;
+    line-height: 4rem;
+    text-align: center;
+}

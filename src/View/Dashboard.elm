@@ -16,13 +16,7 @@ import View.Vehicle
 view : Model -> Html Msg
 view model =
     Grid.row []
-        [ Grid.col [ Col.xs12 ]
-            [ model.vehicles
-                |> Dict.values
-                |> List.map (View.Vehicle.renderCard model)
-                |> Card.columns
-            ]
-        , Grid.col [ Col.xs12 ]
+        [ Grid.col [ Col.xs ]
             [ Button.button
                 [ Button.primary
                 , Button.block
@@ -30,5 +24,19 @@ view model =
                 , Button.attrs [ class "mb-3" ]
                 ]
                 [ icon "plus", text "New Vehicle" ]
+            ]
+        , Grid.col [ Col.xsAuto ]
+            [ Button.button
+                [ Button.roleLink
+                , Button.block
+                , Button.onClick <| To <| ViewPrinterFriendly <| Dict.values model.vehicles
+                ]
+                [ icon "print", text "All Vehicles" ]
+            ]
+        , Grid.col [ Col.xs12 ]
+            [ model.vehicles
+                |> Dict.values
+                |> List.map (View.Vehicle.renderCard model)
+                |> Card.columns
             ]
         ]

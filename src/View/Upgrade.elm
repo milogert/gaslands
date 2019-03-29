@@ -30,13 +30,16 @@ import View.Utils exposing (icon, iconb)
 render : Model -> Vehicle -> Upgrade -> Html Msg
 render model vehicle upgrade =
     let
-        isPreview =
+        ( isPreview, isPrinting ) =
             case model.view of
-                ViewAddingUpgrade _ ->
-                    True
+                ViewAddingWeapon _ ->
+                    ( True, False )
+
+                ViewPrinterFriendly _ ->
+                    ( False, True )
 
                 _ ->
-                    False
+                    ( False, False )
 
         slotsTakenBadge =
             let
@@ -71,7 +74,7 @@ render model vehicle upgrade =
                 ]
 
         renderSpecialFunc special =
-            li [] [ View.Utils.renderSpecial isPreview Nothing special ]
+            li [] [ View.Utils.renderSpecial isPreview isPrinting Nothing special ]
 
         specials =
             case upgrade.specials of

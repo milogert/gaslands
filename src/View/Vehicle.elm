@@ -1,23 +1,29 @@
 module View.Vehicle exposing (renderCard, renderDetails, renderPreview, renderPrint)
 
+import Bootstrap.Badge as Badge
 import Bootstrap.Button as Button
 import Bootstrap.Card as Card
 import Bootstrap.Card.Block as Block
+import Bootstrap.Form.Checkbox as Checkbox
 import Bootstrap.Form.Input as Input
 import Bootstrap.Form.InputGroup as InputGroup
 import Bootstrap.Form.Textarea as Textarea
 import Bootstrap.Grid as Grid
 import Bootstrap.Grid.Col as Col
 import Bootstrap.Grid.Row as Row
+import Bootstrap.Utilities.Spacing as Spacing
 import Html
     exposing
         ( Html
         , div
         , h1
         , h2
+        , h3
         , h4
+        , h5
         , input
         , li
+        , p
         , small
         , span
         , text
@@ -115,9 +121,21 @@ configure model v =
                     "Activate"
 
         activateButton =
+            let
+                isHidden =
+                    case currentView of
+                        ViewPrinterFriendly _ ->
+                            True || wrecked
+
+                        ViewAddingVehicle ->
+                            True || wrecked
+
+                        _ ->
+                            False || wrecked
+            in
             div
                 [ class "vehicle-activate-button-holder mb-2"
-                , classList [ ( "d-none", wrecked ) ]
+                , hidden isHidden
                 ]
                 [ Button.button
                     [ Button.primary
@@ -125,7 +143,6 @@ configure model v =
                     , Button.block
                     , Button.onClick <| VehicleMsg <| UpdateActivated v.key (not v.activated)
                     , Button.disabled <| not canActivate || v.activated
-                    , Button.attrs [ hidden (currentView == ViewAddingVehicle) ]
                     ]
                     [ text activatedText ]
                 ]
@@ -147,6 +164,29 @@ configure model v =
                 [ classList [ ( "d-none", currentView /= ViewDetails v ) ] ]
                 [ View.Photo.view model v ]
 
+        printButton =
+            let
+                isHidden =
+                    case currentView of
+                        ViewDashboard ->
+                            True
+
+                        ViewAddingVehicle ->
+                            True
+
+                        ViewPrinterFriendly _ ->
+                            True
+
+                        _ ->
+                            False
+            in
+            Button.button
+                [ Button.roleLink
+                , Button.attrs [ hidden isHidden ]
+                , Button.onClick <| To <| ViewPrinterFriendly [ v ]
+                ]
+                [ icon "print" ]
+
         stats =
             Grid.simpleRow
                 [ Grid.col
@@ -158,14 +198,19 @@ configure model v =
                     [ photoPlus ]
                 , Grid.col [ Col.xs ]
                     [ activateButton, factsHolder ]
+                , Grid.col [ Col.xs12, Col.lgAuto ]
+                    [ printButton ]
                 ]
 
         gearCounter =
-            case wrecked of
-                True ->
+            case ( currentView, wrecked ) of
+                ( ViewPrinterFriendly print, _ ) ->
+                    div [ class "gear-die" ] [ iconClass "fas fa-lg" "cogs" [ "mx-auto" ] ]
+
+                ( _, True ) ->
                     text ""
 
-                False ->
+                ( _, False ) ->
                     counterElement
                         (iconClass "fas" "cogs" [ "mx-auto" ])
                         1
@@ -178,14 +223,10 @@ configure model v =
         hazardCounter =
             case currentView of
                 ViewPrinterFriendly _ ->
-                    Grid.simpleRow
-                        [ Grid.col [] [ iconClass "fas fa-lg" "exclamation-triangle" [ "mx-auto" ] ]
-                        , Grid.col [] [ div [ class "hazard-symbol" ] [] ]
-                        , Grid.col [] [ div [ class "hazard-symbol" ] [] ]
-                        , Grid.col [] [ div [ class "hazard-symbol" ] [] ]
-                        , Grid.col [] [ div [ class "hazard-symbol" ] [] ]
-                        , Grid.col [] [ div [ class "hazard-symbol" ] [] ]
-                        , Grid.col [] [ div [ class "hazard-symbol" ] [] ]
+                    Grid.row [ Row.attrs [ class "mb-2" ] ]
+                        [ Grid.col [ Col.md1 ] [ iconClass "fas fa-lg" "exclamation-triangle" [ "mx-auto", "print-icon" ] ]
+                        , Grid.col [ Col.md11 ] <|
+                            List.repeat 6 (span [ class "hazard-check mr-1" ] [])
                         ]
 
                 _ ->
@@ -201,24 +242,44 @@ configure model v =
                         ]
 
         hullCounter =
-            counterElement
-                (iconClass "fas" "shield-alt" [ "mx-auto" ])
-                0
-                (totalHull v)
-                v.hull.current
-                (ShiftHull v.key -1)
-                (ShiftHull v.key 1)
-                (UpdateHull v.key)
+            case currentView of
+                ViewPrinterFriendly _ ->
+                    Grid.simpleRow
+                        [ Grid.col [ Col.md1 ] [ iconClass "fas fa-lg" "shield-alt" [ "mx-auto", "print-icon" ] ]
+                        , Grid.col [ Col.md11 ] <|
+                            List.repeat (totalHull v) (div [ class "hazard-check mr-1" ] [])
+                        ]
+
+                _ ->
+                    counterElement
+                        (iconClass "fas" "shield-alt" [ "mx-auto" ])
+                        0
+                        (totalHull v)
+                        v.hull.current
+                        (ShiftHull v.key -1)
+                        (ShiftHull v.key 1)
+                        (UpdateHull v.key)
 
         counterHolder =
-            div [ hidden (currentView == ViewAddingVehicle) ]
-                [ gearCounter
-                , hazardCounter
-                , hullCounter
-                ]
+            case currentView of
+                ViewPrinterFriendly _ ->
+                    Grid.simpleRow
+                        [ Grid.col [ Col.mdAuto ] [ gearCounter ]
+                        , Grid.col [ Col.md ]
+                            [ hazardCounter
+                            , hullCounter
+                            ]
+                        ]
+
+                _ ->
+                    div [ hidden (currentView == ViewAddingVehicle) ]
+                        [ gearCounter
+                        , hazardCounter
+                        , hullCounter
+                        ]
 
         renderSpecialFunc special =
-            li [] [ View.Utils.renderSpecial False Nothing special ]
+            li [] [ View.Utils.renderSpecial False False Nothing special ]
 
         specials =
             case v.specials of
@@ -232,16 +293,43 @@ configure model v =
             div [] [ specials ]
 
         notes =
-            div
-                [ class "vehicle-notes-holder"
-                , hidden (currentView == ViewDashboard || currentView == ViewAddingVehicle)
+            case currentView of
+                ViewPrinterFriendly _ ->
+                    div []
+                        [ h5 [ hidden <| String.isEmpty v.notes ] [ text "Notes" ]
+                        , text v.notes
+                        ]
+
+                ViewDetails details ->
+                    div
+                        [ class "vehicle-notes-holder" ]
+                        [ Textarea.textarea
+                            [ Textarea.onInput <| VehicleMsg << UpdateNotes details.key
+                            , Textarea.attrs [ placeholder "Notes" ]
+                            , Textarea.value details.notes
+                            ]
+                        ]
+
+                _ ->
+                    text ""
+
+        addonListButton onClick icon_ text_ =
+            let
+                isHidden =
+                    case currentView of
+                        ViewPrinterFriendly _ ->
+                            True
+
+                        _ ->
+                            False
+            in
+            Button.button
+                [ Button.roleLink
+                , Button.small
+                , Button.onClick onClick
+                , Button.attrs [ hidden isHidden ]
                 ]
-                [ Textarea.textarea
-                    [ Textarea.onInput <| VehicleMsg << UpdateNotes v.key
-                    , Textarea.attrs [ placeholder "Notes" ]
-                    , Textarea.value v.notes
-                    ]
-                ]
+                [ icon icon_, text text_ ]
 
         weaponsUsingSlots =
             List.sum <| List.map .slots v.weapons
@@ -260,40 +348,43 @@ configure model v =
                 _ ->
                     List.map (View.Weapon.render model v) v.weapons
 
+        weaponListAvailableBadge =
+            case isCrewAvailable of
+                True ->
+                    Badge.badgeSuccess
+
+                False ->
+                    Badge.badgeDanger
+
         weaponList =
-            View.Utils.detailSection
-                currentView
-                [ text "Weapon List"
-                , small [ class "ml-2" ]
-                    [ span
-                        [ class "badge"
-                        , classList
-                            [ ( "badge-success", isCrewAvailable )
-                            , ( "badge-danger", not isCrewAvailable )
+            case ( v.weapons, currentView ) of
+                ( [], ViewPrinterFriendly _ ) ->
+                    text ""
+
+                _ ->
+                    View.Utils.detailSection
+                        currentView
+                        [ text "Weapon List"
+                        , small []
+                            [ weaponListAvailableBadge [ Spacing.ml2 ]
+                                [ " crew used"
+                                    |> (++) (String.fromInt <| totalCrew v)
+                                    |> (++) "/"
+                                    |> (++) (String.fromInt <| View.Utils.crewUsed v)
+                                    |> text
+                                ]
+                            , Badge.badgeDark [ Spacing.ml2 ]
+                                [ " slots used"
+                                    |> (++) (String.fromInt <| v.equipment)
+                                    |> (++) "/"
+                                    |> (++) (String.fromInt <| weaponsUsingSlots)
+                                    |> text
+                                ]
+                            , addonListButton (To <| ViewAddingWeapon v) "plus" "Weapon"
+                            , addonListButton (AddWeapon v.key handgun) "plus" "Handgun"
                             ]
                         ]
-                        [ text <| (String.fromInt <| View.Utils.crewUsed v) ++ "/" ++ (String.fromInt <| totalCrew v) ++ " crew used" ]
-                    ]
-                , small [ class "ml-2" ]
-                    [ span [ class "badge badge-dark" ]
-                        [ text <| (String.fromInt <| weaponsUsingSlots) ++ "/" ++ String.fromInt v.equipment ++ " slots used" ]
-                    ]
-                , small [ class "ml-2" ]
-                    [ Button.button
-                        [ Button.roleLink
-                        , Button.small
-                        , Button.onClick <| To <| ViewAddingWeapon v
-                        ]
-                        [ icon "plus", text "Weapon" ]
-                    , Button.button
-                        [ Button.roleLink
-                        , Button.small
-                        , Button.onClick <| AddWeapon v.key handgun
-                        ]
-                        [ icon "plus", text "Handgun" ]
-                    ]
-                ]
-                weaponsListBody
+                        weaponsListBody
 
         upgradeListBody =
             case v.upgrades of
@@ -304,40 +395,45 @@ configure model v =
                     List.map (View.Upgrade.render model v) v.upgrades
 
         upgradeList =
-            View.Utils.detailSection
-                currentView
-                [ text "Upgrade List"
-                , small [ class "ml-2" ]
-                    [ span [ class "badge badge-dark" ]
-                        [ text <| (String.fromInt <| upgradeUsingSlots) ++ "/" ++ String.fromInt v.equipment ++ " slots used" ]
-                    ]
-                , small []
-                    [ Button.button
-                        [ Button.roleLink
-                        , Button.small
-                        , Button.onClick <| To <| ViewAddingUpgrade v
-                        , Button.attrs [ class "ml-2" ]
-                        ]
-                        [ icon "plus", text "Upgrade" ]
-                    ]
-                ]
-                upgradeListBody
-
-        availablePerks =
-            case model.sponsor of
-                Nothing ->
+            case ( v.upgrades, currentView ) of
+                ( [], ViewPrinterFriendly _ ) ->
                     text ""
 
-                Just sponsor ->
+                _ ->
+                    View.Utils.detailSection
+                        currentView
+                        [ text "Upgrade List"
+                        , small []
+                            [ Badge.badgeDark [ Spacing.ml2 ]
+                                [ " slots used"
+                                    |> (++) (String.fromInt <| v.equipment)
+                                    |> (++) "/"
+                                    |> (++) (String.fromInt <| upgradeUsingSlots)
+                                    |> text
+                                ]
+                            , addonListButton (To <| ViewAddingUpgrade v) "plus" "Upgrade"
+                            ]
+                        ]
+                        upgradeListBody
+
+        availablePerks =
+            case ( model.sponsor, v.perks, currentView ) of
+                ( Nothing, _, _ ) ->
+                    text ""
+
+                ( _, [], ViewPrinterFriendly _ ) ->
+                    text ""
+
+                ( Just sponsor, _, _ ) ->
                     View.Utils.detailSection
                         currentView
                         [ text "Perks Available from "
                         , text sponsor.name
                         ]
-                        [ div [ class "row" ]
+                        [ Grid.simpleRow
                             (sponsor
                                 |> .grantedClasses
-                                |> List.map (View.Sponsor.renderPerkClass v)
+                                |> List.map (View.Sponsor.renderPerkClass currentView v)
                             )
                         ]
 
@@ -376,24 +472,21 @@ configure model v =
                 |> View.Utils.factBadge
 
         expansion =
-            Model.Shared.fromExpansionAbbrev v.expansion
-
-        printButton =
-            Button.button
-                [ Button.primary
-                , Button.attrs
-                    [ class "my-2"
-                    , hidden (List.member currentView [ ViewDashboard, ViewAddingVehicle, ViewPrinterFriendly v ])
-                    ]
-                , Button.onClick <| To <| ViewPrinterFriendly v
-                ]
-                [ text <| "Print " ++ v.name ]
+            Model.Shared.fromExpansion v.expansion
 
         header =
-            span []
-                [ text v.name
-                , small [] [ text <| " " ++ expansion ]
-                ]
+            case currentView of
+                ViewPrinterFriendly _ ->
+                    h2 []
+                        [ text v.name
+                        , small [] [ text <| " [" ++ expansion ++ "]" ]
+                        ]
+
+                _ ->
+                    span []
+                        [ text v.name
+                        , small [] [ text <| " [" ++ expansion ++ "]" ]
+                        ]
 
         body : List (Html Msg)
         body =
@@ -404,7 +497,6 @@ configure model v =
             , weaponList
             , upgradeList
             , availablePerks
-            , printButton
             ]
 
         footer =
@@ -436,7 +528,7 @@ configure model v =
 renderDetails : Model -> Vehicle -> Html Msg
 renderDetails model v =
     let
-        ( header, body, footer ) =
+        ( _, body, _ ) =
             configure model v
     in
     body
@@ -493,27 +585,13 @@ renderPreview model v =
 renderPrint : Model -> Vehicle -> Html Msg
 renderPrint model v =
     let
-        name =
-            input
-                [ onInput <| VehicleMsg << TmpName
-                , placeholder "Name"
-                , class "form-control mr-2"
-                ]
-                [ text v.name ]
-
-        header =
-            h4 [ class "form-inline card-title" ]
-                [ name
-                , small [] [ text <| Model.Shared.fromExpansion v.expansion ]
-                ]
-
-        ( _, body, _ ) =
+        ( header, body, _ ) =
             configure model v
     in
-    Card.config []
-        |> Card.headerH4 [] [ header ]
-        |> Card.block [] (List.map (\b -> Block.text [] [ b ]) body)
-        |> Card.view
+    header
+        :: body
+        |> List.map (\b -> Grid.col [ Col.xs12 ] [ b ])
+        |> Grid.simpleRow
 
 
 counterElement :

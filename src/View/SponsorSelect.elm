@@ -18,6 +18,7 @@ import Html.Attributes
         )
 import Html.Events exposing (onClick, onInput)
 import Model.Model exposing (..)
+import Model.Shared exposing (expansionFilter)
 import Model.Sponsors exposing (..)
 import View.Sponsor
 import View.Utils
@@ -59,6 +60,7 @@ view model =
               <|
                 option [] [ text "No Sponsor" ]
                     :: (allSponsors
+                            |> List.filter (expansionFilter model.settings.expansions.enabled)
                             |> List.map .name
                             |> List.map optionFunc
                        )

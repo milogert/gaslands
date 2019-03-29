@@ -26,6 +26,7 @@ import Html.Attributes
         )
 import Html.Events exposing (onClick, onInput)
 import Model.Model exposing (..)
+import Model.Shared exposing (..)
 import Model.Upgrade.Common as UpgradeC
 import Model.Vehicle.Common as VehicleC
 import Model.Vehicle.Model exposing (..)
@@ -54,8 +55,13 @@ view model =
                 ViewAddingUpgrade v ->
                     To <| ViewDetails v
 
-                ViewPrinterFriendly v ->
-                    To <| ViewDetails v
+                ViewPrinterFriendly lv ->
+                    case List.length lv of
+                        1 ->
+                            To <| ViewDetails <| Maybe.withDefault defaultVehicle <| List.head lv
+
+                        _ ->
+                            To ViewDashboard
 
                 _ ->
                     To ViewDashboard
@@ -129,7 +135,7 @@ view model =
             [ CDN.stylesheet -- creates an inline style node with the Bootstrap CSS
             , Grid.row
                 [ Row.middleXs
-                , Row.attrs [ class "my-2" ]
+                , Row.attrs [ class "my-2 d-print-none" ]
                 ]
                 [ Grid.col [ Col.xsAuto ] [ backButton ]
                 , Grid.col [] [ viewDisplay ]
@@ -186,6 +192,7 @@ render model =
                 AddWeapon
                 View.Weapon.render
                 (WeaponC.allWeaponsList
+                    |> List.filter (expansionFilter model.settings.expansions.enabled)
                     |> List.filter
                         (\x -> x.slots <= VehicleC.slotsRemaining v)
                     |> List.filter
@@ -203,6 +210,7 @@ render model =
                 AddUpgrade
                 View.Upgrade.render
                 (UpgradeC.allUpgradesList
+                    |> List.filter (expansionFilter model.settings.expansions.enabled)
                     |> List.filter
                         (\x -> x.slots <= VehicleC.slotsRemaining v)
                 )
@@ -211,8 +219,8 @@ render model =
         ViewSettings ->
             View.Settings.view model
 
-        ViewPrinterFriendly v ->
-            View.PrinterFriendly.view model v
+        ViewPrinterFriendly lv ->
+            View.PrinterFriendly.view model lv
 
 
 sizeShower : Html Msg

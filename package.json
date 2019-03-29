@@ -8,7 +8,6 @@
   "private": true,
   "scripts": {
       "init": "yarn elm-github-install",
-      "css": "rm public/css/stylesheet.css && yarn node-sass --output-style compressed scss/custom.scss > public/css/stylesheet.css",
       "start": "yarn elm-app start",
       "build": "yarn elm-app build",
       "deploy": "yarn build && yarn gh-pages -d build",

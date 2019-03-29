@@ -4,6 +4,7 @@ import Bootstrap.Button as Btn
 import Bootstrap.Form.Select as Select
 import Bootstrap.Grid as Grid
 import Bootstrap.Grid.Col as Col
+import Bootstrap.Utilities.Spacing as Spacing
 import Html
     exposing
         ( Html
@@ -20,6 +21,7 @@ import Html.Attributes
         ( class
         , classList
         , disabled
+        , hidden
         , value
         )
 import Html.Events exposing (onClick, onInput)
@@ -36,13 +38,16 @@ import View.Utils exposing (icon)
 render : Model -> Vehicle -> Weapon -> Html Msg
 render model vehicle weapon =
     let
-        isPreview =
+        ( isPreview, isPrinting ) =
             case model.view of
                 ViewAddingWeapon _ ->
-                    True
+                    ( True, False )
+
+                ViewPrinterFriendly _ ->
+                    ( False, True )
 
                 _ ->
-                    False
+                    ( False, False )
 
         firingToggle =
             case weapon.status of
@@ -82,10 +87,10 @@ render model vehicle weapon =
                 , Btn.onClick firingToggle
                 , Btn.attrs
                     [ class "mr-2"
+                    , hidden <| isPreview || isPrinting
                     , classList
                         [ ( "btn-secondary", weapon.status == WeaponFired )
                         , ( "btn-primary", weapon.status == WeaponReady )
-                        , ( "d-none", isPreview )
                         ]
                     ]
                 ]
@@ -189,6 +194,7 @@ render model vehicle weapon =
                 renderedSpecial =
                     View.Utils.renderSpecial
                         isPreview
+                        isPrinting
                         (Just <| UpdateAmmoUsed vehicle.key weapon)
                         special
             in
@@ -219,8 +225,8 @@ render model vehicle weapon =
                     , Btn.block
                     , Btn.onClick <| DeleteWeapon vehicle.key weapon
                     , Btn.attrs
-                        [ classList [ ( "d-none", isPreview ) ]
-                        , class "mt-2"
+                        [ Spacing.mt2
+                        , hidden <| isPreview || isPrinting
                         ]
                     ]
                     [ icon "trash-alt" ]
