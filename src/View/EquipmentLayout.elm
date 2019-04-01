@@ -8,16 +8,8 @@ import Model.Model exposing (..)
 import View.Utils
 
 
-render : Bool -> List (Html Msg) -> List (Html Msg) -> Html Msg
-render shouldShowSidebar left right =
-    let
-        displayNone =
-            if shouldShowSidebar then
-                ""
-
-            else
-                "d-none"
-    in
+render : List (Html Msg) -> List (Html Msg) -> Html Msg
+render left right =
     Grid.row [ Row.middleXs, Row.topMd ]
         [ Grid.col [ Col.md3 ] left
         , Grid.col [ Col.md9 ] right

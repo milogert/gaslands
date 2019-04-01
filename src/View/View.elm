@@ -1,7 +1,7 @@
 module View.View exposing (view)
 
 import Bootstrap.Badge as Badge
-import Bootstrap.Button as Btn
+import Bootstrap.Button as Button
 import Bootstrap.CDN as CDN
 import Bootstrap.Grid as Grid
 import Bootstrap.Grid.Col as Col
@@ -28,11 +28,14 @@ import Html.Events exposing (onClick, onInput)
 import Model.Model exposing (..)
 import Model.Shared exposing (..)
 import Model.Upgrade.Common as UpgradeC
+import Model.Upgrade.Model exposing (..)
 import Model.Vehicle.Common as VehicleC
 import Model.Vehicle.Model exposing (..)
 import Model.Weapon.Common as WeaponC
+import Model.Weapon.Model exposing (..)
 import View.Dashboard
 import View.Details
+import View.ModalHolder
 import View.New
 import View.NewVehicle
 import View.PrinterFriendly
@@ -67,13 +70,13 @@ view model =
                     To ViewDashboard
 
         backButton =
-            Btn.button
-                [ Btn.disabled <| model.view == ViewDashboard
-                , Btn.light
-                , Btn.small
-                , Btn.block
-                , Btn.onClick viewToGoTo
-                , Btn.attrs [ attribute "aria-label" "Back Button" ]
+            Button.button
+                [ Button.disabled <| model.view == ViewDashboard
+                , Button.light
+                , Button.small
+                , Button.block
+                , Button.onClick viewToGoTo
+                , Button.attrs [ attribute "aria-label" "Back Button" ]
                 ]
                 [ icon "arrow-left" ]
 
@@ -87,11 +90,11 @@ view model =
             String.fromInt model.gearPhase
 
         gearPhaseButton =
-            Btn.button
-                [ Btn.small
-                , Btn.primary
-                , Btn.attrs [ class "ml-2" ]
-                , Btn.onClick <| VehicleMsg NextGearPhase
+            Button.button
+                [ Button.small
+                , Button.primary
+                , Button.attrs [ class "ml-2" ]
+                , Button.onClick <| VehicleMsg NextGearPhase
                 ]
                 [ icon "cogs", Badge.badgeLight [] [ text gearPhaseText ] ]
 
@@ -114,11 +117,11 @@ view model =
                 ]
 
         settingsButton =
-            Btn.button
-                [ Btn.small
-                , Btn.light
-                , Btn.onClick <| To ViewSettings
-                , Btn.attrs
+            Button.button
+                [ Button.small
+                , Button.light
+                , Button.onClick <| To ViewSettings
+                , Button.attrs
                     [ attribute "aria-label" "Back Button"
                     , class "ml-2"
                     ]
@@ -153,6 +156,7 @@ view model =
             --, hr [] []
             , displayAlert model
             , render model
+            , View.ModalHolder.modalHolder model
 
             --, sizeShower
             ]
@@ -185,12 +189,21 @@ render model =
             View.NewVehicle.view model
 
         ViewAddingWeapon v ->
-            View.New.view
+            (View.New.view
                 model
                 v
                 model.tmpWeapon
+                WeaponMsg
                 AddWeapon
-                View.Weapon.render
+                (View.Weapon.render
+                    (View.Weapon.RenderConfig
+                        False
+                        True
+                        True
+                        False
+                        False
+                    )
+                )
                 (WeaponC.allWeaponsList
                     |> List.filter (expansionFilter model.settings.expansions.enabled)
                     |> List.filter
@@ -200,21 +213,26 @@ render model =
                     |> List.filter
                         (View.Utils.weaponSponsorFilter model)
                 )
-                TmpWeaponUpdate
+                (WeaponMsg << TmpWeaponUpdate)
+            ).body
 
         ViewAddingUpgrade v ->
-            View.New.view
+            (View.New.view
                 model
                 v
                 model.tmpUpgrade
+                UpgradeMsg
                 AddUpgrade
-                View.Upgrade.render
+                (View.Upgrade.render
+                    (View.Upgrade.RenderConfig True False False)
+                )
                 (UpgradeC.allUpgradesList
                     |> List.filter (expansionFilter model.settings.expansions.enabled)
                     |> List.filter
                         (\x -> x.slots <= VehicleC.slotsRemaining v)
                 )
-                TmpUpgradeUpdate
+                (UpgradeMsg << TmpUpgradeUpdate)
+            ).body
 
         ViewSettings ->
             View.Settings.view model

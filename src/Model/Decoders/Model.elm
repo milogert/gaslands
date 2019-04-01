@@ -1,5 +1,6 @@
 module Model.Decoders.Model exposing (modelDecoder)
 
+import Bootstrap.Modal as Modal
 import Json.Decode exposing (..)
 import Json.Decode.Pipeline exposing (hardcoded, optional, required)
 import Model.Decoders.Settings exposing (settingsDecoder)
@@ -25,3 +26,4 @@ modelDecoder =
         |> hardcoded ""
         |> hardcoded []
         |> required "settings" settingsDecoder
+        |> hardcoded defaultModel.modals

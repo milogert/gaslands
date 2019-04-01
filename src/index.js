@@ -61,3 +61,11 @@ app.ports.takePhoto.subscribe(function(nothing) {
 });
 
 app.ports.destroyStream.subscribe(nothing => photo.stopStream());
+
+app.ports.open.subscribe(_ => {
+    document.querySelector('body').classList.add('modal-open');
+});
+
+app.ports.close.subscribe(_ => {
+    document.querySelector('body').classList.remove('modal-open');
+});

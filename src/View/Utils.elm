@@ -66,16 +66,16 @@ mapClassList classes =
     List.map (\x -> ( x, True )) classes
 
 
-detailSection : CurrentView -> List (Html Msg) -> List (Html Msg) -> Html Msg
-detailSection currentView headerContents bodyContents =
-    div [ hidden (currentView == ViewDashboard || currentView == ViewAddingVehicle) ]
+detailSection : List (Html Msg) -> List (Html Msg) -> Html Msg
+detailSection headerContents bodyContents =
+    div []
         [ hr [] [], h5 [] headerContents, div [] bodyContents ]
 
 
-renderSpecial : Bool -> Bool -> Maybe (Int -> Bool -> Msg) -> Special -> Html Msg
-renderSpecial isPreview isPrinting mMsg special =
-    case ( special, mMsg ) of
-        ( Ammo ammo, Just msg ) ->
+renderSpecial : Bool -> Bool -> Maybe (event -> Msg) -> Maybe (Int -> Bool -> event) -> Special -> Html Msg
+renderSpecial isPreview isPrinting mMsg mEvent special =
+    case ( special, mMsg, mEvent ) of
+        ( Ammo ammo, Just msg, Just event ) ->
             case ( isPreview, isPrinting ) of
                 ( True, _ ) ->
                     div [] [ text <| "Ammo: " ++ (String.fromInt <| List.length ammo) ]
@@ -86,49 +86,52 @@ renderSpecial isPreview isPrinting mMsg special =
                 ( False, False ) ->
                     Form.row [ Row.middleXs, Row.attrs [ class "mb-0" ] ]
                         [ Form.colLabel [ Col.xsAuto ] [ text "Ammo: " ]
-                        , renderCountDown msg ammo
+                        , renderCountDown msg event ammo
                         ]
 
-        ( Ammo _, Nothing ) ->
+        ( Ammo _, Nothing, _ ) ->
             text ""
 
-        ( HighlyExplosive, _ ) ->
+        ( Ammo _, _, Nothing ) ->
+            text ""
+
+        ( HighlyExplosive, _, _ ) ->
             text "Highly Explosive"
 
-        ( TreacherousSurface, _ ) ->
+        ( TreacherousSurface, _, _ ) ->
             text "The dropped template counts as a treacherous surface."
 
-        ( SpecialRule rule, _ ) ->
+        ( SpecialRule rule, _, _ ) ->
             text rule
 
-        ( NamedSpecialRule name rule, _ ) ->
+        ( NamedSpecialRule name rule, _, _ ) ->
             span [] [ b [] [ text <| name ++ ": " ], text rule ]
 
-        ( HandlingMod i, _ ) ->
+        ( HandlingMod i, _, _ ) ->
             text <| "Handling modification: " ++ String.fromInt i
 
-        ( HullMod i, _ ) ->
+        ( HullMod i, _, _ ) ->
             text <| "Hull modification: " ++ String.fromInt i
 
-        ( GearMod i, _ ) ->
+        ( GearMod i, _, _ ) ->
             text <| "Gear modification: " ++ String.fromInt i
 
-        ( CrewMod i, _ ) ->
+        ( CrewMod i, _, _ ) ->
             text <| "Crew modification: " ++ String.fromInt i
 
-        ( _, _ ) ->
+        ( _, _, _ ) ->
             text <| fromSpecial special
 
 
-renderCountDown : (Int -> Bool -> Msg) -> List Bool -> Form.Col Msg
-renderCountDown msg checks =
+renderCountDown : (event -> Msg) -> (Int -> Bool -> event) -> List Bool -> Form.Col Msg
+renderCountDown msg event checks =
     let
         checkboxFunc index check =
             Checkbox.checkbox
                 [ Checkbox.id <| String.fromInt index
                 , Checkbox.inline
                 , Checkbox.checked check
-                , Checkbox.onCheck (msg index)
+                , Checkbox.onCheck (msg << event index)
                 ]
                 ""
     in

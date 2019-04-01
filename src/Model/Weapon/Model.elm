@@ -2,6 +2,7 @@ module Model.Weapon.Model exposing
     ( Dice
     , Range(..)
     , Weapon
+    , WeaponEvent(..)
     , WeaponMounting(..)
     , WeaponStatus(..)
     , WeaponType(..)
@@ -10,6 +11,17 @@ module Model.Weapon.Model exposing
 
 import Model.Shared exposing (..)
 import Model.Sponsors exposing (..)
+
+
+type WeaponEvent
+    = AddWeapon String Weapon
+    | DeleteWeapon String Weapon
+    | UpdateAmmoUsed String Weapon Int Bool
+    | TmpWeaponUpdate String
+    | TmpWeaponMountPoint String
+    | SetWeaponsReady
+    | SetWeaponFired String Weapon
+    | RollWeaponDie String Weapon Int
 
 
 type alias Weapon =

@@ -1,20 +1,64 @@
-module Update.Weapon exposing
-    ( addWeapon
-    , deleteWeapon
-    , rollAttackDice
-    , rollWeaponDie
-    , setWeaponFired
-    , updateAmmoUsed
-    )
+module Update.Weapon exposing (update)
 
 import Dict exposing (..)
 import List.Extra as ListE
 import Model.Model exposing (..)
 import Model.Shared exposing (..)
 import Model.Vehicle.Model exposing (..)
+import Model.Weapon.Common exposing (..)
 import Model.Weapon.Model exposing (..)
 import Random
-import Update.Utils exposing (doSaveModel)
+import Update.Utils exposing (doCloseModal, doSaveModel)
+
+
+update : Model -> WeaponEvent -> ( Model, Cmd Msg )
+update model event =
+    case event of
+        AddWeapon key w ->
+            addWeapon model key w
+
+        DeleteWeapon key w ->
+            deleteWeapon model key w
+
+        UpdateAmmoUsed key w index check ->
+            updateAmmoUsed model key w index check
+
+        TmpWeaponUpdate name ->
+            let
+                w =
+                    nameToWeapon name
+            in
+            ( { model | tmpWeapon = w }
+            , Cmd.none
+            )
+
+        TmpWeaponMountPoint mountPointStr ->
+            let
+                mountPoint =
+                    strToMountPoint mountPointStr
+
+                w =
+                    case model.tmpWeapon of
+                        Nothing ->
+                            Nothing
+
+                        Just tmpWeapon ->
+                            Just { tmpWeapon | mountPoint = mountPoint }
+            in
+            ( { model | tmpWeapon = w }
+            , Cmd.none
+            )
+
+        SetWeaponsReady ->
+            ( model
+            , Cmd.none
+            )
+
+        SetWeaponFired v w ->
+            setWeaponFired model v w
+
+        RollWeaponDie v w result ->
+            rollWeaponDie model v w result
 
 
 addWeapon : Model -> String -> Weapon -> ( Model, Cmd Msg )
@@ -43,7 +87,7 @@ addWeapon model key w =
                         , error = []
                         , vehicles = Dict.insert key nv model.vehicles
                       }
-                    , doSaveModel
+                    , Cmd.batch [ doSaveModel, doCloseModal "weapon" ]
                     )
 
 
@@ -119,7 +163,7 @@ setWeaponFired model key w =
                 | view = ViewDetails nv
                 , vehicles = Dict.insert key nv model.vehicles
               }
-            , Random.generate (RollWeaponDie key weaponUpdated) (Random.int minRoll maxRoll)
+            , Random.generate (WeaponMsg << RollWeaponDie key weaponUpdated) (Random.int minRoll maxRoll)
             )
 
 

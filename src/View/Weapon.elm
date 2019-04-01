@@ -1,4 +1,4 @@
-module View.Weapon exposing (render)
+module View.Weapon exposing (RenderConfig, render)
 
 import Bootstrap.Button as Btn
 import Bootstrap.Form.Select as Select
@@ -35,27 +35,25 @@ import View.EquipmentLayout
 import View.Utils exposing (icon)
 
 
-render : Model -> Vehicle -> Weapon -> Html Msg
-render model vehicle weapon =
+type alias RenderConfig =
+    { showFireButton : Bool
+    , showMountPointSelect : Bool
+    , previewSpecials : Bool
+    , printSpecials : Bool
+    , showDeleteButton : Bool
+    }
+
+
+render : RenderConfig -> Model -> Vehicle -> Weapon -> Html Msg
+render cfg model vehicle weapon =
     let
-        ( isPreview, isPrinting ) =
-            case model.view of
-                ViewAddingWeapon _ ->
-                    ( True, False )
-
-                ViewPrinterFriendly _ ->
-                    ( False, True )
-
-                _ ->
-                    ( False, False )
-
         firingToggle =
             case weapon.status of
                 WeaponReady ->
-                    SetWeaponFired vehicle.key weapon
+                    WeaponMsg <| SetWeaponFired vehicle.key weapon
 
                 WeaponFired ->
-                    SetWeaponFired vehicle.key weapon
+                    WeaponMsg <| SetWeaponFired vehicle.key weapon
 
         crewAvailable =
             View.Utils.crewUsed vehicle < totalCrew vehicle
@@ -87,7 +85,7 @@ render model vehicle weapon =
                 , Btn.onClick firingToggle
                 , Btn.attrs
                     [ class "mr-2"
-                    , hidden <| isPreview || isPrinting
+                    , hidden <| not cfg.showFireButton
                     , classList
                         [ ( "btn-secondary", weapon.status == WeaponFired )
                         , ( "btn-primary", weapon.status == WeaponReady )
@@ -109,7 +107,7 @@ render model vehicle weapon =
                 [ text <| View.Utils.renderDice weapon.attack ++ " damage" ]
 
         mountPoint =
-            case ( weapon.mountPoint, isPreview ) of
+            case ( weapon.mountPoint, cfg.showMountPointSelect ) of
                 ( Just CrewFired, _ ) ->
                     span [ class "badge badge-secondary mr-2" ]
                         [ text <| fromWeaponMounting CrewFired ]
@@ -122,7 +120,7 @@ render model vehicle weapon =
                     div [ class "mr-2" ]
                         [ Select.select
                             [ Select.small
-                            , Select.onChange TmpWeaponMountPoint
+                            , Select.onChange <| WeaponMsg << TmpWeaponMountPoint
                             ]
                             (Select.item [ value "" ] [ text "" ]
                                 :: List.map
@@ -193,8 +191,9 @@ render model vehicle weapon =
             let
                 renderedSpecial =
                     View.Utils.renderSpecial
-                        isPreview
-                        isPrinting
+                        cfg.previewSpecials
+                        cfg.printSpecials
+                        (Just WeaponMsg)
                         (Just <| UpdateAmmoUsed vehicle.key weapon)
                         special
             in
@@ -209,7 +208,6 @@ render model vehicle weapon =
                     ul [] <| List.map renderSpecialFunc weapon.specials
     in
     View.EquipmentLayout.render
-        (not isPreview)
         [ Grid.row []
             [ Grid.col [ Col.xs, Col.md12 ]
                 [ h6 [] [ text <| weapon.name ++ " " ]
@@ -223,10 +221,10 @@ render model vehicle weapon =
                     [ Btn.small
                     , Btn.outlineDanger
                     , Btn.block
-                    , Btn.onClick <| DeleteWeapon vehicle.key weapon
+                    , Btn.onClick <| WeaponMsg <| DeleteWeapon vehicle.key weapon
                     , Btn.attrs
                         [ Spacing.mt2
-                        , hidden <| isPreview || isPrinting
+                        , hidden <| not cfg.showDeleteButton
                         ]
                     ]
                     [ icon "trash-alt" ]

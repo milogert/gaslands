@@ -1,10 +1,10 @@
-module View.NewVehicle exposing (view)
+module View.NewVehicle exposing (addButton, view)
 
 import Bootstrap.Button as Button
 import Bootstrap.Form.Select as Select
 import Bootstrap.Grid as Grid
 import Bootstrap.Grid.Col as Col
-import Html exposing (Html, text)
+import Html exposing (Html, hr, text)
 import Html.Attributes
     exposing
         ( class
@@ -29,10 +29,40 @@ view model =
                 Nothing ->
                     text "Select a vehicle type."
 
+        options =
+            allVehicles
+                |> List.filter (View.Utils.vehicleSponsorFilter model)
+                |> List.indexedMap vehicleOption
+                |> (::) (Select.item [] [ text "Select Vehicle" ])
+
+        selectList =
+            Select.select
+                [ Select.onChange <| VehicleMsg << TmpVehicleType
+                , Select.attrs [ class "mb-3" ]
+                ]
+                options
+    in
+    Grid.row []
+        [ Grid.col [ Col.md12 ] [ selectList ]
+        , Grid.col [ Col.md12 ] [ hr [] [] ]
+        , Grid.col [ Col.md12 ] [ body ]
+        ]
+
+
+vehicleOption : Int -> Vehicle -> Select.Item Msg
+vehicleOption i vt =
+    Select.item
+        [ value <| String.fromInt i ]
+        [ text <| fromVehicleType vt.vtype ]
+
+
+addButton : Maybe Vehicle -> Html Msg
+addButton tmpVehicle =
+    let
         disabledButton =
-            case model.tmpVehicle of
-                Just tmpVehicle ->
-                    case tmpVehicle.name of
+            case tmpVehicle of
+                Just vehicle ->
+                    case vehicle.name of
                         "" ->
                             True
 
@@ -42,65 +72,37 @@ view model =
                 Nothing ->
                     True
 
+        event =
+            case tmpVehicle of
+                Nothing ->
+                    []
+
+                Just v ->
+                    [ Button.onClick <| VehicleMsg (AddVehicle v) ]
+
+        attrs =
+            List.append
+                event
+                [ Button.primary
+
+                --, Button.block
+                , Button.attrs [ class "mb-3" ]
+                , Button.disabled disabledButton
+                ]
+
         buttonText =
-            case model.tmpVehicle of
-                Just tmpVehicle ->
-                    case tmpVehicle.name of
+            case tmpVehicle of
+                Just vehicle ->
+                    case vehicle.name of
                         "" ->
                             "Input Name"
 
                         _ ->
-                            "Add " ++ tmpVehicle.name
+                            "Add " ++ vehicle.name
 
                 Nothing ->
                     "Select Vehicle"
-
-        addButton =
-            let
-                event =
-                    case model.tmpVehicle of
-                        Nothing ->
-                            []
-
-                        Just v ->
-                            [ Button.onClick <| VehicleMsg (AddVehicle v) ]
-
-                attrs =
-                    List.append
-                        event
-                        [ Button.primary
-                        , Button.block
-                        , Button.attrs [ class "mb-3" ]
-                        , Button.disabled disabledButton
-                        ]
-            in
-            Button.button
-                attrs
-                [ text buttonText ]
-
-        options =
-            allVehicles
-                |> List.filter (View.Utils.vehicleSponsorFilter model)
-                |> List.indexedMap vehicleOption
-
-        selectList =
-            Select.select
-                [ Select.onChange <| VehicleMsg << TmpVehicleType
-                , Select.attrs
-                    [ class "mb-3"
-                    , size 8
-                    ]
-                ]
-                options
     in
-    Grid.row []
-        [ Grid.col [ Col.md3 ] [ addButton, selectList ]
-        , Grid.col [ Col.md9 ] [ body ]
-        ]
-
-
-vehicleOption : Int -> Vehicle -> Select.Item Msg
-vehicleOption i vt =
-    Select.item
-        [ value <| String.fromInt i ]
-        [ text <| fromVehicleType vt.vtype ]
+    Button.button
+        attrs
+        [ text buttonText ]
