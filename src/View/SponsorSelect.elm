@@ -51,11 +51,10 @@ view model =
                 [ text t ]
     in
     Grid.row []
-        [ Grid.col [ Col.md3 ]
+        [ Grid.col [ Col.md12 ]
             [ select
                 [ onInput SponsorUpdate
                 , class "form-control mb-3"
-                , size 8
                 ]
               <|
                 option [] [ text "No Sponsor" ]
@@ -64,6 +63,6 @@ view model =
                             |> List.map .name
                             |> List.map optionFunc
                        )
+            , body
             ]
-        , Grid.col [ Col.md9 ] [ body ]
         ]

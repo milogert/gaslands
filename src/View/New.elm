@@ -4,7 +4,7 @@ import Bootstrap.Button as Btn
 import Bootstrap.Form.Select as Select
 import Bootstrap.Grid as Grid
 import Bootstrap.Grid.Col as Col
-import Html exposing (Html, text)
+import Html exposing (Html, hr, text)
 import Html.Attributes exposing (class, size, value)
 import Model.Model exposing (..)
 import Model.Shared exposing (..)
@@ -13,16 +13,23 @@ import Model.Vehicle.Model exposing (..)
 import View.Upgrade
 
 
+type alias NewItem =
+    { body : Html Msg
+    , button : Html Msg
+    }
+
+
 view :
     Model
     -> Vehicle
     -> Maybe a
-    -> (String -> a -> Msg)
+    -> (event -> Msg)
+    -> (String -> a -> event)
     -> (Model -> Vehicle -> a -> Html Msg)
     -> List { a | slots : Int, expansion : Expansion, name : String }
     -> (String -> Msg)
-    -> Html Msg
-view model vehicle mThing buttonMsg renderFunc filteredThings selectMsg =
+    -> NewItem
+view model vehicle mThing msg event renderFunc filteredThings selectMsg =
     let
         buttonAttrs =
             [ Btn.primary
@@ -33,7 +40,7 @@ view model vehicle mThing buttonMsg renderFunc filteredThings selectMsg =
             case mThing of
                 Just thing ->
                     Btn.button
-                        (Btn.onClick (buttonMsg vehicle.key thing) :: buttonAttrs)
+                        (Btn.onClick (msg <| event vehicle.key thing) :: buttonAttrs)
                         [ text "Add" ]
 
                 Nothing ->
@@ -61,18 +68,22 @@ view model vehicle mThing buttonMsg renderFunc filteredThings selectMsg =
                             [ value name ]
                             [ text <| name ++ " (" ++ exp ++ ")" ]
                     )
+                |> (::) (Select.item [] [ text "" ])
 
         selectList =
             Select.select
                 [ Select.onChange selectMsg
                 , Select.attrs
                     [ class "mb-3"
-                    , size 8
                     ]
                 ]
                 options
     in
-    Grid.row []
-        [ Grid.col [ Col.md3 ] [ addButton, selectList ]
-        , Grid.col [ Col.md9 ] [ body ]
-        ]
+    NewItem
+        (Grid.row []
+            [ Grid.col [ Col.md12 ] [ selectList ]
+            , Grid.col [ Col.md12 ] [ hr [] [] ]
+            , Grid.col [ Col.md12 ] [ body ]
+            ]
+        )
+        addButton

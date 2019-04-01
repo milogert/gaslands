@@ -1,10 +1,9 @@
-module View.Upgrade exposing (render)
+module View.Upgrade exposing (RenderConfig, render)
 
 import Bootstrap.Button as Btn
 import Html
     exposing
         ( Html
-        , br
         , div
         , h6
         , li
@@ -13,11 +12,7 @@ import Html
         , text
         , ul
         )
-import Html.Attributes
-    exposing
-        ( class
-        , classList
-        )
+import Html.Attributes exposing (class, hidden)
 import Html.Events exposing (onClick, onInput)
 import Model.Model exposing (..)
 import Model.Shared exposing (..)
@@ -27,20 +22,16 @@ import View.EquipmentLayout
 import View.Utils exposing (icon, iconb)
 
 
-render : Model -> Vehicle -> Upgrade -> Html Msg
-render model vehicle upgrade =
+type alias RenderConfig =
+    { previewSpecials : Bool
+    , printSpecials : Bool
+    , showDeleteButton : Bool
+    }
+
+
+render : RenderConfig -> Model -> Vehicle -> Upgrade -> Html Msg
+render cfg model vehicle upgrade =
     let
-        ( isPreview, isPrinting ) =
-            case model.view of
-                ViewAddingWeapon _ ->
-                    ( True, False )
-
-                ViewPrinterFriendly _ ->
-                    ( False, True )
-
-                _ ->
-                    ( False, False )
-
         slotsTakenBadge =
             let
                 slotLabel =
@@ -74,7 +65,7 @@ render model vehicle upgrade =
                 ]
 
         renderSpecialFunc special =
-            li [] [ View.Utils.renderSpecial isPreview isPrinting Nothing special ]
+            li [] [ View.Utils.renderSpecial cfg.previewSpecials cfg.printSpecials Nothing Nothing special ]
 
         specials =
             case upgrade.specials of
@@ -85,20 +76,17 @@ render model vehicle upgrade =
                     ul [] <| List.map renderSpecialFunc upgrade.specials
     in
     View.EquipmentLayout.render
-        (not isPreview)
-        [ h6
-            [ classList [ ( "form-inline", isPreview ) ] ]
-            [ text <| upgrade.name
-            ]
+        [ h6 [] [ text <| upgrade.name ]
         , h6 []
-            [ small [] [ text <| fromExpansion upgrade.expansion ]
+            [ small []
+                [ text <| fromExpansion upgrade.expansion ]
             ]
         , Btn.button
-            [ Btn.onClick <| DeleteUpgrade vehicle.key upgrade
+            [ Btn.onClick <| UpgradeMsg <| DeleteUpgrade vehicle.key upgrade
             , Btn.outlineDanger
             , Btn.small
             , Btn.block
-            , Btn.attrs [ classList [ ( "d-none", isPreview ) ] ]
+            , Btn.attrs [ hidden <| not cfg.showDeleteButton ]
             ]
             [ icon "trash-alt" ]
         ]

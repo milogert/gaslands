@@ -175,7 +175,7 @@ addVehicle model vehicle =
                 , tmpVehicle = Nothing
                 , error = []
               }
-            , doSaveModel
+            , Cmd.batch [ doSaveModel, doCloseModal "vehicle" ]
             )
 
 

@@ -4,6 +4,7 @@ import Bootstrap.Button as Button
 import Bootstrap.Card as Card
 import Bootstrap.Grid as Grid
 import Bootstrap.Grid.Col as Col
+import Bootstrap.Modal as Modal
 import Dict exposing (Dict)
 import Html exposing (Html, text)
 import Html.Attributes exposing (checked, class, disabled, for, href, id, max, min, placeholder, rel, src, type_, value)
@@ -15,15 +16,15 @@ import View.Vehicle
 
 view : Model -> Html Msg
 view model =
-    Grid.row []
+    Grid.simpleRow
         [ Grid.col [ Col.xs ]
             [ Button.button
                 [ Button.primary
                 , Button.block
-                , Button.onClick <| To ViewAddingVehicle
+                , Button.onClick <| ShowModal "vehicle"
                 , Button.attrs [ class "mb-3" ]
                 ]
-                [ icon "plus", text "New Vehicle" ]
+                [ icon "plus", icon "car" ]
             ]
         , Grid.col [ Col.xsAuto ]
             [ Button.button

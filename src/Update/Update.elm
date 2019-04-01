@@ -1,11 +1,13 @@
 module Update.Update exposing (update)
 
+import Bootstrap.Modal as Modal
+import Dict
 import Model.Model exposing (..)
 import Model.Settings exposing (..)
 import Model.Sponsors exposing (..)
 import Model.Upgrade.Common exposing (..)
 import Model.Upgrade.Model exposing (..)
-import Model.Weapon.Common exposing (..)
+import Ports.Modals
 import Ports.Photo
 import Ports.Storage
 import Task
@@ -51,67 +53,12 @@ update msg model =
             Update.Vehicle.update model event
 
         -- WEAPON.
-        AddWeapon key w ->
-            Update.Weapon.addWeapon model key w
-
-        DeleteWeapon key w ->
-            Update.Weapon.deleteWeapon model key w
-
-        UpdateAmmoUsed key w index check ->
-            Update.Weapon.updateAmmoUsed model key w index check
-
-        TmpWeaponUpdate name ->
-            let
-                w =
-                    nameToWeapon name
-            in
-            ( { model | tmpWeapon = w }
-            , Cmd.none
-            )
-
-        TmpWeaponMountPoint mountPointStr ->
-            let
-                mountPoint =
-                    strToMountPoint mountPointStr
-
-                w =
-                    case model.tmpWeapon of
-                        Nothing ->
-                            Nothing
-
-                        Just tmpWeapon ->
-                            Just { tmpWeapon | mountPoint = mountPoint }
-            in
-            ( { model | tmpWeapon = w }
-            , Cmd.none
-            )
-
-        SetWeaponsReady ->
-            ( model
-            , Cmd.none
-            )
-
-        SetWeaponFired v w ->
-            Update.Weapon.setWeaponFired model v w
-
-        RollWeaponDie v w result ->
-            Update.Weapon.rollWeaponDie model v w result
+        WeaponMsg event ->
+            Update.Weapon.update model event
 
         -- UPGRADE.
-        AddUpgrade v u ->
-            Update.Upgrade.addUpgrade model v u
-
-        DeleteUpgrade v u ->
-            Update.Upgrade.deleteUpgrade model v u
-
-        TmpUpgradeUpdate name ->
-            let
-                u =
-                    nameToUpgrade name
-            in
-            ( { model | tmpUpgrade = u }
-            , Cmd.none
-            )
+        UpgradeMsg event ->
+            Update.Upgrade.update model event
 
         -- SPONSOR.
         SponsorUpdate sponsorName ->
@@ -164,3 +111,22 @@ update msg model =
 
         SettingsMsg event ->
             Update.Settings.update model event
+
+        -- Modals.
+        ShowModal modal ->
+            let
+                modals =
+                    Dict.insert modal Modal.shown model.modals
+            in
+            ( { model | modals = modals }
+            , Ports.Modals.open ()
+            )
+
+        CloseModal modal ->
+            let
+                modals =
+                    Dict.insert modal Modal.hidden model.modals
+            in
+            ( { model | modals = modals }
+            , Ports.Modals.close ()
+            )

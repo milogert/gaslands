@@ -10,6 +10,7 @@ module Model.Model exposing
     , viewToStr
     )
 
+import Bootstrap.Modal as Modal
 import Dict exposing (Dict)
 import Model.Settings exposing (..)
 import Model.Shared exposing (..)
@@ -37,6 +38,7 @@ type alias Model =
     , importValue : String
     , storageKeys : List String
     , settings : Settings
+    , modals : Dict String Modal.Visibility
     }
 
 
@@ -134,6 +136,13 @@ defaultModel =
         ""
         []
         Model.Settings.init
+        (Dict.fromList
+            [ ( "vehicle", Modal.hidden )
+            , ( "weapon", Modal.hidden )
+            , ( "upgrade", Modal.hidden )
+            , ( "sponsor", Modal.hidden )
+            ]
+        )
 
 
 init : () -> ( Model, Cmd Msg )
@@ -150,20 +159,9 @@ type
       -- VEHICLE.
     | VehicleMsg VehicleEvent
       -- WEAPON.
-    | AddWeapon String Weapon
-    | DeleteWeapon String Weapon
-    | UpdateAmmoUsed String Weapon Int Bool
-    | TmpWeaponUpdate String
-    | TmpWeaponMountPoint String
-    | SetWeaponsReady
-    | SetWeaponFired String Weapon
-    | RollWeaponDie String Weapon Int
+    | WeaponMsg WeaponEvent
       -- UPGRADE.
-    | AddUpgrade String Upgrade
-    | DeleteUpgrade String Upgrade
-    | TmpUpgradeUpdate String
-    | UpdatePointsAllowed String
-    | UpdateTeamName String
+    | UpgradeMsg UpgradeEvent
       -- SPONSOR.
     | SponsorUpdate String
       -- DATA.
@@ -179,3 +177,8 @@ type
     | DeleteItemCallback String
       -- SETTINGS.
     | SettingsMsg SettingsEvent
+    | UpdatePointsAllowed String
+    | UpdateTeamName String
+      -- MODALS.
+    | ShowModal String
+    | CloseModal String
