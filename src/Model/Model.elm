@@ -45,11 +45,6 @@ type alias Model =
 type CurrentView
     = ViewDashboard
     | ViewDetails Vehicle
-    | ViewSelectingSponsor
-    | ViewAddingVehicle
-    | ViewAddingWeapon Vehicle
-    | ViewAddingUpgrade Vehicle
-    | ViewSettings
     | ViewPrinterFriendly (List Vehicle)
 
 
@@ -92,21 +87,6 @@ viewToStr model =
 
         ViewDetails v ->
             v.name
-
-        ViewSelectingSponsor ->
-            "Sponsor Select"
-
-        ViewAddingVehicle ->
-            "Adding Vehicle"
-
-        ViewAddingWeapon v ->
-            "Adding Weapon to " ++ v.name
-
-        ViewAddingUpgrade v ->
-            "Adding Upgrade to " ++ v.name
-
-        ViewSettings ->
-            "Settings"
 
         ViewPrinterFriendly lv ->
             "Printing " ++ String.fromInt (List.length lv) ++ " vehicle(s)"

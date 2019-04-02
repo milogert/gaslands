@@ -33,7 +33,7 @@ view model =
             allVehicles
                 |> List.filter (View.Utils.vehicleSponsorFilter model)
                 |> List.indexedMap vehicleOption
-                |> (::) (Select.item [] [ text "Select Vehicle" ])
+                |> (::) (Select.item [ value "-1" ] [ text "Select Vehicle" ])
 
         selectList =
             Select.select

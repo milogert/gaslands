@@ -52,12 +52,6 @@ view model =
     let
         viewToGoTo =
             case model.view of
-                ViewAddingWeapon v ->
-                    To <| ViewDetails v
-
-                ViewAddingUpgrade v ->
-                    To <| ViewDetails v
-
                 ViewPrinterFriendly lv ->
                     case List.length lv of
                         1 ->
@@ -120,7 +114,7 @@ view model =
             Button.button
                 [ Button.small
                 , Button.light
-                , Button.onClick <| To ViewSettings
+                , Button.onClick <| ShowModal "settings"
                 , Button.attrs
                     [ attribute "aria-label" "Back Button"
                     , class "ml-2"
@@ -181,61 +175,6 @@ render model =
 
         ViewDetails v ->
             View.Details.view model v
-
-        ViewSelectingSponsor ->
-            View.SponsorSelect.view model
-
-        ViewAddingVehicle ->
-            View.NewVehicle.view model
-
-        ViewAddingWeapon v ->
-            (View.New.view
-                model
-                v
-                model.tmpWeapon
-                WeaponMsg
-                AddWeapon
-                (View.Weapon.render
-                    (View.Weapon.RenderConfig
-                        False
-                        True
-                        True
-                        False
-                        False
-                    )
-                )
-                (WeaponC.allWeaponsList
-                    |> List.filter (expansionFilter model.settings.expansions.enabled)
-                    |> List.filter
-                        (\x -> x.slots <= VehicleC.slotsRemaining v)
-                    |> List.filter
-                        (\x -> x.name /= WeaponC.handgun.name)
-                    |> List.filter
-                        (View.Utils.weaponSponsorFilter model)
-                )
-                (WeaponMsg << TmpWeaponUpdate)
-            ).body
-
-        ViewAddingUpgrade v ->
-            (View.New.view
-                model
-                v
-                model.tmpUpgrade
-                UpgradeMsg
-                AddUpgrade
-                (View.Upgrade.render
-                    (View.Upgrade.RenderConfig True False False)
-                )
-                (UpgradeC.allUpgradesList
-                    |> List.filter (expansionFilter model.settings.expansions.enabled)
-                    |> List.filter
-                        (\x -> x.slots <= VehicleC.slotsRemaining v)
-                )
-                (UpgradeMsg << TmpUpgradeUpdate)
-            ).body
-
-        ViewSettings ->
-            View.Settings.view model
 
         ViewPrinterFriendly lv ->
             View.PrinterFriendly.view model lv

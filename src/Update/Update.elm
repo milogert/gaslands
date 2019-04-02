@@ -117,9 +117,17 @@ update msg model =
             let
                 modals =
                     Dict.insert modal Modal.shown model.modals
+
+                cmds =
+                    case modal of
+                        "settings" ->
+                            [ Ports.Storage.getKeys "" ]
+
+                        _ ->
+                            []
             in
             ( { model | modals = modals }
-            , Ports.Modals.open ()
+            , Cmd.batch <| Ports.Modals.open () :: cmds
             )
 
         CloseModal modal ->

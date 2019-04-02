@@ -27,31 +27,6 @@ update model currentView =
                 ]
             )
 
-        ViewSelectingSponsor ->
-            ( { model | view = ViewSelectingSponsor }
-            , Cmd.none
-            )
-
-        ViewAddingVehicle ->
-            ( { model | view = ViewAddingVehicle, tmpVehicle = Nothing }
-            , Cmd.none
-            )
-
-        ViewAddingWeapon v ->
-            ( { model | view = ViewAddingWeapon v, tmpWeapon = Nothing }
-            , Cmd.none
-            )
-
-        ViewAddingUpgrade v ->
-            ( { model | view = ViewAddingUpgrade v, tmpUpgrade = Nothing }
-            , Cmd.none
-            )
-
-        ViewSettings ->
-            ( { model | view = ViewSettings }
-            , Ports.Storage.getKeys ""
-            )
-
         ViewPrinterFriendly v ->
             ( { model | view = ViewPrinterFriendly v }
             , Cmd.none

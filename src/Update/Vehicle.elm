@@ -60,7 +60,12 @@ update model event =
                     )
 
         TmpVehicleType indexString ->
-            setTmpVehicleType model (Maybe.withDefault 0 (String.toInt indexString))
+            case indexString of
+                "-1" ->
+                    ( { model | tmpVehicle = Nothing }, Cmd.none )
+
+                _ ->
+                    setTmpVehicleType model (Maybe.withDefault 0 (String.toInt indexString))
 
         TmpNotes notes ->
             case model.tmpVehicle of

@@ -14,6 +14,7 @@ import Model.Weapon.Common as WeaponC
 import Model.Weapon.Model exposing (..)
 import View.New
 import View.NewVehicle
+import View.Settings
 import View.SponsorSelect
 import View.Upgrade
 import View.Utils
@@ -77,6 +78,9 @@ modalHolder model =
 
         sponsorSelect =
             View.SponsorSelect.view model
+
+        settings =
+            View.Settings.view model
     in
     div []
         [ generateModal
@@ -97,16 +101,29 @@ modalHolder model =
             (text <| "New Upgrade for " ++ currentVehicle.name)
             addUpgrade.body
             addUpgrade.button
-        , generateModal
+        , generateModalWithClose
             model
             "sponsor"
             (text <| "Select a Team Sponsor")
             sponsorSelect
-            (Button.button
-                [ Button.onClick <| CloseModal "sponsor" ]
-                [ text "Close" ]
-            )
+        , generateModalWithClose
+            model
+            "settings"
+            (text <| "Settings")
+            (View.Settings.view model)
         ]
+
+
+generateModalWithClose : Model -> String -> Html Msg -> Html Msg -> Html Msg
+generateModalWithClose model key header body =
+    generateModal model
+        key
+        header
+        body
+        (Button.button
+            [ Button.onClick <| CloseModal key ]
+            [ text "Close" ]
+        )
 
 
 generateModal : Model -> String -> Html Msg -> Html Msg -> Html Msg -> Html Msg
