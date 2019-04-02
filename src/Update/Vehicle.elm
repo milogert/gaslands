@@ -33,11 +33,12 @@ update model event =
                         |> Dict.map (\k v -> { v | activated = False })
 
                 gearPhase =
-                    if model.gearPhase < 6 then
-                        model.gearPhase + 1
+                    case compare model.gearPhase 6 of
+                        LT ->
+                            model.gearPhase + 1
 
-                    else
-                        1
+                        _ ->
+                            1
             in
             ( { model
                 | view = ViewDashboard

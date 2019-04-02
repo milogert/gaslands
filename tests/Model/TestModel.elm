@@ -54,11 +54,6 @@ viewTests : Test
 viewTests =
     [ ( ViewDashboard, "Team NoName" )
     , ( ViewDetails defaultVehicle, "" )
-    , ( ViewSelectingSponsor, "Sponsor Select" )
-    , ( ViewAddingVehicle, "Adding Vehicle" )
-    , ( ViewAddingWeapon defaultVehicle, "Adding Weapon to " )
-    , ( ViewAddingUpgrade defaultVehicle, "Adding Upgrade to " )
-    , ( ViewSettings, "Settings" )
     ]
         |> List.map
             (\( view, result ) ->
