@@ -76,20 +76,7 @@ render cfg model vehicle upgrade =
                     ul [] <| List.map renderSpecialFunc upgrade.specials
     in
     View.EquipmentLayout.render
-        [ h6 [] [ text <| upgrade.name ]
-        , h6 []
-            [ small []
-                [ text <| fromExpansion upgrade.expansion ]
-            ]
-        , Btn.button
-            [ Btn.onClick <| UpgradeMsg <| DeleteUpgrade vehicle.key upgrade
-            , Btn.outlineDanger
-            , Btn.small
-            , Btn.block
-            , Btn.attrs [ hidden <| not cfg.showDeleteButton ]
-            ]
-            [ icon "trash-alt" ]
-        ]
-        [ factsHolder
-        , specials
-        ]
+        upgrade
+        (UpgradeMsg << DeleteUpgrade vehicle.key)
+        [ factsHolder ]
+        [ specials ]

@@ -13,7 +13,9 @@ import Model.Vehicle.Model as VehicleM
 import Model.Weapon.Common as WeaponC
 import Model.Weapon.Model exposing (..)
 import View.New
+import View.NewUpgrade
 import View.NewVehicle
+import View.NewWeapon
 import View.Settings
 import View.SponsorSelect
 import View.Upgrade
@@ -33,21 +35,9 @@ modalHolder model =
                     VehicleM.defaultVehicle
 
         addWeapon =
-            View.New.view
+            View.NewWeapon.view
                 model
                 currentVehicle
-                model.tmpWeapon
-                WeaponMsg
-                AddWeapon
-                (View.Weapon.render
-                    (View.Weapon.RenderConfig
-                        False
-                        True
-                        True
-                        False
-                        False
-                    )
-                )
                 (WeaponC.allWeaponsList
                     |> List.filter (expansionFilter model.settings.expansions.enabled)
                     |> List.filter
@@ -57,24 +47,16 @@ modalHolder model =
                     |> List.filter
                         (View.Utils.weaponSponsorFilter model)
                 )
-                (WeaponMsg << TmpWeaponUpdate)
 
         addUpgrade =
-            View.New.view
+            View.NewUpgrade.view
                 model
                 currentVehicle
-                model.tmpUpgrade
-                UpgradeMsg
-                AddUpgrade
-                (View.Upgrade.render
-                    (View.Upgrade.RenderConfig True False False)
-                )
                 (UpgradeC.allUpgradesList
                     |> List.filter (expansionFilter model.settings.expansions.enabled)
                     |> List.filter
                         (\x -> x.slots <= VehicleC.slotsRemaining currentVehicle)
                 )
-                (UpgradeMsg << TmpUpgradeUpdate)
 
         sponsorSelect =
             View.SponsorSelect.view model

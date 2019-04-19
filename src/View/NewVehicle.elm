@@ -1,13 +1,17 @@
 module View.NewVehicle exposing (addButton, view)
 
 import Bootstrap.Button as Button
+import Bootstrap.Form as Form
+import Bootstrap.Form.Input as Input
 import Bootstrap.Form.Select as Select
 import Bootstrap.Grid as Grid
 import Bootstrap.Grid.Col as Col
+import Bootstrap.Utilities.Spacing as Spacing
 import Html exposing (Html, hr, text)
 import Html.Attributes
     exposing
         ( class
+        , disabled
         , size
         , value
         )
@@ -41,10 +45,38 @@ view model =
                 , Select.attrs [ class "mb-3" ]
                 ]
                 options
+
+        nameInput =
+            case model.tmpVehicle of
+                Nothing ->
+                    Input.text
+                        [ Input.placeholder "Select a vehicle type above"
+                        , Input.attrs [ disabled True, Spacing.mr1 ]
+                        ]
+
+                Just vehicle ->
+                    Input.text
+                        [ Input.placeholder "Name"
+                        , Input.onInput <| VehicleMsg << TmpName
+                        , Input.value vehicle.name
+                        , Input.attrs [ Spacing.mr1 ]
+                        ]
     in
     Grid.row []
-        [ Grid.col [ Col.md12 ] [ selectList ]
-        , Grid.col [ Col.md12 ] [ hr [] [] ]
+        [ Grid.col [ Col.md12 ]
+            [ Form.form []
+                [ Form.row []
+                    [ Form.colLabel [ Col.mdAuto ]
+                        [ Form.label [] [ text "Vehicle Type" ] ]
+                    , Form.col [] [ selectList ]
+                    ]
+                , Form.row []
+                    [ Form.colLabel [ Col.mdAuto ]
+                        [ Form.label [] [ text "Vehicle Name" ] ]
+                    , Form.col [] [ nameInput ]
+                    ]
+                ]
+            ]
         , Grid.col [ Col.md12 ] [ body ]
         ]
 

@@ -48,7 +48,7 @@ import Model.Weapon.Model exposing (..)
 import View.Photo
 import View.Sponsor
 import View.Upgrade
-import View.Utils exposing (icon, iconClass)
+import View.Utils exposing (icon, iconClass, plural)
 import View.Weapon
 
 
@@ -110,18 +110,11 @@ configure model cfg v =
         vtype =
             fromVehicleType v.vtype
 
-        vehicleTypeBadge =
-            View.Utils.factBadge vtype
+        pointsDisplay =
+            (String.fromInt <| vehicleCost v) ++ " points"
 
-        weightBadge =
-            View.Utils.factBadge <|
-                fromVehicleWeight v.weight
-                    ++ "-weight"
-
-        handlingBadge =
-            View.Utils.factBadge <|
-                (String.fromInt <| totalHandling v)
-                    ++ " handling"
+        weightDisplay =
+            fromVehicleWeight v.weight ++ "-weight"
 
         equipmentUsed =
             List.sum (List.map .slots v.weapons)
@@ -129,14 +122,29 @@ configure model cfg v =
         equipmentRemaining =
             String.fromInt <| v.equipment - equipmentUsed
 
-        crewBadge =
-            View.Utils.factBadge <| (String.fromInt <| totalCrew v) ++ " total crew"
+        crewDisplay =
+            (String.fromInt <| totalCrew v) ++ " total crew"
+
+        handlingDisplay =
+            (String.fromInt <| totalHandling v) ++ " handling"
+
+        equipmentSlotsDisplay =
+            String.fromInt v.equipment ++ " build slot" ++ plural v.equipment
+
+        maxHullDisplay =
+            v
+                |> totalHull
+                |> String.fromInt
+                |> (\s -> s ++ " max hull")
+
+        maxGearDisplay =
+            v
+                |> totalGear
+                |> String.fromInt
+                |> (\s -> s ++ " max gear")
 
         isCrewAvailable =
             totalCrew v > View.Utils.crewUsed v
-
-        crewRemaining =
-            String.fromInt <| totalCrew v - View.Utils.crewUsed v
 
         wrecked =
             v.hull.current >= totalHull v
@@ -172,14 +180,14 @@ configure model cfg v =
 
         factsHolder =
             View.Utils.factsHolder
-                [ vehicleTypeBadge
-                , pointsCostBadge
-                , weightBadge
-                , crewBadge
-                , handlingBadge
-                , equipmentSlotsBadge
-                , maxHullBadge
-                , maxGearBadge
+                [ vtype
+                , pointsDisplay
+                , weightDisplay
+                , crewDisplay
+                , handlingDisplay
+                , equipmentSlotsDisplay
+                , maxHullDisplay
+                , maxGearDisplay
                 ]
 
         photoPlus =
@@ -362,7 +370,6 @@ configure model cfg v =
                             (View.Weapon.RenderConfig
                                 (not cfg.printDetails)
                                 False
-                                False
                                 cfg.printDetails
                                 (not cfg.printDetails)
                             )
@@ -483,40 +490,6 @@ configure model cfg v =
                             )
                         ]
 
-        pointsCostBadge =
-            View.Utils.factBadge <|
-                (String.fromInt <| vehicleCost v)
-                    ++ " points"
-
-        equipmentSlotsBadge =
-            let
-                slots =
-                    case v.equipment of
-                        1 ->
-                            "slot"
-
-                        _ ->
-                            "slots"
-            in
-            View.Utils.factBadge <|
-                String.fromInt v.equipment
-                    ++ " build "
-                    ++ slots
-
-        maxHullBadge =
-            v
-                |> totalHull
-                |> String.fromInt
-                |> (\s -> s ++ " max hull")
-                |> View.Utils.factBadge
-
-        maxGearBadge =
-            v
-                |> totalGear
-                |> String.fromInt
-                |> (\s -> s ++ " max gear")
-                |> View.Utils.factBadge
-
         expansion =
             Model.Shared.fromExpansion v.expansion
 
@@ -614,18 +587,19 @@ renderPreview : Model -> Vehicle -> Html Msg
 renderPreview model v =
     let
         name =
-            Input.text
-                [ Input.small
-                , Input.placeholder "Name"
-                , Input.onInput <| VehicleMsg << TmpName
-                , Input.value v.name
-                , Input.attrs [ Spacing.mr1 ]
-                ]
+            case v.name of
+                "" ->
+                    "..."
+
+                _ ->
+                    v.name
 
         header =
-            h4 [ class "form-inline card-title" ]
-                [ name
-                , small [] [ text <| "[" ++ Model.Shared.fromExpansion v.expansion ++ "]" ]
+            h4 []
+                [ text name
+                , small
+                    [ Spacing.ml2 ]
+                    [ text <| "[" ++ Model.Shared.fromExpansion v.expansion ++ "]" ]
                 ]
 
         ( _, body, _ ) =

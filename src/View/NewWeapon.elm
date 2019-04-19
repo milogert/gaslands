@@ -1,78 +1,139 @@
 module View.NewWeapon exposing (view)
 
 import Bootstrap.Button as Button
+import Bootstrap.Form as Form
 import Bootstrap.Form.Select as Select
 import Bootstrap.Grid as Grid
 import Bootstrap.Grid.Col as Col
-import Html exposing (Html, text)
-import Html.Attributes exposing (class, size, value)
-import Html.Events exposing (onClick, onInput)
+import Html exposing (Html, div, hr, text)
+import Html.Attributes exposing (class, disabled, size, value)
 import Model.Model exposing (..)
 import Model.Shared exposing (..)
-import Model.Vehicle.Common exposing (..)
 import Model.Vehicle.Model exposing (..)
 import Model.Weapon.Common exposing (..)
-import View.Utils
+import Model.Weapon.Model exposing (..)
+import View.Utils exposing (NewItem)
 import View.Weapon
 
 
-view : Model -> Vehicle -> Html Msg
-view model v =
+view : Model -> Vehicle -> List Weapon -> NewItem
+view model vehicle weapons =
     let
+        buttonAttrs =
+            [ Button.primary
+            , Button.attrs [ class "mb-3" ]
+            ]
+
         addButton =
             case model.tmpWeapon of
-                Just w ->
-                    Button.button
-                        [ Button.primary
-                        , Button.attrs [ class "mb-3" ]
-                        , Button.onClick (AddWeapon v.key w)
-                        ]
-                        [ text "Add Weapon" ]
+                Just weapon ->
+                    case weapon.mountPoint of
+                        Nothing ->
+                            Button.button
+                                (Button.disabled True :: buttonAttrs)
+                                [ text "Select Mount Point" ]
+
+                        Just _ ->
+                            Button.button
+                                (Button.onClick (WeaponMsg <| AddWeapon vehicle.key weapon) :: buttonAttrs)
+                                [ text <| "Add " ++ weapon.name ++ " to " ++ vehicle.name ]
 
                 Nothing ->
                     Button.button
-                        [ Button.primary
-                        , Button.attrs [ class "mb-3" ]
-                        , Button.disabled True
-                        ]
-                        [ text "Select Weapon" ]
+                        (Button.disabled True :: buttonAttrs)
+                        [ text "Choose Weapon Type" ]
 
         body =
             case model.tmpWeapon of
-                Just tmpWeapon ->
-                    View.Weapon.render model v tmpWeapon
+                Just weapon ->
+                    View.Weapon.render
+                        (View.Weapon.RenderConfig
+                            False
+                            True
+                            False
+                            False
+                        )
+                        model
+                        vehicle
+                        weapon
 
                 Nothing ->
-                    text "Select a weapon."
+                    text "Select a weapon type from the dropdown."
+
+        thingToTuple : Weapon -> ( String, String )
+        thingToTuple t =
+            ( t.name, fromExpansionAbbrev t.expansion )
 
         options =
-            allWeaponsList
-                |> List.filter
-                    (\x -> x.slots <= slotsRemaining v)
-                |> List.filter (\x -> x.name /= handgun.name)
-                |> List.filter (View.Utils.weaponSponsorFilter model)
-                |> List.map
-                    (\w ->
-                        ( w.name, fromExpansionAbbrev w.expansion )
-                    )
+            weapons
+                |> List.map thingToTuple
                 |> List.map
                     (\( name, exp ) ->
                         Select.item
                             [ value name ]
                             [ text <| name ++ " (" ++ exp ++ ")" ]
                     )
+                |> (::) (Select.item [] [ text "" ])
 
         selectList =
             Select.select
-                [ Select.onChange TmpWeaponUpdate
+                [ Select.onChange (WeaponMsg << TmpWeaponUpdate)
                 , Select.attrs
-                    [ class "form-control mb-3"
-                    , size 8
+                    [ class "mb-3"
                     ]
                 ]
                 options
+
+        mountPointOption mountPoint =
+            mountPoint
+                |> fromWeaponMounting
+                |> (\mp -> Select.item [ value mp ] [ text mp ])
+
+        mountPointSelector =
+            case model.tmpWeapon of
+                Nothing ->
+                    Select.select
+                        [ Select.attrs [ disabled True ] ]
+                        [ Select.item
+                            [ value "" ]
+                            [ text "Select a weapon type above" ]
+                        ]
+
+                Just weapon ->
+                    case Just CrewFired == weapon.mountPoint of
+                        True ->
+                            Select.select
+                                [ Select.attrs [ disabled True ] ]
+                                [ Select.item
+                                    [ value "" ]
+                                    [ text "Crew Fired" ]
+                                ]
+
+                        False ->
+                            [ Full, Front, LeftSide, RightSide, Rear ]
+                                |> List.map mountPointOption
+                                |> (::) (Select.item [ value "" ] [ text "" ])
+                                |> Select.select
+                                    [ Select.onChange <| WeaponMsg << TmpWeaponMountPoint
+                                    ]
     in
-    Grid.row []
-        [ Grid.col [ Col.md3 ] [ addButton, selectList ]
-        , Grid.col [ Col.md9 ] [ body ]
-        ]
+    NewItem
+        (Grid.row []
+            [ Grid.col [ Col.md12 ]
+                [ Form.form []
+                    [ Form.row []
+                        [ Form.colLabel [ Col.mdAuto ]
+                            [ Form.label [] [ text "Weapon Type" ] ]
+                        , Form.col [] [ selectList ]
+                        ]
+                    , Form.row []
+                        [ Form.colLabel [ Col.mdAuto ]
+                            [ Form.label [] [ text "Mount Point" ] ]
+                        , Form.col [] [ mountPointSelector ]
+                        ]
+                    ]
+                ]
+            , Grid.col [ Col.md12 ] [ body ]
+            ]
+        )
+        addButton

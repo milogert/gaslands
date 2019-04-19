@@ -13,6 +13,7 @@ import Html
         , div
         , h2
         , hr
+        , node
         , pre
         , span
         , text
@@ -22,6 +23,8 @@ import Html.Attributes
         ( attribute
         , class
         , classList
+        , href
+        , rel
         , style
         )
 import Html.Events exposing (onClick, onInput)
@@ -130,6 +133,14 @@ view model =
         (viewToStr model)
         [ Grid.container []
             [ CDN.stylesheet -- creates an inline style node with the Bootstrap CSS
+            , node "link"
+                [ rel "stylesheet"
+                , href "https://use.fontawesome.com/releases/v5.0.13/css/all.css"
+                , attribute "integrity" "sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp"
+                , attribute "async" "true"
+                , attribute "crossorigin" "anonymous"
+                ]
+                []
             , Grid.row
                 [ Row.middleXs
                 , Row.attrs [ class "my-2 d-print-none" ]

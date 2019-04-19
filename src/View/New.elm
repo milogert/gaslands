@@ -11,12 +11,7 @@ import Model.Shared exposing (..)
 import Model.Vehicle.Common exposing (..)
 import Model.Vehicle.Model exposing (..)
 import View.Upgrade
-
-
-type alias NewItem =
-    { body : Html Msg
-    , button : Html Msg
-    }
+import View.Utils exposing (NewItem)
 
 
 view :

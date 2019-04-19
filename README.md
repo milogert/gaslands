@@ -10,21 +10,28 @@ This this needs [Elm](http://elm-lang.org/) installed. Installing `create-elm-ap
 
 # Development
 
-1. `git clone --recurse-submodules https://github.com/milogert/glom`
+1. `git clone https://github.com/milogert/glom`
 2. `cd glom`
-3. `make install`
-4. `make start`
-4. Navigate to `http://localhost:3000`.
+3. `yarn install`
+4. `yarn start`
+5. Navigate to `http://localhost:3000`.
 
 # Building for production
 
-1. Steps 1-3 in Development.
-2. `make build`
+1. `yarn build`
 
 # Deploying
 
-1. Steps 1-3 in Development.
-2. `make deploy`
+1. `yarn deploy`
+
+# Testing
+
+1. `yarn test`
+
+# Coverage
+
+1. `yarn coverage`
+2. Navigate to file:///home/you/code/glom/.coverage/coverage.html
 
 # Hosting
 

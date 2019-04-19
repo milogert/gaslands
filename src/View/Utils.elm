@@ -1,11 +1,13 @@
 module View.Utils exposing
-    ( crewUsed
+    ( NewItem
+    , crewUsed
     , detailSection
     , factBadge
     , factsHolder
     , icon
     , iconClass
     , iconb
+    , plural
     , renderCountDown
     , renderDice
     , renderSpecial
@@ -21,6 +23,7 @@ import Bootstrap.Form.Input as Input
 import Bootstrap.Grid as Grid
 import Bootstrap.Grid.Col as Col
 import Bootstrap.Grid.Row as Row
+import Bootstrap.Utilities.Spacing as Spacing
 import Html
     exposing
         ( Html
@@ -41,6 +44,12 @@ import Model.Vehicle.Model exposing (..)
 import Model.Weapon.Model exposing (..)
 
 
+type alias NewItem =
+    { body : Html Msg
+    , button : Html Msg
+    }
+
+
 icon : String -> Html Msg
 icon s =
     iconClass "fas" s []
@@ -59,11 +68,6 @@ iconClass styleOrBrand s cl =
         , classList <| List.map (\c -> ( c, True )) cl
         ]
         []
-
-
-mapClassList : List String -> List ( String, Bool )
-mapClassList classes =
-    List.map (\x -> ( x, True )) classes
 
 
 detailSection : List (Html Msg) -> List (Html Msg) -> Html Msg
@@ -119,7 +123,25 @@ renderSpecial isPreview isPrinting mMsg mEvent special =
         ( CrewMod i, _, _ ) ->
             text <| "Crew modification: " ++ String.fromInt i
 
-        ( _, _, _ ) ->
+        ( Blast, _, _ ) ->
+            text <| fromSpecial special
+
+        ( Fire, _, _ ) ->
+            text <| fromSpecial special
+
+        ( Explosive, _, _ ) ->
+            text <| fromSpecial special
+
+        ( Blitz, _, _ ) ->
+            text <| fromSpecial special
+
+        ( Electrical, _, _ ) ->
+            text <| fromSpecial special
+
+        ( Specialist, _, _ ) ->
+            text <| fromSpecial special
+
+        ( Entangle, _, _ ) ->
             text <| fromSpecial special
 
 
@@ -143,14 +165,9 @@ renderCountDown msg event checks =
         ]
 
 
-renderDice : Maybe Dice -> String
-renderDice maybeDice =
-    case maybeDice of
-        Nothing ->
-            ""
-
-        Just dice ->
-            String.fromInt dice.number ++ "d" ++ String.fromInt dice.die
+renderDice : Dice -> String
+renderDice dice =
+    String.fromInt dice.number ++ "d" ++ String.fromInt dice.die
 
 
 crewUsed : Vehicle -> Int
@@ -158,14 +175,15 @@ crewUsed v =
     List.length <| List.filter (\x -> x.status == WeaponFired) v.weapons
 
 
-factsHolder : List (Html Msg) -> Html Msg
+factsHolder : List String -> Html Msg
 factsHolder facts =
-    div [ class "text-center mb-2" ] facts
+    div [ Spacing.mb2 ] <|
+        List.map factBadge facts
 
 
 factBadge : String -> Html Msg
-factBadge factString =
-    Badge.badgeSecondary [ class "mr-2" ] [ text factString ]
+factBadge fact =
+    Badge.badgeSecondary [ class "mr-2" ] [ text fact ]
 
 
 vehicleSponsorFilter : Model -> Vehicle -> Bool
@@ -189,3 +207,13 @@ sponsorFilter_ model mst =
 
         ( Just sponsor, Just vehicleSponsor ) ->
             sponsor == vehicleSponsor
+
+
+plural : Int -> String
+plural i =
+    case i of
+        1 ->
+            ""
+
+        _ ->
+            "s"

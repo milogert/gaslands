@@ -126,7 +126,12 @@ update msg model =
                         _ ->
                             []
             in
-            ( { model | modals = modals }
+            ( { model
+                | modals = modals
+                , tmpUpgrade = Nothing
+                , tmpVehicle = Nothing
+                , tmpWeapon = Nothing
+              }
             , Cmd.batch <| Ports.Modals.open () :: cmds
             )
 
@@ -135,6 +140,11 @@ update msg model =
                 modals =
                     Dict.insert modal Modal.hidden model.modals
             in
-            ( { model | modals = modals }
+            ( { model
+                | modals = modals
+                , tmpUpgrade = Nothing
+                , tmpVehicle = Nothing
+                , tmpWeapon = Nothing
+              }
             , Ports.Modals.close ()
             )
