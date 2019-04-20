@@ -149,35 +149,6 @@ configure model cfg v =
         wrecked =
             v.hull.current >= totalHull v
 
-        canActivate =
-            model.gearPhase <= v.gear.current
-
-        activatedText =
-            case ( v.activated, canActivate ) of
-                ( True, False ) ->
-                    "Activated"
-
-                ( _, False ) ->
-                    "Cannot be Activated"
-
-                ( _, _ ) ->
-                    "Activate"
-
-        activateButton =
-            div
-                [ class "vehicle-activate-button-holder mb-2"
-                , hidden <| not cfg.showActivateButton || wrecked
-                ]
-                [ Button.button
-                    [ Button.primary
-                    , Button.small
-                    , Button.block
-                    , Button.onClick <| VehicleMsg <| UpdateActivated v.key (not v.activated)
-                    , Button.disabled <| not canActivate || v.activated
-                    ]
-                    [ text activatedText ]
-                ]
-
         factsHolder =
             View.Utils.factsHolder
                 [ vtype
@@ -195,14 +166,6 @@ configure model cfg v =
                 [ hidden <| not cfg.showPhoto ]
                 [ View.Photo.view model v ]
 
-        printButton =
-            Button.button
-                [ Button.roleLink
-                , Button.attrs [ hidden <| not cfg.showPrintButton ]
-                , Button.onClick <| To <| ViewPrinterFriendly [ v ]
-                ]
-                [ icon "print" ]
-
         stats =
             Grid.simpleRow
                 [ Grid.col
@@ -212,13 +175,7 @@ configure model cfg v =
                     ]
                     [ photoPlus ]
                 , Grid.col [ Col.xs ]
-                    [ activateButton, factsHolder ]
-                , Grid.col
-                    [ Col.xs12
-                    , Col.lgAuto
-                    , Col.attrs [ hidden <| not cfg.showPrintButton ]
-                    ]
-                    [ printButton ]
+                    [ factsHolder ]
                 ]
 
         gearCounter =

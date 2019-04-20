@@ -1,6 +1,7 @@
 module Update.Vehicle exposing (update)
 
 import Dict exposing (Dict)
+import List.Extra as ListE
 import Model.Model exposing (..)
 import Model.Sponsors exposing (..)
 import Model.Vehicle.Common exposing (..)
@@ -8,6 +9,7 @@ import Model.Vehicle.Model exposing (..)
 import Model.Weapon.Model exposing (..)
 import Ports.Photo
 import Update.Utils exposing (..)
+import View.Utils
 
 
 update : Model -> VehicleEvent -> ( Model, Cmd Msg )
@@ -190,8 +192,8 @@ setTmpVehicleType model index =
     ( { model
         | tmpVehicle =
             allVehicles
-                |> List.drop (index + 1)
-                |> List.head
+                |> List.filter (View.Utils.vehicleSponsorFilter model)
+                |> ListE.getAt index
       }
     , Cmd.none
     )

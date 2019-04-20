@@ -6,6 +6,7 @@ import Bootstrap.CDN as CDN
 import Bootstrap.Grid as Grid
 import Bootstrap.Grid.Col as Col
 import Bootstrap.Grid.Row as Row
+import Bootstrap.Utilities.Spacing as Spacing
 import Browser exposing (Document)
 import Html
     exposing
@@ -38,6 +39,7 @@ import Model.Weapon.Common as WeaponC
 import Model.Weapon.Model exposing (..)
 import View.Dashboard
 import View.Details
+import View.Menu
 import View.ModalHolder
 import View.New
 import View.NewVehicle
@@ -83,18 +85,6 @@ view model =
         maxPoints =
             model.pointsAllowed
 
-        gearPhaseText =
-            String.fromInt model.gearPhase
-
-        gearPhaseButton =
-            Button.button
-                [ Button.small
-                , Button.primary
-                , Button.attrs [ class "ml-2" ]
-                , Button.onClick <| VehicleMsg NextGearPhase
-                ]
-                [ icon "cogs", Badge.badgeLight [] [ text gearPhaseText ] ]
-
         pointsBadgeFunction =
             case compare currentPoints maxPoints of
                 LT ->
@@ -113,25 +103,13 @@ view model =
                 , icon "coins"
                 ]
 
-        settingsButton =
-            Button.button
-                [ Button.small
-                , Button.light
-                , Button.onClick <| ShowModal "settings"
-                , Button.attrs
-                    [ attribute "aria-label" "Back Button"
-                    , class "ml-2"
-                    ]
-                ]
-                [ icon "wrench" ]
-
         viewDisplay =
             h2 [ style "margin-bottom" "0" ]
                 [ text <| viewToStr model ]
     in
     Document
         (viewToStr model)
-        [ Grid.container []
+        [ Grid.container [ Spacing.mt3 ]
             [ CDN.stylesheet -- creates an inline style node with the Bootstrap CSS
             , node "link"
                 [ rel "stylesheet"
@@ -141,29 +119,29 @@ view model =
                 , attribute "crossorigin" "anonymous"
                 ]
                 []
-            , Grid.row
-                [ Row.middleXs
-                , Row.attrs [ class "my-2 d-print-none" ]
-                ]
-                [ Grid.col [ Col.xsAuto ] [ backButton ]
-                , Grid.col [] [ viewDisplay ]
-                , Grid.col
-                    [ Col.xs12
-                    , Col.mdAuto
+            , Grid.simpleRow
+                [ View.Menu.side model
+                , View.Menu.top model
+                , Grid.col []
+                    [ Grid.row [ Row.attrs [ Spacing.mb2 ] ]
+                        [ Grid.col [] [ viewDisplay ]
+                        , Grid.col
+                            [ Col.xs12
+                            , Col.mdAuto
+                            ]
+                            [ View.Sponsor.renderBadge model.sponsor
+                            , pointsBadge
+                            ]
+                        ]
+                    , Grid.simpleRow
+                        [ Grid.col []
+                            [ displayAlert model
+                            , render model
+                            , View.ModalHolder.modalHolder model
+                            ]
+                        ]
                     ]
-                    [ View.Sponsor.renderBadge model.sponsor
-                    , gearPhaseButton
-                    , pointsBadge
-                    , settingsButton
-                    ]
                 ]
-
-            --, hr [] []
-            , displayAlert model
-            , render model
-            , View.ModalHolder.modalHolder model
-
-            --, sizeShower
             ]
         ]
 
