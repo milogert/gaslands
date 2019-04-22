@@ -153,7 +153,7 @@ tmpVehicleTests =
                             |> Maybe.withDefault defaultVehicle
                 in
                 Expect.equal
-                    PerformanceCar
+                    Car
                     vehicle.vtype
         , test "notes" <|
             \_ ->

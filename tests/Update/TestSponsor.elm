@@ -2,11 +2,11 @@ module Update.TestSponsor exposing (suite)
 
 import Dict
 import Expect exposing (Expectation)
-import Model.Model exposing (defaultModel)
+import Model.Model exposing (Msg(..), defaultModel)
 import Model.Sponsors exposing (VehiclePerk, allSponsors, stringToSponsor)
 import Model.Vehicle.Model exposing (defaultVehicle)
 import Test exposing (..)
-import Update.Sponsor
+import Update.Update
 
 
 suite : Test
@@ -14,8 +14,7 @@ suite =
     describe "all sponsor tests"
         [ test "set" <|
             \_ ->
-                stringToSponsor "Rutherford"
-                    |> Update.Sponsor.set defaultModel
+                Update.Update.update (SponsorUpdate "Rutherford") defaultModel
                     |> Tuple.first
                     |> .sponsor
                     |> Expect.equal (stringToSponsor "Rutherford")
@@ -28,8 +27,7 @@ suite =
                     model =
                         { defaultModel | vehicles = Dict.fromList [ ( "test", vehicle ) ] }
                 in
-                stringToSponsor "Rutherford"
-                    |> Update.Sponsor.set model
+                Update.Update.update (SponsorUpdate "Rutherford") model
                     |> Tuple.first
                     |> .vehicles
                     |> Dict.get "test"
