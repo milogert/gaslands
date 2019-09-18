@@ -30,13 +30,9 @@ jobs:
         CI: true
     - name: Checkout master (again)
       uses: actions/checkout@master
-    - name: Build and Deploy
-      uses: JamesIves/github-pages-deploy-action@master
+    - name: GH Pages deploy
+      uses: Cecilapp/GitHub-Pages-deploy@1.1.0
       env:
-        ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-        BASE_BRANCH: master # The branch the action should deploy from.
-        BRANCH: public-site # The branch the action should deploy to.
-        FOLDER: build # The folder the action should deploy.
-        BUILD_SCRIPT: |
-          npm install
-          npm run build --if-present
+        # GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        BUILD_DIR: "build/"
+        EMAIL: milo@milogert.com
