@@ -35,7 +35,7 @@ jobs:
       env:
         ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
         BASE_BRANCH: master # The branch the action should deploy from.
-        BRANCH: gh-pages # The branch the action should deploy to.
+        BRANCH: public-site # The branch the action should deploy to.
         FOLDER: build # The folder the action should deploy.
         BUILD_SCRIPT: |
           npm install
