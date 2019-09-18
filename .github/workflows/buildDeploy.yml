@@ -34,9 +34,8 @@ jobs:
         CI: true
     #- name: Checkout master (again)
     #  uses: actions/checkout@master
-    - name: GH Pages deploy
-      uses: Cecilapp/GitHub-Pages-deploy@1.1.0
+    - name: GitHub Pages Deploy
+      uses: maxheld83/ghpages@v0.2.1
       env:
         # GH_TOKEN: ${{ secrets.GH_TOKEN }}
         BUILD_DIR: "build/"
-        EMAIL: milo@milogert.com
