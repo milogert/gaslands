@@ -40,6 +40,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
         BASE_BRANCH: master # The branch the action should deploy from.
-        BRANCH: site # The branch the action should deploy to.
+        BRANCH: gh-pages # The branch the action should deploy to.
         FOLDER: build # The folder the action should deploy.
         BUILD_SCRIPT: npm install && npm run build # The build script the action should run prior to deploying.
