@@ -1,6 +1,8 @@
 module Update.Update exposing (update)
 
 import Bootstrap.Modal as Modal
+import Browser
+import Browser.Navigation as Nav
 import Dict
 import Model.Model exposing (..)
 import Model.Settings exposing (..)
@@ -19,14 +21,35 @@ import Update.Utils exposing (doSaveModel)
 import Update.Vehicle
 import Update.View
 import Update.Weapon
+import Url exposing (Url)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         -- ROUTING.
-        To currentView ->
-            Update.View.update model currentView
+        UrlRequested request ->
+            case request of
+                Browser.Internal url ->
+                    case url.path of
+                        "/" ->
+                            ( { model | view = ViewDashboard }
+                            , Nav.pushUrl model.key (Url.toString url)
+                            )
+
+                        "/settings" ->
+                            ( { model | view = ViewSettings }
+                            , Nav.pushUrl model.key (Url.toString url)
+                            )
+
+                        _ ->
+                            ( model, Nav.pushUrl model.key (Url.toString url) )
+
+                Browser.External href ->
+                    ( model, Nav.load href )
+
+        UrlChanged url ->
+            ( { model | url = url }, Cmd.none )
 
         -- GAME SETTINGS.
         UpdatePointsAllowed s ->
@@ -114,37 +137,11 @@ update msg model =
 
         -- Modals.
         ShowModal modal ->
-            let
-                modals =
-                    Dict.insert modal Modal.shown model.modals
-
-                cmds =
-                    case modal of
-                        "settings" ->
-                            [ Ports.Storage.getKeys "" ]
-
-                        _ ->
-                            []
-            in
-            ( { model
-                | modals = modals
-                , tmpUpgrade = Nothing
-                , tmpVehicle = Nothing
-                , tmpWeapon = Nothing
-              }
-            , Cmd.batch <| Ports.Modals.open () :: cmds
+            ( model
+            , Cmd.none
             )
 
         CloseModal modal ->
-            let
-                modals =
-                    Dict.insert modal Modal.hidden model.modals
-            in
-            ( { model
-                | modals = modals
-                , tmpUpgrade = Nothing
-                , tmpVehicle = Nothing
-                , tmpWeapon = Nothing
-              }
+            ( model
             , Ports.Modals.close ()
             )

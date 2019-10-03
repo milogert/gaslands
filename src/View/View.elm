@@ -168,6 +168,9 @@ render model =
         ViewPrinterFriendly lv ->
             View.PrinterFriendly.view model lv
 
+        ViewSettings ->
+            View.Settings.view model
+
 
 sizeShower : Html Msg
 sizeShower =

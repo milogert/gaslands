@@ -10,8 +10,10 @@ module Model.Model exposing
     , viewToStr
     )
 
-import Bootstrap.Modal as Modal
+import Browser exposing (UrlRequest)
+import Browser.Navigation as Nav
 import Dict exposing (Dict)
+import Model.Router.Model exposing (..)
 import Model.Settings exposing (..)
 import Model.Shared exposing (..)
 import Model.Sponsors exposing (..)
@@ -22,6 +24,7 @@ import Model.Vehicle.Model exposing (..)
 import Model.Weapon.Common exposing (..)
 import Model.Weapon.Model exposing (..)
 import Ports.Storage exposing (StorageEntry)
+import Url exposing (Url)
 
 
 type alias Model =
@@ -38,7 +41,8 @@ type alias Model =
     , importValue : String
     , storageKeys : List String
     , settings : Settings
-    , modals : Dict String Modal.Visibility
+    , url : Url
+    , key : Nav.Key
     }
 
 
@@ -46,6 +50,7 @@ type CurrentView
     = ViewDashboard
     | ViewDetails Vehicle
     | ViewPrinterFriendly (List Vehicle)
+    | ViewSettings
 
 
 type ErrorType
@@ -91,6 +96,9 @@ viewToStr model =
         ViewPrinterFriendly lv ->
             "Printing " ++ String.fromInt (List.length lv) ++ " vehicle(s)"
 
+        ViewSettings ->
+            "Game Settings"
+
 
 totalPoints : Model -> Int
 totalPoints model =
@@ -100,7 +108,7 @@ totalPoints model =
         |> List.sum
 
 
-defaultModel : Model
+defaultModel : Url -> Nav.Key -> Model
 defaultModel =
     Model
         ViewDashboard
@@ -116,18 +124,11 @@ defaultModel =
         ""
         []
         Model.Settings.init
-        (Dict.fromList
-            [ ( "vehicle", Modal.hidden )
-            , ( "weapon", Modal.hidden )
-            , ( "upgrade", Modal.hidden )
-            , ( "sponsor", Modal.hidden )
-            ]
-        )
 
 
-init : () -> ( Model, Cmd Msg )
-init _ =
-    ( defaultModel
+init : () -> Url -> Nav.Key -> ( Model, Cmd Msg )
+init flags url key =
+    ( defaultModel url key
     , Cmd.none
     )
 
@@ -135,7 +136,8 @@ init _ =
 type
     Msg
     -- ROUTES.
-    = To CurrentView
+    = UrlRequested UrlRequest
+    | UrlChanged Url
       -- VEHICLE.
     | VehicleMsg VehicleEvent
       -- WEAPON.

@@ -23,6 +23,7 @@ import Html.Attributes
         ( attribute
         , class
         , classList
+        , href
         , style
         )
 import Model.Model exposing (..)
@@ -141,13 +142,15 @@ renderInternal model location =
                     ]
                 )
                 [ icon "print", icon "car" ]
-            , Button.button
+            , Button.linkButton
                 ((++)
                     allButtonConfig
                     [ Button.light
-                    , Button.onClick <| ShowModal "settings"
+
+                    --, Button.onClick <| ShowModal "settings"
                     , Button.attrs
                         [ attribute "aria-label" "Back Button"
+                        , href "/settings"
                         ]
                     ]
                 )

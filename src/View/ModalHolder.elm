@@ -110,13 +110,18 @@ generateModalWithClose model key header body =
 
 generateModal : Model -> String -> Html Msg -> Html Msg -> Html Msg -> Html Msg
 generateModal model key header body footer =
-    Modal.config (CloseModal key)
-        |> Modal.large
-        |> Modal.h3 [] [ header ]
-        |> Modal.body [] [ body ]
-        |> Modal.footer [] [ footer ]
-        |> Modal.view
-            (model.modals
-                |> Dict.get key
-                |> Maybe.withDefault Modal.hidden
-            )
+    div [] [ text "" ]
+
+
+
+{- Modal.config (CloseModal key)
+   |> Modal.large
+   |> Modal.h3 [] [ header ]
+   |> Modal.body [] [ body ]
+   |> Modal.footer [] [ footer ]
+   |> Modal.view
+       (model.modals
+           |> Dict.get key
+           |> Maybe.withDefault Modal.hidden
+       )
+-}

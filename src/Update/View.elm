@@ -31,3 +31,6 @@ update model currentView =
             ( { model | view = ViewPrinterFriendly v }
             , Cmd.none
             )
+
+        _ ->
+            ( model, Cmd.none )

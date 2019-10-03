@@ -1,16 +1,19 @@
 module Update.Data exposing (import_, saveModel, share)
 
+import Browser.Navigation as Nav
 import Json.Decode
 import Json.Encode
 import Model.Decoders.Model exposing (modelDecoder)
 import Model.Encoders.Model exposing (modelEncoder)
 import Model.Model exposing (..)
 import Ports.Storage
+import Url exposing (Url)
 
 
 import_ : Model -> ( Model, Cmd Msg )
 import_ model =
     let
+        decodeRes : Result Json.Decode.Error (Url -> Nav.Key -> Model)
         decodeRes =
             Json.Decode.decodeString modelDecoder model.importValue
 
@@ -18,7 +21,7 @@ import_ model =
         newModel =
             case decodeRes of
                 Ok m ->
-                    m
+                    m model.url model.key
 
                 Err s ->
                     { model | error = [ JsonDecodeError <| Json.Decode.errorToString s ] }
