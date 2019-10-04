@@ -33,6 +33,7 @@ import Html.Attributes
         , classList
         , disabled
         , hidden
+        , href
         , placeholder
         , style
         )
@@ -478,11 +479,13 @@ configure model cfg v =
                     , Button.onClick <| VehicleMsg <| DeleteVehicle v.key
                     ]
                     [ icon "trash-alt" ]
-                , Button.button
+                , Button.linkButton
                     [ Button.info
                     , Button.small
-                    , Button.attrs [ class "float-right" ]
-                    , Button.onClick <| To <| ViewDetails v
+                    , Button.attrs
+                        [ class "float-right"
+                        , href "/"
+                        ]
                     ]
                     [ icon "info" ]
                 ]

@@ -28,9 +28,8 @@ modalHolder model =
     let
         currentVehicle =
             case model.view of
-                ViewDetails v ->
-                    v
-
+                --ViewDetails v ->
+                --   v
                 _ ->
                     VehicleM.defaultVehicle
 

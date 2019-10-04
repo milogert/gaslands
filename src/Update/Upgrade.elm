@@ -3,6 +3,7 @@ module Update.Upgrade exposing (update)
 import Dict exposing (Dict)
 import List.Extra
 import Model.Model exposing (..)
+import Model.Routes exposing (Route(..))
 import Model.Upgrade.Common exposing (..)
 import Model.Upgrade.Model exposing (..)
 import Model.Vehicle.Common exposing (..)
@@ -43,7 +44,7 @@ addUpgrade model key u =
                     { vehicle | upgrades = upgradeList }
             in
             ( { model
-                | view = ViewDetails nv
+                | view = RouteDetails nv.key
                 , error = []
                 , vehicles = Dict.insert key nv model.vehicles
               }
@@ -67,7 +68,7 @@ deleteUpgrade model key u =
                     { vehicle | upgrades = upgradesNew }
             in
             ( { model
-                | view = ViewDetails nv
+                | view = RouteDetails nv.key
                 , vehicles = Dict.insert key nv model.vehicles
               }
             , doSaveModel

@@ -8,6 +8,7 @@ import Bootstrap.Grid.Col as Col
 import Bootstrap.Grid.Row as Row
 import Bootstrap.Utilities.Spacing as Spacing
 import Browser exposing (Document)
+import Dict exposing (Dict)
 import Html
     exposing
         ( Html
@@ -30,6 +31,7 @@ import Html.Attributes
         )
 import Html.Events exposing (onClick, onInput)
 import Model.Model exposing (..)
+import Model.Routes exposing (Route(..))
 import Model.Shared exposing (..)
 import Model.Upgrade.Common as UpgradeC
 import Model.Upgrade.Model exposing (..)
@@ -57,25 +59,19 @@ view model =
     let
         viewToGoTo =
             case model.view of
-                ViewPrinterFriendly lv ->
-                    case List.length lv of
-                        1 ->
-                            To <| ViewDetails <| Maybe.withDefault defaultVehicle <| List.head lv
-
-                        _ ->
-                            To ViewDashboard
+                RoutePrint key ->
+                    "/details/" ++ key
 
                 _ ->
-                    To ViewDashboard
+                    "/"
 
         backButton =
-            Button.button
-                [ Button.disabled <| model.view == ViewDashboard
+            Button.linkButton
+                [ Button.disabled <| model.view == RouteDashboard
                 , Button.light
                 , Button.small
                 , Button.block
-                , Button.onClick viewToGoTo
-                , Button.attrs [ attribute "aria-label" "Back Button" ]
+                , Button.attrs [ href viewToGoTo, attribute "aria-label" "Back Button" ]
                 ]
                 [ icon "arrow-left" ]
 
@@ -159,16 +155,28 @@ displayAlert model =
 render : Model -> Html Msg
 render model =
     case model.view of
-        ViewDashboard ->
+        RouteDashboard ->
             View.Dashboard.view model
 
-        ViewDetails v ->
-            View.Details.view model v
+        RouteDetails key ->
+            model.vehicles
+                |> Dict.get key
+                |> Maybe.withDefault defaultVehicle
+                |> View.Details.view model
 
-        ViewPrinterFriendly lv ->
-            View.PrinterFriendly.view model lv
+        RoutePrint key ->
+            model.vehicles
+                |> Dict.get key
+                |> Maybe.withDefault defaultVehicle
+                |> List.singleton
+                |> View.PrinterFriendly.view model
 
-        ViewSettings ->
+        RoutePrintAll ->
+            model.vehicles
+                |> Dict.values
+                |> View.PrinterFriendly.view model
+
+        RouteSettings ->
             View.Settings.view model
 
 

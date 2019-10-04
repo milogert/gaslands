@@ -3,6 +3,7 @@ module Update.Weapon exposing (update)
 import Dict exposing (..)
 import List.Extra as ListE
 import Model.Model exposing (..)
+import Model.Routes exposing (Route(..))
 import Model.Shared exposing (..)
 import Model.Vehicle.Model exposing (..)
 import Model.Weapon.Common exposing (..)
@@ -83,7 +84,7 @@ addWeapon model key w =
 
                 ( _, _ ) ->
                     ( { model
-                        | view = ViewDetails nv
+                        | view = RouteDetails nv.key
                         , error = []
                         , vehicles = Dict.insert key nv model.vehicles
                       }
@@ -116,7 +117,7 @@ updateAmmoUsed model key weapon index check =
                     { vehicle | weapons = weaponsNew }
             in
             ( { model
-                | view = ViewDetails nv
+                | view = RouteDetails nv.key
                 , vehicles = Dict.insert key nv model.vehicles
               }
             , Cmd.none
@@ -160,7 +161,7 @@ setWeaponFired model key w =
                             0
             in
             ( { model
-                | view = ViewDetails nv
+                | view = RouteDetails nv.key
                 , vehicles = Dict.insert key nv model.vehicles
               }
             , Random.generate (WeaponMsg << RollWeaponDie key weaponUpdated) (Random.int minRoll maxRoll)
@@ -185,7 +186,7 @@ rollWeaponDie model key w result =
                     { vehicle | weapons = newWeapons }
             in
             ( { model
-                | view = ViewDetails nv
+                | view = RouteDetails nv.key
                 , vehicles = Dict.insert key nv model.vehicles
               }
             , Cmd.none
@@ -208,7 +209,7 @@ deleteWeapon model key w =
                     { vehicle | weapons = weaponsNew }
             in
             ( { model
-                | view = ViewDetails nv
+                | view = RouteDetails nv.key
                 , vehicles = Dict.insert key nv model.vehicles
               }
             , doSaveModel

@@ -8,6 +8,7 @@ import Model.Decoders.Settings exposing (settingsDecoder)
 import Model.Decoders.Sponsors exposing (sponsorDecoder)
 import Model.Decoders.Vehicles exposing (vehicleDecoder)
 import Model.Model exposing (..)
+import Model.Routes exposing (Route(..))
 import Model.Sponsors exposing (stringToSponsor)
 import Url exposing (Url)
 
@@ -15,7 +16,7 @@ import Url exposing (Url)
 modelDecoder : Decoder (Url -> Nav.Key -> Model)
 modelDecoder =
     succeed Model
-        |> hardcoded ViewDashboard
+        |> hardcoded RouteDashboard
         |> optional "teamName" (nullable string) Nothing
         |> required "pointsAllowed" int
         |> hardcoded 1

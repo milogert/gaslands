@@ -1,6 +1,5 @@
 module Model.Model exposing
-    ( CurrentView(..)
-    , ErrorType(..)
+    ( ErrorType(..)
     , Model
     , Msg(..)
     , defaultModel
@@ -14,6 +13,7 @@ import Browser exposing (UrlRequest)
 import Browser.Navigation as Nav
 import Dict exposing (Dict)
 import Model.Router.Model exposing (..)
+import Model.Routes exposing (Route(..))
 import Model.Settings exposing (..)
 import Model.Shared exposing (..)
 import Model.Sponsors exposing (..)
@@ -28,7 +28,7 @@ import Url exposing (Url)
 
 
 type alias Model =
-    { view : CurrentView
+    { view : Route
     , teamName : Maybe String
     , pointsAllowed : Int
     , gearPhase : Int
@@ -44,13 +44,6 @@ type alias Model =
     , url : Url
     , key : Nav.Key
     }
-
-
-type CurrentView
-    = ViewDashboard
-    | ViewDetails Vehicle
-    | ViewPrinterFriendly (List Vehicle)
-    | ViewSettings
 
 
 type ErrorType
@@ -87,16 +80,22 @@ errorToStr e =
 viewToStr : Model -> String
 viewToStr model =
     case model.view of
-        ViewDashboard ->
+        RouteDashboard ->
             "Team " ++ Maybe.withDefault "NoName" model.teamName
 
-        ViewDetails v ->
-            v.name
+        RouteDetails key ->
+            model.vehicles
+                |> Dict.get key
+                |> Maybe.withDefault defaultVehicle
+                |> .name
 
-        ViewPrinterFriendly lv ->
-            "Printing " ++ String.fromInt (List.length lv) ++ " vehicle(s)"
+        RoutePrintAll ->
+            "Printing " ++ String.fromInt (Dict.size model.vehicles) ++ " vehicle(s)"
 
-        ViewSettings ->
+        RoutePrint key ->
+            "Printing vehicle"
+
+        RouteSettings ->
             "Game Settings"
 
 
@@ -111,7 +110,7 @@ totalPoints model =
 defaultModel : Url -> Nav.Key -> Model
 defaultModel =
     Model
-        ViewDashboard
+        RouteDashboard
         Nothing
         50
         1

@@ -14,6 +14,7 @@ import Ports.Photo
 import Ports.Storage
 import Task
 import Update.Data
+import Update.Routes
 import Update.Settings
 import Update.Sponsor
 import Update.Upgrade
@@ -29,27 +30,10 @@ update msg model =
     case msg of
         -- ROUTING.
         UrlRequested request ->
-            case request of
-                Browser.Internal url ->
-                    case url.path of
-                        "/" ->
-                            ( { model | view = ViewDashboard }
-                            , Nav.pushUrl model.key (Url.toString url)
-                            )
-
-                        "/settings" ->
-                            ( { model | view = ViewSettings }
-                            , Nav.pushUrl model.key (Url.toString url)
-                            )
-
-                        _ ->
-                            ( model, Nav.pushUrl model.key (Url.toString url) )
-
-                Browser.External href ->
-                    ( model, Nav.load href )
+            Update.Routes.urlRequested model request
 
         UrlChanged url ->
-            ( { model | url = url }, Cmd.none )
+            Update.Routes.urlChanged model url
 
         -- GAME SETTINGS.
         UpdatePointsAllowed s ->
