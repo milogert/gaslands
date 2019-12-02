@@ -20,9 +20,9 @@ import Test exposing (..)
 import Update.Vehicle exposing (update)
 
 
-suite : Test
+suite : String
 suite =
-    todo "undo delete"
+    "undo delete"
 
 
 

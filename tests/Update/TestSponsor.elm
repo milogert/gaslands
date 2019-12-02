@@ -9,9 +9,9 @@ import Test exposing (..)
 import Update.Update
 
 
-suite : Test
+suite : String
 suite =
-    todo "undo delete"
+    "undo delete"
 
 
 

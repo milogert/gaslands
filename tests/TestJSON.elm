@@ -19,9 +19,9 @@ import Model.Weapon.Model exposing (defaultWeapon)
 import Test exposing (..)
 
 
-suite : Test
+suite : String
 suite =
-    todo "undo disable"
+    "undo disable"
 
 
 

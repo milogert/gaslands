@@ -10,9 +10,9 @@ import Model.Vehicle.Model exposing (VehicleType(..), defaultVehicle)
 import Test exposing (..)
 
 
-suite : Test
+suite : String
 suite =
-    todo "undo disable"
+    "undo disable"
 
 
 
