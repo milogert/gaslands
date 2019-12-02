@@ -134,11 +134,11 @@ renderInternal model location =
                     []
 
         settingsButtons =
-            [ Button.button
+            [ Button.linkButton
                 ((++)
                     allButtonConfig
                     [ Button.primary
-                    , Button.onClick <| ShowModal "vehicle"
+                    , Button.attrs [ href "/new/vehicle" ]
                     ]
                 )
                 [ icon "plus", icon "car" ]
@@ -146,6 +146,7 @@ renderInternal model location =
                 ((++)
                     allButtonConfig
                     [ Button.secondary
+                    , Button.disabled <| Dict.isEmpty model.vehicles
                     , Button.attrs
                         [ href "/print" ]
                     ]
@@ -155,8 +156,6 @@ renderInternal model location =
                 ((++)
                     allButtonConfig
                     [ Button.light
-
-                    --, Button.onClick <| ShowModal "settings"
                     , Button.attrs
                         [ attribute "aria-label" "Back Button"
                         , href "/settings"

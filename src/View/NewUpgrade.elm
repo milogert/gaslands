@@ -13,10 +13,9 @@ import Model.Upgrade.Common exposing (..)
 import Model.Upgrade.Model exposing (..)
 import Model.Vehicle.Model exposing (..)
 import View.Upgrade
-import View.Utils exposing (NewItem)
 
 
-view : Model -> Vehicle -> List Upgrade -> NewItem
+view : Model -> Vehicle -> List Upgrade -> Html Msg
 view model vehicle weapons =
     let
         buttonAttrs =
@@ -76,18 +75,16 @@ view model vehicle weapons =
                 ]
                 options
     in
-    NewItem
-        (Grid.row []
-            [ Grid.col [ Col.md12 ]
-                [ Form.form []
-                    [ Form.row []
-                        [ Form.colLabel [ Col.mdAuto ]
-                            [ Form.label [] [ text "Upgrade Type" ] ]
-                        , Form.col [] [ selectList ]
-                        ]
+    Grid.row []
+        [ Grid.col [ Col.md12 ]
+            [ Form.form []
+                [ Form.row []
+                    [ Form.colLabel [ Col.mdAuto ]
+                        [ Form.label [] [ text "Upgrade Type" ] ]
+                    , Form.col [] [ selectList ]
                     ]
                 ]
-            , Grid.col [ Col.md12 ] [ body ]
             ]
-        )
-        addButton
+        , Grid.col [ Col.md12 ] [ addButton ]
+        , Grid.col [ Col.md12 ] [ body ]
+        ]

@@ -12,11 +12,10 @@ import Model.Shared exposing (..)
 import Model.Vehicle.Model exposing (..)
 import Model.Weapon.Common exposing (..)
 import Model.Weapon.Model exposing (..)
-import View.Utils exposing (NewItem)
-import View.Weapon
+import View.Weapon exposing (defaultWeaponConfig)
 
 
-view : Model -> Vehicle -> List Weapon -> NewItem
+view : Model -> Vehicle -> List Weapon -> Html Msg
 view model vehicle weapons =
     let
         buttonAttrs =
@@ -47,12 +46,11 @@ view model vehicle weapons =
             case model.tmpWeapon of
                 Just weapon ->
                     View.Weapon.render
-                        (View.Weapon.RenderConfig
-                            False
-                            True
-                            False
-                            False
-                        )
+                        { defaultWeaponConfig
+                            | showFireButton = False
+                            , printSpecials = False
+                            , showDeleteButton = False
+                        }
                         model
                         vehicle
                         weapon
@@ -117,23 +115,23 @@ view model vehicle weapons =
                                     [ Select.onChange <| WeaponMsg << TmpWeaponMountPoint
                                     ]
     in
-    NewItem
-        (Grid.row []
-            [ Grid.col [ Col.md12 ]
-                [ Form.form []
-                    [ Form.row []
-                        [ Form.colLabel [ Col.mdAuto ]
-                            [ Form.label [] [ text "Weapon Type" ] ]
-                        , Form.col [] [ selectList ]
-                        ]
-                    , Form.row []
-                        [ Form.colLabel [ Col.mdAuto ]
-                            [ Form.label [] [ text "Mount Point" ] ]
-                        , Form.col [] [ mountPointSelector ]
-                        ]
+    Grid.row []
+        [ Grid.col [ Col.md12 ]
+            [ Form.form []
+                [ Form.row []
+                    [ Form.colLabel [ Col.mdAuto ]
+                        [ Form.label [] [ text "Weapon Type" ] ]
+                    , Form.col [] [ selectList ]
+                    ]
+                , Form.row []
+                    [ Form.colLabel [ Col.mdAuto ]
+                        [ Form.label [] [ text "Mount Point" ] ]
+                    , Form.col [] [ mountPointSelector ]
                     ]
                 ]
-            , Grid.col [ Col.md12 ] [ body ]
             ]
-        )
-        addButton
+        , Grid.col [ Col.md12 ] [ body ]
+        , Grid.col [ Col.md12 ]
+            [ addButton
+            ]
+        ]

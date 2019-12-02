@@ -31,7 +31,7 @@ import Html.Attributes
         )
 import Html.Events exposing (onClick, onInput)
 import Model.Model exposing (..)
-import Model.Routes exposing (Route(..))
+import Model.Routes exposing (NewType(..), Route(..))
 import Model.Shared exposing (..)
 import Model.Upgrade.Common as UpgradeC
 import Model.Upgrade.Model exposing (..)
@@ -42,9 +42,9 @@ import Model.Weapon.Model exposing (..)
 import View.Dashboard
 import View.Details
 import View.Menu
-import View.ModalHolder
-import View.New
+import View.NewUpgrade
 import View.NewVehicle
+import View.NewWeapon
 import View.PrinterFriendly
 import View.Settings
 import View.Sponsor
@@ -133,7 +133,6 @@ view model =
                         [ Grid.col []
                             [ displayAlert model
                             , render model
-                            , View.ModalHolder.modalHolder model
                             ]
                         ]
                     ]
@@ -158,11 +157,55 @@ render model =
         RouteDashboard ->
             View.Dashboard.view model
 
+        RouteNew type_ ->
+            case type_ of
+                NewVehicle ->
+                    View.NewVehicle.view model
+
+                NewWeapon key ->
+                    case vehicleFromKey model key of
+                        Nothing ->
+                            View.Dashboard.view model
+
+                        Just vehicle ->
+                            View.NewWeapon.view
+                                model
+                                vehicle
+                                (WeaponC.allWeaponsList
+                                    |> List.filter (expansionFilter model.settings.expansions.enabled)
+                                    |> List.filter
+                                        (\x -> x.slots <= VehicleC.slotsRemaining vehicle)
+                                    |> List.filter
+                                        (\x -> x.name /= WeaponC.handgun.name)
+                                    |> List.filter
+                                        (View.Utils.weaponSponsorFilter model)
+                                )
+
+                NewUpgrade key ->
+                    case vehicleFromKey model key of
+                        Nothing ->
+                            View.Dashboard.view model
+
+                        Just vehicle ->
+                            View.NewUpgrade.view
+                                model
+                                vehicle
+                                (UpgradeC.allUpgradesList
+                                    |> List.filter (expansionFilter model.settings.expansions.enabled)
+                                    |> List.filter
+                                        (\x -> x.slots <= VehicleC.slotsRemaining vehicle)
+                                )
+
         RouteDetails key ->
-            model.vehicles
-                |> Dict.get key
-                |> Maybe.withDefault defaultVehicle
-                |> View.Details.view model
+            case vehicleFromKey model key of
+                Nothing ->
+                    View.Dashboard.view model
+
+                Just vehicle ->
+                    View.Details.view model vehicle
+
+        RouteSponsor ->
+            View.SponsorSelect.view model
 
         RoutePrint key ->
             model.vehicles

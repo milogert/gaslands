@@ -7,7 +7,6 @@ import Model.Routes exposing (Route(..))
 import Model.Upgrade.Common exposing (..)
 import Model.Upgrade.Model exposing (..)
 import Model.Vehicle.Common exposing (..)
-import Update.Utils exposing (doCloseModal, doSaveModel)
 
 
 update : Model -> UpgradeEvent -> ( Model, Cmd Msg )
@@ -48,7 +47,7 @@ addUpgrade model key u =
                 , error = []
                 , vehicles = Dict.insert key nv model.vehicles
               }
-            , Cmd.batch [ doSaveModel, doCloseModal "upgrade" ]
+            , Cmd.batch []
             )
 
 
@@ -71,5 +70,5 @@ deleteUpgrade model key u =
                 | view = RouteDetails nv.key
                 , vehicles = Dict.insert key nv model.vehicles
               }
-            , doSaveModel
+            , Cmd.none
             )

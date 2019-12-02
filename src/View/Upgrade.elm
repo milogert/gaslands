@@ -77,6 +77,6 @@ render cfg model vehicle upgrade =
     in
     View.EquipmentLayout.render
         upgrade
-        (UpgradeMsg << DeleteUpgrade vehicle.key)
+        (Just <| UpgradeMsg << DeleteUpgrade vehicle.key)
         [ factsHolder ]
         [ specials ]

@@ -1,4 +1,4 @@
-module Update.Utils exposing (doCloseModal, doSaveModel)
+module Update.Utils exposing (doOtherMsg, doSaveModel)
 
 import Model.Model exposing (..)
 import Task
@@ -12,8 +12,3 @@ doOtherMsg msg =
 doSaveModel : Cmd Msg
 doSaveModel =
     doOtherMsg SaveModel
-
-
-doCloseModal : String -> Cmd Msg
-doCloseModal modal =
-    doOtherMsg (CloseModal modal)

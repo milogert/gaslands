@@ -1,5 +1,6 @@
 module Update.Weapon exposing (update)
 
+import Browser.Navigation as Nav
 import Dict exposing (..)
 import List.Extra as ListE
 import Model.Model exposing (..)
@@ -9,7 +10,6 @@ import Model.Vehicle.Model exposing (..)
 import Model.Weapon.Common exposing (..)
 import Model.Weapon.Model exposing (..)
 import Random
-import Update.Utils exposing (doCloseModal, doSaveModel)
 
 
 update : Model -> WeaponEvent -> ( Model, Cmd Msg )
@@ -87,8 +87,9 @@ addWeapon model key w =
                         | view = RouteDetails nv.key
                         , error = []
                         , vehicles = Dict.insert key nv model.vehicles
+                        , tmpWeapon = Nothing
                       }
-                    , Cmd.batch [ doSaveModel, doCloseModal "weapon" ]
+                    , Nav.pushUrl model.key ("/details/" ++ key)
                     )
 
 
@@ -212,7 +213,7 @@ deleteWeapon model key w =
                 | view = RouteDetails nv.key
                 , vehicles = Dict.insert key nv model.vehicles
               }
-            , doSaveModel
+            , Cmd.none
             )
 
 

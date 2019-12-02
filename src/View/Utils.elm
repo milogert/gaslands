@@ -1,6 +1,5 @@
 module View.Utils exposing
-    ( NewItem
-    , crewUsed
+    ( crewUsed
     , detailSection
     , factBadge
     , factsHolder
@@ -42,12 +41,6 @@ import Model.Shared exposing (..)
 import Model.Sponsors exposing (..)
 import Model.Vehicle.Model exposing (..)
 import Model.Weapon.Model exposing (..)
-
-
-type alias NewItem =
-    { body : Html Msg
-    , button : Html Msg
-    }
 
 
 icon : String -> Html Msg

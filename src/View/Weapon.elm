@@ -1,4 +1,4 @@
-module View.Weapon exposing (RenderConfig, render)
+module View.Weapon exposing (defaultWeaponConfig, render)
 
 import Bootstrap.Button as Button
 import Bootstrap.Form.Select as Select
@@ -44,6 +44,11 @@ type alias RenderConfig =
     , printSpecials : Bool
     , showDeleteButton : Bool
     }
+
+
+defaultWeaponConfig : RenderConfig
+defaultWeaponConfig =
+    RenderConfig True True False True
 
 
 render : RenderConfig -> Model -> Vehicle -> Weapon -> Html Msg
@@ -164,10 +169,18 @@ render cfg model vehicle weapon =
 
                 _ ->
                     ul [] <| List.map renderSpecialFunc weapon.specials
+
+        deleteMsg =
+            case cfg.showDeleteButton of
+                True ->
+                    Just (WeaponMsg << DeleteWeapon vehicle.key)
+
+                False ->
+                    Nothing
     in
     View.EquipmentLayout.render
         weapon
-        (WeaponMsg << DeleteWeapon vehicle.key)
+        deleteMsg
         [ fireButton
         , factsHolder
         ]

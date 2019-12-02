@@ -78,6 +78,7 @@ view model =
                 ]
             ]
         , Grid.col [ Col.md12 ] [ body ]
+        , Grid.col [ Col.md12 ] [ addButton model.tmpVehicle ]
         ]
 
 

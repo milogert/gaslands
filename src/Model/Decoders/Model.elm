@@ -7,6 +7,7 @@ import Json.Decode.Pipeline exposing (hardcoded, optional, required)
 import Model.Decoders.Settings exposing (settingsDecoder)
 import Model.Decoders.Sponsors exposing (sponsorDecoder)
 import Model.Decoders.Vehicles exposing (vehicleDecoder)
+import Model.Features
 import Model.Model exposing (..)
 import Model.Routes exposing (Route(..))
 import Model.Sponsors exposing (stringToSponsor)
@@ -29,3 +30,4 @@ modelDecoder =
         |> hardcoded ""
         |> hardcoded []
         |> required "settings" settingsDecoder
+        |> hardcoded Model.Features.flags

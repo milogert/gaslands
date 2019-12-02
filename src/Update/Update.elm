@@ -18,7 +18,6 @@ import Update.Routes
 import Update.Settings
 import Update.Sponsor
 import Update.Upgrade
-import Update.Utils exposing (doSaveModel)
 import Update.Vehicle
 import Update.View
 import Update.Weapon
@@ -40,7 +39,7 @@ update msg model =
             ( { model
                 | pointsAllowed = Maybe.withDefault 0 (String.toInt s)
               }
-            , doSaveModel
+            , Cmd.none
             )
 
         UpdateTeamName s ->
@@ -118,14 +117,3 @@ update msg model =
 
         SettingsMsg event ->
             Update.Settings.update model event
-
-        -- Modals.
-        ShowModal modal ->
-            ( model
-            , Cmd.none
-            )
-
-        CloseModal modal ->
-            ( model
-            , Ports.Modals.close ()
-            )

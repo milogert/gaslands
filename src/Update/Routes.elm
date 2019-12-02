@@ -4,6 +4,8 @@ import Browser exposing (UrlRequest)
 import Browser.Navigation as Nav
 import Model.Model exposing (..)
 import Model.Routes exposing (Route(..), routeMap)
+import Ports.Storage
+import Update.Utils exposing (doOtherMsg)
 import Url exposing (Url)
 import Url.Parser
 
@@ -15,12 +17,16 @@ urlRequested model request =
             case Url.Parser.parse routeMap url of
                 Nothing ->
                     ( { model | view = RouteDashboard }
-                    , Nav.pushUrl model.key (Url.toString url)
+                    , Cmd.batch <|
+                        Nav.pushUrl model.key (Url.toString url)
+                            :: doPreloadWork model RouteDashboard
                     )
 
                 Just route ->
                     ( { model | view = route }
-                    , Nav.pushUrl model.key (Url.toString url)
+                    , Cmd.batch <|
+                        Nav.pushUrl model.key (Url.toString url)
+                            :: doPreloadWork model route
                     )
 
         Browser.External href ->
@@ -30,3 +36,23 @@ urlRequested model request =
 urlChanged : Model -> Url -> ( Model, Cmd Msg )
 urlChanged model url =
     ( { model | url = url }, Cmd.none )
+
+
+doPreloadWork : Model -> Route -> List (Cmd Msg)
+doPreloadWork model request =
+    [ ( RouteSettings, Ports.Storage.getKeys <| Maybe.withDefault "" model.teamName ) ]
+        |> List.filterMap (possibleCmd request)
+
+
+possibleCmd : Route -> ( Route, Cmd Msg ) -> Maybe (Cmd Msg)
+possibleCmd filter tuple =
+    let
+        ( route, cmd ) =
+            tuple
+    in
+    case route == filter of
+        True ->
+            Just cmd
+
+        False ->
+            Nothing

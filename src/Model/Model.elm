@@ -6,14 +6,16 @@ module Model.Model exposing
     , errorToStr
     , init
     , totalPoints
+    , vehicleFromKey
     , viewToStr
     )
 
 import Browser exposing (UrlRequest)
 import Browser.Navigation as Nav
 import Dict exposing (Dict)
+import Model.Features
 import Model.Router.Model exposing (..)
-import Model.Routes exposing (Route(..))
+import Model.Routes exposing (NewType(..), Route(..))
 import Model.Settings exposing (..)
 import Model.Shared exposing (..)
 import Model.Sponsors exposing (..)
@@ -41,6 +43,7 @@ type alias Model =
     , importValue : String
     , storageKeys : List String
     , settings : Settings
+    , featureFlags : Dict String Bool
     , url : Url
     , key : Nav.Key
     }
@@ -83,11 +86,37 @@ viewToStr model =
         RouteDashboard ->
             "Team " ++ Maybe.withDefault "NoName" model.teamName
 
+        RouteNew newType ->
+            case newType of
+                NewVehicle ->
+                    "New Vehicle"
+
+                NewWeapon key ->
+                    case vehicleFromKey model key of
+                        Nothing ->
+                            "Not a vehicle"
+
+                        Just { name } ->
+                            "New Weapon for " ++ name
+
+                NewUpgrade key ->
+                    case vehicleFromKey model key of
+                        Nothing ->
+                            "Not a vehicle"
+
+                        Just { name } ->
+                            "New Upgrade for " ++ name
+
         RouteDetails key ->
-            model.vehicles
-                |> Dict.get key
-                |> Maybe.withDefault defaultVehicle
-                |> .name
+            case vehicleFromKey model key of
+                Nothing ->
+                    "Not a vehicle"
+
+                Just vehicle ->
+                    vehicle.name
+
+        RouteSponsor ->
+            "Sponsor Select"
 
         RoutePrintAll ->
             "Printing " ++ String.fromInt (Dict.size model.vehicles) ++ " vehicle(s)"
@@ -96,7 +125,7 @@ viewToStr model =
             "Printing vehicle"
 
         RouteSettings ->
-            "Game Settings"
+            "Settings"
 
 
 totalPoints : Model -> Int
@@ -105,6 +134,11 @@ totalPoints model =
         |> Dict.values
         |> List.map vehicleCost
         |> List.sum
+
+
+vehicleFromKey : Model -> String -> Maybe Vehicle
+vehicleFromKey model key =
+    Dict.get key model.vehicles
 
 
 defaultModel : Url -> Nav.Key -> Model
@@ -123,6 +157,7 @@ defaultModel =
         ""
         []
         Model.Settings.init
+        Model.Features.flags
 
 
 init : () -> Url -> Nav.Key -> ( Model, Cmd Msg )
@@ -160,6 +195,3 @@ type
     | SettingsMsg SettingsEvent
     | UpdatePointsAllowed String
     | UpdateTeamName String
-      -- MODALS.
-    | ShowModal String
-    | CloseModal String

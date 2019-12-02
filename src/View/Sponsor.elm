@@ -94,8 +94,7 @@ renderBadge ms =
     span [ class "sponsor-badge" ]
         [ a
             [ class "badge badge-secondary"
-            , onClick <| ShowModal "sponsor"
-            , href "#"
+            , href "/sponsor"
             , title description
             ]
             [ text name

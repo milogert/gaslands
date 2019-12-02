@@ -1,5 +1,6 @@
 module Update.Vehicle exposing (update)
 
+import Browser.Navigation as Nav
 import Dict exposing (Dict)
 import List.Extra as ListE
 import Model.Model exposing (..)
@@ -184,7 +185,7 @@ addVehicle model vehicle =
                 , tmpVehicle = Nothing
                 , error = []
               }
-            , Cmd.batch [ doSaveModel, doCloseModal "vehicle" ]
+            , Nav.pushUrl model.key "/"
             )
 
 
