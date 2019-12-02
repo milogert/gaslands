@@ -38,6 +38,7 @@ import Html.Attributes
         , style
         )
 import Html.Events exposing (onClick, onInput)
+import Model.Features
 import Model.Model exposing (..)
 import Model.Shared
 import Model.Sponsors exposing (..)
@@ -166,6 +167,9 @@ configure model cfg v =
             div
                 [ hidden <| not cfg.showPhoto ]
                 [ View.Photo.view model v ]
+                |> Model.Features.withDefault
+                    "feature-car-photo"
+                    (text "")
 
         stats =
             Grid.simpleRow

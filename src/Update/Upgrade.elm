@@ -1,5 +1,6 @@
 module Update.Upgrade exposing (update)
 
+import Browser.Navigation as Nav
 import Dict exposing (Dict)
 import List.Extra
 import Model.Model exposing (..)
@@ -46,8 +47,9 @@ addUpgrade model key u =
                 | view = RouteDetails nv.key
                 , error = []
                 , vehicles = Dict.insert key nv model.vehicles
+                , tmpUpgrade = Nothing
               }
-            , Cmd.batch []
+            , Nav.pushUrl model.key ("/details/" ++ key)
             )
 
 

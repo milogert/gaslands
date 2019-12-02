@@ -7,6 +7,7 @@ flags : Dict String Bool
 flags =
     Dict.fromList
         [ ( "feature-generate-team", False )
+        , ( "feature-car-photo", False )
         ]
 
 
