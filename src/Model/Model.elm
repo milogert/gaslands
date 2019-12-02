@@ -163,15 +163,15 @@ defaultModel =
 init : () -> Url -> Nav.Key -> ( Model, Cmd Msg )
 init flags url key =
     ( defaultModel url key
-    , Cmd.none
+    , Nav.pushUrl key <| Url.toString url
     )
 
 
 type
     Msg
     -- ROUTES.
-    = UrlRequested UrlRequest
-    | UrlChanged Url
+    = ClickedLink UrlRequest
+    | ChangedUrl Url
       -- VEHICLE.
     | VehicleMsg VehicleEvent
       -- WEAPON.

@@ -12,22 +12,21 @@ import Url.Parser
 
 urlRequested : Model -> UrlRequest -> ( Model, Cmd Msg )
 urlRequested model request =
+    let
+        cmdBatch =
+            \url route ->
+                Cmd.batch <|
+                    Nav.pushUrl model.key (Url.toString url)
+                        :: doPreloadWork model RouteDashboard
+    in
     case request of
         Browser.Internal url ->
             case Url.Parser.parse routeMap url of
                 Nothing ->
-                    ( { model | view = RouteDashboard }
-                    , Cmd.batch <|
-                        Nav.pushUrl model.key (Url.toString url)
-                            :: doPreloadWork model RouteDashboard
-                    )
+                    ( model, cmdBatch url RouteDashboard )
 
                 Just route ->
-                    ( { model | view = route }
-                    , Cmd.batch <|
-                        Nav.pushUrl model.key (Url.toString url)
-                            :: doPreloadWork model route
-                    )
+                    ( model, cmdBatch url route )
 
         Browser.External href ->
             ( model, Nav.load href )
@@ -35,7 +34,22 @@ urlRequested model request =
 
 urlChanged : Model -> Url -> ( Model, Cmd Msg )
 urlChanged model url =
-    ( { model | url = url }, Cmd.none )
+    case Url.Parser.parse routeMap url of
+        Nothing ->
+            ( { model
+                | view = RouteDashboard
+                , url = url
+              }
+            , Cmd.none
+            )
+
+        Just route ->
+            ( { model
+                | view = route
+                , url = url
+              }
+            , Cmd.none
+            )
 
 
 doPreloadWork : Model -> Route -> List (Cmd Msg)

@@ -15,6 +15,6 @@ main =
         , view = View.view
         , update = Update.update
         , subscriptions = Subscriptions.subscriptions
-        , onUrlRequest = UrlRequested
-        , onUrlChange = UrlChanged
+        , onUrlRequest = ClickedLink
+        , onUrlChange = ChangedUrl
         }

@@ -28,10 +28,10 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         -- ROUTING.
-        UrlRequested request ->
+        ClickedLink request ->
             Update.Routes.urlRequested model request
 
-        UrlChanged url ->
+        ChangedUrl url ->
             Update.Routes.urlChanged model url
 
         -- GAME SETTINGS.

@@ -11,27 +11,32 @@ import Update.Update
 
 suite : Test
 suite =
-    describe "all sponsor tests"
-        [ test "set" <|
-            \_ ->
-                Update.Update.update (SponsorUpdate "Rutherford") defaultModel
-                    |> Tuple.first
-                    |> .sponsor
-                    |> Expect.equal (stringToSponsor "Rutherford")
-        , test "clears perks" <|
-            \_ ->
-                let
-                    vehicle =
-                        { defaultVehicle | perks = [ VehiclePerk "test" 0 "desc" ] }
+    todo "undo delete"
 
-                    model =
-                        { defaultModel | vehicles = Dict.fromList [ ( "test", vehicle ) ] }
-                in
-                Update.Update.update (SponsorUpdate "Rutherford") model
-                    |> Tuple.first
-                    |> .vehicles
-                    |> Dict.get "test"
-                    |> Maybe.withDefault { defaultVehicle | perks = [ VehiclePerk "should" -1 "not be present" ] }
-                    |> .perks
-                    |> Expect.equal []
-        ]
+
+
+{- describe "all sponsor tests"
+   [ test "set" <|
+       \_ ->
+           Update.Update.update (SponsorUpdate "Rutherford") defaultModel
+               |> Tuple.first
+               |> .sponsor
+               |> Expect.equal (stringToSponsor "Rutherford")
+   , test "clears perks" <|
+       \_ ->
+           let
+               vehicle =
+                   { defaultVehicle | perks = [ VehiclePerk "test" 0 "desc" ] }
+
+               model =
+                   { defaultModel | vehicles = Dict.fromList [ ( "test", vehicle ) ] }
+           in
+           Update.Update.update (SponsorUpdate "Rutherford") model
+               |> Tuple.first
+               |> .vehicles
+               |> Dict.get "test"
+               |> Maybe.withDefault { defaultVehicle | perks = [ VehiclePerk "should" -1 "not be present" ] }
+               |> .perks
+               |> Expect.equal []
+   ]
+-}
