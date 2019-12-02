@@ -11,7 +11,6 @@ let storage = {
         if (!checkStorage()) return;
         return window.localStorage.getItem(str);
     },
-
     
     getKeys: function(str) {
         if (!checkStorage()) return;

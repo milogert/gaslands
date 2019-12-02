@@ -1,17 +1,21 @@
 module Model.Model exposing
-    ( CurrentView(..)
-    , ErrorType(..)
+    ( ErrorType(..)
     , Model
     , Msg(..)
     , defaultModel
     , errorToStr
     , init
     , totalPoints
+    , vehicleFromKey
     , viewToStr
     )
 
-import Bootstrap.Modal as Modal
+import Browser exposing (UrlRequest)
+import Browser.Navigation as Nav
 import Dict exposing (Dict)
+import Model.Features
+import Model.Router.Model exposing (..)
+import Model.Routes exposing (NewType(..), Route(..))
 import Model.Settings exposing (..)
 import Model.Shared exposing (..)
 import Model.Sponsors exposing (..)
@@ -22,10 +26,11 @@ import Model.Vehicle.Model exposing (..)
 import Model.Weapon.Common exposing (..)
 import Model.Weapon.Model exposing (..)
 import Ports.Storage exposing (StorageEntry)
+import Url exposing (Url)
 
 
 type alias Model =
-    { view : CurrentView
+    { view : Route
     , teamName : Maybe String
     , pointsAllowed : Int
     , gearPhase : Int
@@ -38,14 +43,10 @@ type alias Model =
     , importValue : String
     , storageKeys : List String
     , settings : Settings
-    , modals : Dict String Modal.Visibility
+    , featureFlags : Dict String Bool
+    , url : Url
+    , key : Nav.Key
     }
-
-
-type CurrentView
-    = ViewDashboard
-    | ViewDetails Vehicle
-    | ViewPrinterFriendly (List Vehicle)
 
 
 type ErrorType
@@ -82,14 +83,49 @@ errorToStr e =
 viewToStr : Model -> String
 viewToStr model =
     case model.view of
-        ViewDashboard ->
+        RouteDashboard ->
             "Team " ++ Maybe.withDefault "NoName" model.teamName
 
-        ViewDetails v ->
-            v.name
+        RouteNew newType ->
+            case newType of
+                NewVehicle ->
+                    "New Vehicle"
 
-        ViewPrinterFriendly lv ->
-            "Printing " ++ String.fromInt (List.length lv) ++ " vehicle(s)"
+                NewWeapon key ->
+                    case vehicleFromKey model key of
+                        Nothing ->
+                            "Not a vehicle"
+
+                        Just { name } ->
+                            "New Weapon for " ++ name
+
+                NewUpgrade key ->
+                    case vehicleFromKey model key of
+                        Nothing ->
+                            "Not a vehicle"
+
+                        Just { name } ->
+                            "New Upgrade for " ++ name
+
+        RouteDetails key ->
+            case vehicleFromKey model key of
+                Nothing ->
+                    "Not a vehicle"
+
+                Just vehicle ->
+                    vehicle.name
+
+        RouteSponsor ->
+            "Sponsor Select"
+
+        RoutePrintAll ->
+            "Printing " ++ String.fromInt (Dict.size model.vehicles) ++ " vehicle(s)"
+
+        RoutePrint key ->
+            "Printing vehicle"
+
+        RouteSettings ->
+            "Settings"
 
 
 totalPoints : Model -> Int
@@ -100,10 +136,15 @@ totalPoints model =
         |> List.sum
 
 
-defaultModel : Model
+vehicleFromKey : Model -> String -> Maybe Vehicle
+vehicleFromKey model key =
+    Dict.get key model.vehicles
+
+
+defaultModel : Url -> Nav.Key -> Model
 defaultModel =
     Model
-        ViewDashboard
+        RouteDashboard
         Nothing
         50
         1
@@ -116,26 +157,21 @@ defaultModel =
         ""
         []
         Model.Settings.init
-        (Dict.fromList
-            [ ( "vehicle", Modal.hidden )
-            , ( "weapon", Modal.hidden )
-            , ( "upgrade", Modal.hidden )
-            , ( "sponsor", Modal.hidden )
-            ]
-        )
+        Model.Features.flags
 
 
-init : () -> ( Model, Cmd Msg )
-init _ =
-    ( defaultModel
-    , Cmd.none
+init : () -> Url -> Nav.Key -> ( Model, Cmd Msg )
+init flags url key =
+    ( defaultModel url key
+    , Nav.pushUrl key <| Url.toString url
     )
 
 
 type
     Msg
     -- ROUTES.
-    = To CurrentView
+    = ClickedLink UrlRequest
+    | ChangedUrl Url
       -- VEHICLE.
     | VehicleMsg VehicleEvent
       -- WEAPON.
@@ -159,6 +195,3 @@ type
     | SettingsMsg SettingsEvent
     | UpdatePointsAllowed String
     | UpdateTeamName String
-      -- MODALS.
-    | ShowModal String
-    | CloseModal String

@@ -1,12 +1,13 @@
 module Update.Upgrade exposing (update)
 
+import Browser.Navigation as Nav
 import Dict exposing (Dict)
 import List.Extra
 import Model.Model exposing (..)
+import Model.Routes exposing (Route(..))
 import Model.Upgrade.Common exposing (..)
 import Model.Upgrade.Model exposing (..)
 import Model.Vehicle.Common exposing (..)
-import Update.Utils exposing (doCloseModal, doSaveModel)
 
 
 update : Model -> UpgradeEvent -> ( Model, Cmd Msg )
@@ -43,11 +44,12 @@ addUpgrade model key u =
                     { vehicle | upgrades = upgradeList }
             in
             ( { model
-                | view = ViewDetails nv
+                | view = RouteDetails nv.key
                 , error = []
                 , vehicles = Dict.insert key nv model.vehicles
+                , tmpUpgrade = Nothing
               }
-            , Cmd.batch [ doSaveModel, doCloseModal "upgrade" ]
+            , Nav.pushUrl model.key ("/details/" ++ key)
             )
 
 
@@ -67,8 +69,8 @@ deleteUpgrade model key u =
                     { vehicle | upgrades = upgradesNew }
             in
             ( { model
-                | view = ViewDetails nv
+                | view = RouteDetails nv.key
                 , vehicles = Dict.insert key nv model.vehicles
               }
-            , doSaveModel
+            , Cmd.none
             )

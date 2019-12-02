@@ -1,6 +1,8 @@
 module Update.Update exposing (update)
 
 import Bootstrap.Modal as Modal
+import Browser
+import Browser.Navigation as Nav
 import Dict
 import Model.Model exposing (..)
 import Model.Settings exposing (..)
@@ -12,28 +14,32 @@ import Ports.Photo
 import Ports.Storage
 import Task
 import Update.Data
+import Update.Routes
 import Update.Settings
 import Update.Sponsor
 import Update.Upgrade
-import Update.Utils exposing (doSaveModel)
 import Update.Vehicle
 import Update.View
 import Update.Weapon
+import Url exposing (Url)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         -- ROUTING.
-        To currentView ->
-            Update.View.update model currentView
+        ClickedLink request ->
+            Update.Routes.urlRequested model request
+
+        ChangedUrl url ->
+            Update.Routes.urlChanged model url
 
         -- GAME SETTINGS.
         UpdatePointsAllowed s ->
             ( { model
                 | pointsAllowed = Maybe.withDefault 0 (String.toInt s)
               }
-            , doSaveModel
+            , Cmd.none
             )
 
         UpdateTeamName s ->
@@ -111,40 +117,3 @@ update msg model =
 
         SettingsMsg event ->
             Update.Settings.update model event
-
-        -- Modals.
-        ShowModal modal ->
-            let
-                modals =
-                    Dict.insert modal Modal.shown model.modals
-
-                cmds =
-                    case modal of
-                        "settings" ->
-                            [ Ports.Storage.getKeys "" ]
-
-                        _ ->
-                            []
-            in
-            ( { model
-                | modals = modals
-                , tmpUpgrade = Nothing
-                , tmpVehicle = Nothing
-                , tmpWeapon = Nothing
-              }
-            , Cmd.batch <| Ports.Modals.open () :: cmds
-            )
-
-        CloseModal modal ->
-            let
-                modals =
-                    Dict.insert modal Modal.hidden model.modals
-            in
-            ( { model
-                | modals = modals
-                , tmpUpgrade = Nothing
-                , tmpVehicle = Nothing
-                , tmpWeapon = Nothing
-              }
-            , Ports.Modals.close ()
-            )

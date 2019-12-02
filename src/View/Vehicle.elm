@@ -33,10 +33,12 @@ import Html.Attributes
         , classList
         , disabled
         , hidden
+        , href
         , placeholder
         , style
         )
 import Html.Events exposing (onClick, onInput)
+import Model.Features
 import Model.Model exposing (..)
 import Model.Shared
 import Model.Sponsors exposing (..)
@@ -49,7 +51,7 @@ import View.Photo
 import View.Sponsor
 import View.Upgrade
 import View.Utils exposing (icon, iconClass, plural)
-import View.Weapon
+import View.Weapon exposing (defaultWeaponConfig)
 
 
 type alias RenderConfig =
@@ -165,6 +167,9 @@ configure model cfg v =
             div
                 [ hidden <| not cfg.showPhoto ]
                 [ View.Photo.view model v ]
+                |> Model.Features.withDefault
+                    "feature-car-photo"
+                    (text "")
 
         stats =
             Grid.simpleRow
@@ -298,12 +303,14 @@ configure model cfg v =
                 _ ->
                     View.Utils.detailSection [ text "Notes" ] [ notesBody ]
 
-        addonListButton onClick icon_ text_ =
-            Button.button
+        addonListButton href_ icon_ text_ =
+            Button.linkButton
                 [ Button.roleLink
                 , Button.small
-                , Button.onClick onClick
-                , Button.attrs [ hidden <| not cfg.showAddonButton ]
+                , Button.attrs
+                    [ hidden <| not cfg.showAddonButton
+                    , href href_
+                    ]
                 ]
                 [ icon icon_, text text_ ]
 
@@ -324,12 +331,12 @@ configure model cfg v =
                 _ ->
                     List.map
                         (View.Weapon.render
-                            (View.Weapon.RenderConfig
-                                (not cfg.printDetails)
-                                False
-                                cfg.printDetails
-                                (not cfg.printDetails)
-                            )
+                            { defaultWeaponConfig
+                                | showFireButton = not cfg.printDetails
+                                , previewSpecials = False
+                                , printSpecials = cfg.printDetails
+                                , showDeleteButton = not cfg.printDetails
+                            }
                             model
                             v
                         )
@@ -369,8 +376,16 @@ configure model cfg v =
                                     |> (++) (String.fromInt <| weaponsUsingSlots)
                                     |> text
                                 ]
-                            , addonListButton (ShowModal "weapon") "plus" "Weapon"
-                            , addonListButton (WeaponMsg <| AddWeapon v.key handgun) "plus" "Handgun"
+                            , addonListButton ("/new/weapon/" ++ v.key) "plus" "Weapon"
+                            , Button.button
+                                [ Button.roleLink
+                                , Button.small
+                                , Button.onClick (WeaponMsg <| AddWeapon v.key handgun)
+                                , Button.attrs
+                                    [ hidden <| not cfg.showAddonButton
+                                    ]
+                                ]
+                                [ icon "plus", text "Handgun" ]
                             ]
                         ]
                         weaponsListBody
@@ -412,7 +427,7 @@ configure model cfg v =
                                     |> (++) (String.fromInt <| upgradeUsingSlots)
                                     |> text
                                 ]
-                            , addonListButton (ShowModal "upgrade") "plus" "Upgrade"
+                            , addonListButton ("/new/upgrade/" ++ v.key) "plus" "Upgrade"
                             ]
                         ]
                         upgradeListBody
@@ -478,11 +493,13 @@ configure model cfg v =
                     , Button.onClick <| VehicleMsg <| DeleteVehicle v.key
                     ]
                     [ icon "trash-alt" ]
-                , Button.button
+                , Button.linkButton
                     [ Button.info
                     , Button.small
-                    , Button.attrs [ class "float-right" ]
-                    , Button.onClick <| To <| ViewDetails v
+                    , Button.attrs
+                        [ class "float-right"
+                        , href <| "/details/" ++ v.key
+                        ]
                     ]
                     [ icon "info" ]
                 ]

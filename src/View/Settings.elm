@@ -28,6 +28,7 @@ import Html.Attributes
         , style
         )
 import Html.Events exposing (onClick, onInput)
+import Model.Features
 import Model.Model exposing (..)
 import Model.Settings exposing (..)
 import Model.Shared exposing (..)
@@ -104,10 +105,25 @@ renderExpansionSettings model =
 
 renderAppSettings : Settings -> Html Msg
 renderAppSettings settings =
+    let
+        maybeAppSettings =
+            [ Model.Features.get
+                "feature-generate-team"
+                (View.Settings.SquadGeneration.render settings)
+            ]
+                |> List.filterMap identity
+
+        actualSettings =
+            case List.isEmpty maybeAppSettings of
+                True ->
+                    [ text "Nothing here yet!" ]
+
+                False ->
+                    maybeAppSettings
+    in
     Grid.row []
         [ Grid.col [ Col.xs12 ] [ h3 [] [ text "App Settings" ] ]
-        , Grid.col [ Col.xs12 ]
-            [ View.Settings.SquadGeneration.render settings ]
+        , Grid.col [ Col.xs12 ] actualSettings
         ]
 
 

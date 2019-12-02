@@ -1,17 +1,18 @@
 module Update.View exposing (update)
 
 import Model.Model exposing (..)
+import Model.Routes exposing (Route(..))
 import Ports.Photo
 import Ports.Storage
 import Update.Utils exposing (doSaveModel)
 
 
-update : Model -> CurrentView -> ( Model, Cmd Msg )
+update : Model -> Route -> ( Model, Cmd Msg )
 update model currentView =
     case currentView of
-        ViewDashboard ->
+        RouteDashboard ->
             ( { model
-                | view = ViewDashboard
+                | view = RouteDashboard
                 , tmpVehicle = Nothing
                 , tmpWeapon = Nothing
                 , tmpUpgrade = Nothing
@@ -19,15 +20,18 @@ update model currentView =
             , doSaveModel
             )
 
-        ViewDetails v ->
-            ( { model | view = ViewDetails v }
+        RouteDetails v ->
+            ( { model | view = RouteDetails v }
             , Cmd.batch
                 [ Ports.Photo.destroyStream ""
                 , doSaveModel
                 ]
             )
 
-        ViewPrinterFriendly v ->
-            ( { model | view = ViewPrinterFriendly v }
+        RoutePrint v ->
+            ( { model | view = RoutePrint v }
             , Cmd.none
             )
+
+        _ ->
+            ( model, Cmd.none )

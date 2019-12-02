@@ -20,20 +20,29 @@ import View.Utils exposing (icon)
 
 render :
     { a | name : String, expansion : Expansion, specials : List Special }
-    -> ({ a | name : String, expansion : Expansion, specials : List Special } -> Msg)
+    -> Maybe ({ a | name : String, expansion : Expansion, specials : List Special } -> Msg)
     -> List (Html Msg)
     -> List (Html Msg)
     -> Html Msg
-render thing removeMsg leftCol rightCol =
+render thing mRemoveMsg leftCol rightCol =
+    let
+        deleteButton =
+            case mRemoveMsg of
+                Nothing ->
+                    text ""
+
+                Just removeMsg ->
+                    a
+                        [ onClick <| removeMsg thing
+                        , style "cursor" "pointer"
+                        ]
+                        [ icon "times" ]
+    in
     Grid.row
         [ Row.middleXs, Row.topMd ]
         [ Grid.col [ Col.xs12 ]
             [ h6 []
-                [ a
-                    [ onClick <| removeMsg thing
-                    , style "cursor" "pointer"
-                    ]
-                    [ icon "times" ]
+                [ text ""
                 , text <| thing.name ++ " "
                 , small []
                     [ text <| Model.Shared.fromExpansion thing.expansion ]

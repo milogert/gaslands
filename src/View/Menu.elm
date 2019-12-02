@@ -23,9 +23,11 @@ import Html.Attributes
         ( attribute
         , class
         , classList
+        , href
         , style
         )
 import Model.Model exposing (..)
+import Model.Routes exposing (Route(..))
 import Model.Vehicle.Model exposing (..)
 import View.Utils exposing (..)
 
@@ -61,11 +63,12 @@ renderInternal model location =
                 ++ [ Button.small ]
 
         gameButtons =
-            [ Button.button
+            [ Button.linkButton
                 ((++)
                     allButtonConfig
                     [ Button.primary
-                    , Button.onClick <| To ViewDashboard
+                    , Button.attrs
+                        [ href "/" ]
                     ]
                 )
                 [ icon "home" ]
@@ -86,8 +89,13 @@ renderInternal model location =
 
         detailsButtons =
             case model.view of
-                ViewDetails vehicle ->
+                RouteDetails key ->
                     let
+                        vehicle =
+                            model.vehicles
+                                |> Dict.get key
+                                |> Maybe.withDefault defaultVehicle
+
                         canActivate =
                             model.gearPhase <= vehicle.gear.current
 
@@ -111,11 +119,12 @@ renderInternal model location =
                             ]
                         )
                         [ text activatedText ]
-                    , Button.button
+                    , Button.linkButton
                         ((++)
                             allButtonConfig
                             [ Button.secondary
-                            , Button.onClick <| To <| ViewPrinterFriendly [ vehicle ]
+                            , Button.attrs
+                                [ href <| "/print/" ++ vehicle.key ]
                             ]
                         )
                         [ icon "print" ]
@@ -125,29 +134,31 @@ renderInternal model location =
                     []
 
         settingsButtons =
-            [ Button.button
+            [ Button.linkButton
                 ((++)
                     allButtonConfig
                     [ Button.primary
-                    , Button.onClick <| ShowModal "vehicle"
+                    , Button.attrs [ href "/new/vehicle" ]
                     ]
                 )
                 [ icon "plus", icon "car" ]
-            , Button.button
+            , Button.linkButton
                 ((++)
                     allButtonConfig
                     [ Button.secondary
-                    , Button.onClick <| To <| ViewPrinterFriendly <| Dict.values model.vehicles
+                    , Button.disabled <| Dict.isEmpty model.vehicles
+                    , Button.attrs
+                        [ href "/print" ]
                     ]
                 )
                 [ icon "print", icon "car" ]
-            , Button.button
+            , Button.linkButton
                 ((++)
                     allButtonConfig
                     [ Button.light
-                    , Button.onClick <| ShowModal "settings"
                     , Button.attrs
                         [ attribute "aria-label" "Back Button"
+                        , href "/settings"
                         ]
                     ]
                 )

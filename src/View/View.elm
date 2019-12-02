@@ -8,6 +8,7 @@ import Bootstrap.Grid.Col as Col
 import Bootstrap.Grid.Row as Row
 import Bootstrap.Utilities.Spacing as Spacing
 import Browser exposing (Document)
+import Dict exposing (Dict)
 import Html
     exposing
         ( Html
@@ -30,6 +31,7 @@ import Html.Attributes
         )
 import Html.Events exposing (onClick, onInput)
 import Model.Model exposing (..)
+import Model.Routes exposing (NewType(..), Route(..))
 import Model.Shared exposing (..)
 import Model.Upgrade.Common as UpgradeC
 import Model.Upgrade.Model exposing (..)
@@ -40,9 +42,9 @@ import Model.Weapon.Model exposing (..)
 import View.Dashboard
 import View.Details
 import View.Menu
-import View.ModalHolder
-import View.New
+import View.NewUpgrade
 import View.NewVehicle
+import View.NewWeapon
 import View.PrinterFriendly
 import View.Settings
 import View.Sponsor
@@ -57,25 +59,19 @@ view model =
     let
         viewToGoTo =
             case model.view of
-                ViewPrinterFriendly lv ->
-                    case List.length lv of
-                        1 ->
-                            To <| ViewDetails <| Maybe.withDefault defaultVehicle <| List.head lv
-
-                        _ ->
-                            To ViewDashboard
+                RoutePrint key ->
+                    "/details/" ++ key
 
                 _ ->
-                    To ViewDashboard
+                    "/"
 
         backButton =
-            Button.button
-                [ Button.disabled <| model.view == ViewDashboard
+            Button.linkButton
+                [ Button.disabled <| model.view == RouteDashboard
                 , Button.light
                 , Button.small
                 , Button.block
-                , Button.onClick viewToGoTo
-                , Button.attrs [ attribute "aria-label" "Back Button" ]
+                , Button.attrs [ href viewToGoTo, attribute "aria-label" "Back Button" ]
                 ]
                 [ icon "arrow-left" ]
 
@@ -137,7 +133,6 @@ view model =
                         [ Grid.col []
                             [ displayAlert model
                             , render model
-                            , View.ModalHolder.modalHolder model
                             ]
                         ]
                     ]
@@ -159,14 +154,73 @@ displayAlert model =
 render : Model -> Html Msg
 render model =
     case model.view of
-        ViewDashboard ->
+        RouteDashboard ->
             View.Dashboard.view model
 
-        ViewDetails v ->
-            View.Details.view model v
+        RouteNew type_ ->
+            case type_ of
+                NewVehicle ->
+                    View.NewVehicle.view model
 
-        ViewPrinterFriendly lv ->
-            View.PrinterFriendly.view model lv
+                NewWeapon key ->
+                    case vehicleFromKey model key of
+                        Nothing ->
+                            View.Dashboard.view model
+
+                        Just vehicle ->
+                            View.NewWeapon.view
+                                model
+                                vehicle
+                                (WeaponC.allWeaponsList
+                                    |> List.filter (expansionFilter model.settings.expansions.enabled)
+                                    |> List.filter
+                                        (\x -> x.slots <= VehicleC.slotsRemaining vehicle)
+                                    |> List.filter
+                                        (\x -> x.name /= WeaponC.handgun.name)
+                                    |> List.filter
+                                        (View.Utils.weaponSponsorFilter model)
+                                )
+
+                NewUpgrade key ->
+                    case vehicleFromKey model key of
+                        Nothing ->
+                            View.Dashboard.view model
+
+                        Just vehicle ->
+                            View.NewUpgrade.view
+                                model
+                                vehicle
+                                (UpgradeC.allUpgradesList
+                                    |> List.filter (expansionFilter model.settings.expansions.enabled)
+                                    |> List.filter
+                                        (\x -> x.slots <= VehicleC.slotsRemaining vehicle)
+                                )
+
+        RouteDetails key ->
+            case vehicleFromKey model key of
+                Nothing ->
+                    View.Dashboard.view model
+
+                Just vehicle ->
+                    View.Details.view model vehicle
+
+        RouteSponsor ->
+            View.SponsorSelect.view model
+
+        RoutePrint key ->
+            model.vehicles
+                |> Dict.get key
+                |> Maybe.withDefault defaultVehicle
+                |> List.singleton
+                |> View.PrinterFriendly.view model
+
+        RoutePrintAll ->
+            model.vehicles
+                |> Dict.values
+                |> View.PrinterFriendly.view model
+
+        RouteSettings ->
+            View.Settings.view model
 
 
 sizeShower : Html Msg
