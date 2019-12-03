@@ -16,8 +16,8 @@ import Html.Attributes
     exposing
         ( attribute
         , class
-        , disabled
         , classList
+        , disabled
         , href
         , style
         )
@@ -72,8 +72,8 @@ render model =
                                 ( _, _ ) ->
                                     "Activate"
                     in
-                    [ navbarItem
-                        False
+                    [ button
+                        buttonModifiers
                         [ onClick <| VehicleMsg <| UpdateActivated vehicle.key (not vehicle.activated)
                         , disabled <| not canActivate || vehicle.activated
                         ]
@@ -91,13 +91,13 @@ render model =
             [ navbarItemLink
                 False
                 [ href "/new/vehicle" ]
-                [ View.Utils.icon "plus", View.Utils.icon "car" ]
+                [ View.Utils.icon "plus" ]
             , navbarItemLink
                 False
                 [ disabled <| Dict.isEmpty model.vehicles
-                , href "/print" 
+                , href "/print"
                 ]
-                [ View.Utils.icon "print", View.Utils.icon "car" ]
+                [ View.Utils.icon "print" ]
             , navbarItemLink
                 False
                 [ attribute "aria-label" "Back Button"
@@ -110,7 +110,7 @@ render model =
         menuLayout buttons =
             buttons
                 |> List.filter (not << List.isEmpty)
-                |> List.intersperse ([navbarDivider [] []])
+                |> List.intersperse [ navbarDivider [] [] ]
                 |> List.concat
     in
     [ gameButtons, detailsButtons, settingsButtons ]

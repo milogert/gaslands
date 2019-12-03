@@ -1,6 +1,7 @@
 module View.Utils exposing
     ( crewUsed
     , detailSection
+    , expansionMarker
     , factBadge
     , factsHolder
     , icon
@@ -10,6 +11,7 @@ module View.Utils exposing
     , renderCountDown
     , renderDice
     , renderSpecial
+    , tagGen
     , vehicleSponsorFilter
     , weaponSponsorFilter
     )
@@ -23,6 +25,8 @@ import Bootstrap.Grid as Grid
 import Bootstrap.Grid.Col as Col
 import Bootstrap.Grid.Row as Row
 import Bootstrap.Utilities.Spacing as Spacing
+import Bulma.Elements exposing (..)
+import Bulma.Modifiers exposing (..)
 import Html
     exposing
         ( Html
@@ -210,3 +214,29 @@ plural i =
 
         _ ->
             "s"
+
+
+tagGen : String -> Maybe String -> Html Msg
+tagGen title value =
+    let
+        titleTag =
+            easyTag { tagModifiers | color = Dark } [] title
+    in
+    case value of
+        Nothing ->
+            multitag []
+                [ titleTag ]
+
+        Just v ->
+            multitag []
+                [ titleTag
+                , easyTag { tagModifiers | color = White } [] v
+                ]
+
+
+expansionMarker : Expansion -> Html Msg
+expansionMarker expansion =
+    expansion
+        |> fromExpansion
+        |> Just
+        |> tagGen "expansion"

@@ -1,29 +1,29 @@
 module View.Vehicle exposing (renderCard, renderDetails, renderPreview, renderPrint)
 
-import Bulma.Modifiers exposing (..)
-import Bulma.Layout exposing (..)
-import Bulma.Form exposing (..)
-import Bulma.Elements exposing (..)
 import Bootstrap.Badge as Badge
 import Bootstrap.Form.Checkbox as Checkbox
 import Bootstrap.Grid as Grid
 import Bootstrap.Grid.Col as Col
 import Bootstrap.Grid.Row as Row
 import Bootstrap.Utilities.Spacing as Spacing
+import Bulma.Elements exposing (..)
+import Bulma.Form exposing (..)
+import Bulma.Layout exposing (..)
+import Bulma.Modifiers exposing (..)
 import Html
     exposing
         ( Html
+        , a
         , div
         , h2
         , h4
-        , a
         , h5
         , hr
         , li
         , small
-        , textarea
         , span
         , text
+        , textarea
         , ul
         )
 import Html.Attributes
@@ -36,6 +36,7 @@ import Html.Attributes
         , href
         , placeholder
         , style
+        , value
         )
 import Html.Events exposing (onClick, onInput)
 import Model.Features
@@ -50,7 +51,7 @@ import Model.Weapon.Model exposing (..)
 import View.Photo
 import View.Sponsor
 import View.Upgrade
-import View.Utils exposing (icon, iconClass, plural)
+import View.Utils exposing (icon, iconClass, plural, tagGen)
 import View.Weapon exposing (defaultWeaponConfig)
 
 
@@ -110,13 +111,13 @@ configure model cfg v =
             model.view
 
         vtype =
-            fromVehicleType v.vtype
+            ( fromVehicleType v.vtype, Nothing )
 
         pointsDisplay =
-            (String.fromInt <| vehicleCost v) ++ " points"
+            ( "points", Just <| String.fromInt <| vehicleCost v )
 
         weightDisplay =
-            fromVehicleWeight v.weight ++ "-weight"
+            ( fromVehicleWeight v.weight ++ "-weight", Nothing )
 
         equipmentUsed =
             List.sum (List.map .slots v.weapons)
@@ -124,26 +125,30 @@ configure model cfg v =
         equipmentRemaining =
             String.fromInt <| v.equipment - equipmentUsed
 
+        equipmentSlotsDisplay =
+            ( "build slots", Just <| String.fromInt v.equipment )
+
         crewDisplay =
-            (String.fromInt <| totalCrew v) ++ " total crew"
+            ( "total crew", Just <| String.fromInt <| totalCrew v )
 
         handlingDisplay =
-            (String.fromInt <| totalHandling v) ++ " handling"
-
-        equipmentSlotsDisplay =
-            String.fromInt v.equipment ++ " build slot" ++ plural v.equipment
+            ( "handling", Just <| String.fromInt <| totalHandling v )
 
         maxHullDisplay =
-            v
+            ( "max hull"
+            , v
                 |> totalHull
                 |> String.fromInt
-                |> (\s -> s ++ " max hull")
+                |> Just
+            )
 
         maxGearDisplay =
-            v
+            ( "max gear"
+            , v
                 |> totalGear
                 |> String.fromInt
-                |> (\s -> s ++ " max gear")
+                |> Just
+            )
 
         isCrewAvailable =
             totalCrew v > View.Utils.crewUsed v
@@ -152,16 +157,19 @@ configure model cfg v =
             v.hull.current >= totalHull v
 
         factsHolder =
-            View.Utils.factsHolder
-                [ vtype
-                , pointsDisplay
-                , weightDisplay
-                , crewDisplay
-                , handlingDisplay
-                , equipmentSlotsDisplay
-                , maxHullDisplay
-                , maxGearDisplay
-                ]
+            [ vtype
+            , pointsDisplay
+            , weightDisplay
+            , crewDisplay
+            , handlingDisplay
+            , equipmentSlotsDisplay
+            , maxHullDisplay
+            , maxGearDisplay
+            ]
+                |> List.map (\( title, value ) -> tagGen title value)
+                |> List.map (\t -> control controlModifiers [] [ t ])
+                |> fields Left
+                    []
 
         photoPlus =
             div
@@ -172,15 +180,10 @@ configure model cfg v =
                     (text "")
 
         stats =
-            Grid.simpleRow
-                [ Grid.col
-                    [ Col.xs3
-                    , Col.lg2
-                    , Col.attrs [ hidden <| not cfg.showPhoto ]
-                    ]
-                    [ photoPlus ]
-                , Grid.col [ Col.xs ]
-                    [ factsHolder ]
+            div
+                []
+                [ photoPlus
+                , factsHolder
                 ]
 
         gearCounter =
@@ -449,7 +452,7 @@ configure model cfg v =
                         [ text "Perks Available from "
                         , text sponsor.name
                         ]
-                        [ Grid.simpleRow
+                        [ container []
                             (sponsor
                                 |> .grantedClasses
                                 |> List.map (View.Sponsor.renderPerkClass v)
@@ -467,7 +470,7 @@ configure model cfg v =
 
         body : List (Html Msg)
         body =
-            [ stats
+            [ factsHolder
             , counterHolder
             , specialHolder
             , notes
@@ -483,8 +486,8 @@ configure model cfg v =
                 ]
                 [ button
                     { buttonModifiers
-                    | color = Danger
-                    , size = Small
+                        | color = Danger
+                        , size = Small
                     }
                     [ onClick <| VehicleMsg <| DeleteVehicle v.key
                     ]
@@ -607,55 +610,35 @@ counterElement :
     -> (String -> VehicleEvent)
     -> Html Msg
 counterElement icon_ min max counterValue decrementMsg incrementMsg inputMsg =
-    connectedFields Centered []
-    [ span
-        [ style "min-width" "4rem"
-        , style "text-align" "center"
+    connectedFields Centered
+        []
+        [ controlLabel
+            [ style "min-width" "4rem"
+            , style "text-align" "center"
+            ]
+            [ icon_ ]
+        , controlButton
+            buttonModifiers
+            []
+            [ onClick <| VehicleMsg <| decrementMsg min max
+            , disabled <| min == counterValue
+            ]
+            [ icon "minus" ]
+        , controlInput
+            controlInputModifiers
+            []
+            [ onInput <| VehicleMsg << inputMsg
+            , style "text-align" "center"
+            , Html.Attributes.min <| String.fromInt min
+            , Html.Attributes.max <| String.fromInt max
+            , value <| String.fromInt counterValue
+            ]
+            []
+        , controlButton
+            buttonModifiers
+            []
+            [ onClick <| VehicleMsg <| incrementMsg min max
+            , disabled <| counterValue >= max
+            ]
+            [ icon "plus" ]
         ]
-        [ icon_ ]
-    , button
-        [ Button.outlineSecondary
-        , Button.onClick <| VehicleMsg <| decrementMsg min max
-        , Button.disabled <| min == counterValue
-        ]
-        [ icon "minus" ]
-    ]
-    InputGroup.config
-        (InputGroup.number
-            [ Input.onInput <| VehicleMsg << inputMsg
-            , Input.value <| String.fromInt counterValue
-            , Input.attrs
-                [ style "text-align" "center"
-                , Html.Attributes.min <| String.fromInt min
-                , Html.Attributes.max <| String.fromInt max
-                ]
-            ]
-        )
-        |> InputGroup.small
-        |> InputGroup.attrs [ class "my-2" ]
-        |> InputGroup.predecessors
-            [ InputGroup.span
-                [ style "min-width" "4rem"
-                , style "text-align" "center"
-                ]
-                [ icon_ ]
-            , InputGroup.button
-                [ Button.outlineSecondary
-                , Button.onClick <| VehicleMsg <| decrementMsg min max
-                , Button.disabled <| min == counterValue
-                ]
-                [ icon "minus" ]
-            ]
-        |> InputGroup.successors
-            [ InputGroup.button
-                [ Button.outlineSecondary
-                , Button.onClick <| VehicleMsg <| incrementMsg min max
-                , Button.disabled <| counterValue >= max
-                ]
-                [ icon "plus" ]
-
-            {--, InputGroup.span
-                [ style "min-width" "4rem" ]
-                [ span [ class "mx-auto" ] [ text <| "of " ++ String.fromInt max ] ]--}
-            ]
-        |> InputGroup.view

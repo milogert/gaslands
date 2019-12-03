@@ -1,14 +1,14 @@
 module View.View exposing (view)
 
-import Bulma.CDN exposing (..)
-import Bulma.Modifiers exposing (..)
-import Bulma.Components exposing (..)
-import Bulma.Elements exposing (..)
-import Bulma.Columns exposing (..)
-import Bulma.Layout exposing (..)
 import Bootstrap.Badge as Badge
 import Bootstrap.Utilities.Spacing as Spacing
 import Browser exposing (Document)
+import Bulma.CDN exposing (..)
+import Bulma.Columns exposing (..)
+import Bulma.Components exposing (..)
+import Bulma.Elements exposing (..)
+import Bulma.Layout exposing (..)
+import Bulma.Modifiers exposing (..)
 import Dict exposing (Dict)
 import Html
     exposing
@@ -69,8 +69,8 @@ view model =
         backButton =
             button
                 { buttonModifiers
-                | disabled = model.view == RouteDashboard
-                , size = Small
+                    | disabled = model.view == RouteDashboard
+                    , size = Small
                 }
                 [ href viewToGoTo, attribute "aria-label" "Back Button" ]
                 [ View.Utils.icon "arrow-left" ]
@@ -100,7 +100,8 @@ view model =
                 ]
 
         viewDisplay =
-            title H4 --[ style "margin-bottom" "0" ]
+            title H4
+                --[ style "margin-bottom" "0" ]
                 []
                 [ text <| viewToStr model ]
     in
@@ -116,17 +117,17 @@ view model =
             , attribute "crossorigin" "anonymous"
             ]
             []
-        , section NotSpaced
-            []
-            [ viewDisplay
-            , View.Sponsor.renderBadge model.sponsor
-            , pointsBadge
+        , level
+            [ style "margin" "2rem 2rem 1rem 2rem" ]
+            [ levelLeft []
+                [ levelItem [] [ viewDisplay ] ]
+            , levelRight []
+                [ levelItem [] [ View.Sponsor.renderBadge model.sponsor ]
+                , levelItem [] [ pointsBadge ]
+                ]
             ]
-        , section NotSpaced
-            []
-            [ displayAlert model
-            , render model
-            ]
+        , displayAlert model
+        , container [] [ render model ]
         ]
 
 
@@ -134,9 +135,12 @@ nav : Model -> Html Msg
 nav model =
     fixedNavbar
         Bottom
-        navbarModifiers
+        { navbarModifiers
+            | color = Dark
+            , transparent = True
+        }
         []
-        (View.Menu.render model)
+        [ navbarStart [] (View.Menu.render model) ]
 
 
 displayAlert : Model -> Html Msg
