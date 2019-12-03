@@ -1,13 +1,11 @@
 module View.Vehicle exposing (renderCard, renderDetails, renderPreview, renderPrint)
 
+import Bulma.Modifiers exposing (..)
+import Bulma.Layout exposing (..)
+import Bulma.Form exposing (..)
+import Bulma.Elements exposing (..)
 import Bootstrap.Badge as Badge
-import Bootstrap.Button as Button
-import Bootstrap.Card as Card
-import Bootstrap.Card.Block as Block
 import Bootstrap.Form.Checkbox as Checkbox
-import Bootstrap.Form.Input as Input
-import Bootstrap.Form.InputGroup as InputGroup
-import Bootstrap.Form.Textarea as Textarea
 import Bootstrap.Grid as Grid
 import Bootstrap.Grid.Col as Col
 import Bootstrap.Grid.Row as Row
@@ -18,10 +16,12 @@ import Html
         , div
         , h2
         , h4
+        , a
         , h5
         , hr
         , li
         , small
+        , textarea
         , span
         , text
         , ul
@@ -284,11 +284,11 @@ configure model cfg v =
                             text v.notes
 
                         ( _, True ) ->
-                            Textarea.textarea
-                                [ Textarea.onInput <| VehicleMsg << UpdateNotes v.key
-                                , Textarea.attrs [ placeholder "Notes" ]
-                                , Textarea.value v.notes
+                            textarea
+                                [ onInput <| VehicleMsg << UpdateNotes v.key
+                                , placeholder "Notes"
                                 ]
+                                [ text v.notes ]
 
                         _ ->
                             text ""
@@ -304,13 +304,10 @@ configure model cfg v =
                     View.Utils.detailSection [ text "Notes" ] [ notesBody ]
 
         addonListButton href_ icon_ text_ =
-            Button.linkButton
-                [ Button.roleLink
-                , Button.small
-                , Button.attrs
-                    [ hidden <| not cfg.showAddonButton
-                    , href href_
-                    ]
+            a
+                [ class "button"
+                , hidden <| not cfg.showAddonButton
+                , href href_
                 ]
                 [ icon icon_, text text_ ]
 
@@ -377,13 +374,10 @@ configure model cfg v =
                                     |> text
                                 ]
                             , addonListButton ("/new/weapon/" ++ v.key) "plus" "Weapon"
-                            , Button.button
-                                [ Button.roleLink
-                                , Button.small
-                                , Button.onClick (WeaponMsg <| AddWeapon v.key handgun)
-                                , Button.attrs
-                                    [ hidden <| not cfg.showAddonButton
-                                    ]
+                            , a
+                                [ class "button"
+                                , onClick (WeaponMsg <| AddWeapon v.key handgun)
+                                , hidden <| not cfg.showAddonButton
                                 ]
                                 [ icon "plus", text "Handgun" ]
                             ]
@@ -487,19 +481,18 @@ configure model cfg v =
                 [ class "buttons"
                 , classList [ ( "d-none", wrecked ) ]
                 ]
-                [ Button.button
-                    [ Button.danger
-                    , Button.small
-                    , Button.onClick <| VehicleMsg <| DeleteVehicle v.key
+                [ button
+                    { buttonModifiers
+                    | color = Danger
+                    , size = Small
+                    }
+                    [ onClick <| VehicleMsg <| DeleteVehicle v.key
                     ]
                     [ icon "trash-alt" ]
-                , Button.linkButton
-                    [ Button.info
-                    , Button.small
-                    , Button.attrs
-                        [ class "float-right"
-                        , href <| "/details/" ++ v.key
-                        ]
+                , a
+                    [ class "button"
+                    , class "float-right"
+                    , href <| "/details/" ++ v.key
                     ]
                     [ icon "info" ]
                 ]
@@ -530,7 +523,7 @@ renderDetails model v =
         |> Grid.simpleRow
 
 
-renderCard : Model -> Vehicle -> Card.Config Msg
+renderCard : Model -> Vehicle -> Html Msg
 renderCard model v =
     let
         ( header, body, footer ) =
@@ -542,19 +535,12 @@ renderCard model v =
                     , showDetailsButton = True
                 }
                 v
-
-        cardDisplay =
-            case v.hull.current >= totalHull v of
-                True ->
-                    [ Card.outlineDanger ]
-
-                False ->
-                    []
     in
-    Card.config cardDisplay
-        |> Card.headerH4 [] [ header ]
-        |> Card.block [] (List.map (\b -> Block.text [] [ b ]) body)
-        |> Card.footer [] [ footer ]
+    div []
+        [ h4 [] [ header ]
+        , div [] body
+        , div [] [ footer ]
+        ]
 
 
 renderPreview : Model -> Vehicle -> Html Msg
@@ -621,6 +607,19 @@ counterElement :
     -> (String -> VehicleEvent)
     -> Html Msg
 counterElement icon_ min max counterValue decrementMsg incrementMsg inputMsg =
+    connectedFields Centered []
+    [ span
+        [ style "min-width" "4rem"
+        , style "text-align" "center"
+        ]
+        [ icon_ ]
+    , button
+        [ Button.outlineSecondary
+        , Button.onClick <| VehicleMsg <| decrementMsg min max
+        , Button.disabled <| min == counterValue
+        ]
+        [ icon "minus" ]
+    ]
     InputGroup.config
         (InputGroup.number
             [ Input.onInput <| VehicleMsg << inputMsg
