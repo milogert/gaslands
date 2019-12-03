@@ -5,9 +5,9 @@ module View.Sponsor exposing
     , renderPerkList
     )
 
-import Bootstrap.Form.Checkbox as Checkbox
-import Bootstrap.Grid as Grid
-import Bootstrap.Grid.Col as Col
+import Bulma.Columns exposing (..)
+import Bulma.Elements exposing (..)
+import Bulma.Form exposing (..)
 import Html
     exposing
         ( Html
@@ -25,9 +25,10 @@ import Html
         )
 import Html.Attributes
     exposing
-        ( class
+        ( checked
+        , class
         , href
-        , title
+        , id
         )
 import Html.Events exposing (onCheck, onClick)
 import Model.Model exposing (..)
@@ -42,17 +43,13 @@ import Model.Sponsors
         , getClassPerks
         )
 import Model.Vehicle.Model exposing (..)
-import View.Utils exposing (icon)
+import View.Utils exposing (expansionMarker, icon)
 
 
 render : Sponsor -> Html Msg
 render { name, description, perks, grantedClasses, expansion } =
     div []
-        [ h3 []
-            [ text name
-            , text " "
-            , small [] [ text <| "[" ++ fromExpansion expansion ++ "]" ]
-            ]
+        [ title H5 [] [ text name ]
         , p [] [ text description ]
         , ul [] <| renderPerks perks
         , p [] <|
@@ -62,6 +59,7 @@ render { name, description, perks, grantedClasses, expansion } =
                         |> List.intersperse ", "
                         |> List.map text
                    )
+        , expansionMarker expansion
         ]
 
 
@@ -95,7 +93,7 @@ renderBadge ms =
         [ a
             [ class "badge badge-secondary"
             , href "/sponsor"
-            , title description
+            , Html.Attributes.title description
             ]
             [ text name
             , icon "exchange-alt"
@@ -103,14 +101,16 @@ renderBadge ms =
         ]
 
 
-renderPerkClass : Vehicle -> PerkClass -> Grid.Column Msg
+renderPerkClass : Vehicle -> PerkClass -> Html Msg
 renderPerkClass vehicle perkClass =
-    Grid.col [ Col.md6 ] <|
-        [ h6 [] [ text <| fromPerkClass perkClass ] ]
+    column columnModifiers
+        []
+        ([ title H6 [] [ text <| fromPerkClass perkClass ] ]
             ++ (perkClass
                     |> getClassPerks
                     |> List.map (renderVehiclePerk vehicle)
                )
+        )
 
 
 renderPerkList : List VehiclePerk -> List PerkClass -> Html Msg
@@ -131,12 +131,15 @@ renderPerkList perks perkClasses =
 
 renderVehiclePerk : Vehicle -> VehiclePerk -> Html Msg
 renderVehiclePerk vehicle perk =
-    Checkbox.checkbox
-        [ Checkbox.id perk.name
-        , Checkbox.onCheck <| VehicleMsg << SetPerkInVehicle vehicle.key perk
-        , Checkbox.checked <| List.member perk vehicle.perks
+    controlCheckBox
+        False
+        []
+        []
+        [ id perk.name
+        , onCheck <| VehicleMsg << SetPerkInVehicle vehicle.key perk
+        , checked <| List.member perk vehicle.perks
         ]
-        (printPerk perk)
+        [ text <| printPerk perk ]
 
 
 printPerk : VehiclePerk -> String
