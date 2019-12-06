@@ -5,7 +5,6 @@ module View.Sponsor exposing
     , renderPerkList
     )
 
-
 import FontAwesome.Icon as Icon exposing (Icon)
 import FontAwesome.Solid as Icon
 import Bulma.Columns exposing (..)

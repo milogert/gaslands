@@ -26,7 +26,12 @@ urlRequested model request =
                     ( model, cmdBatch url RouteDashboard )
 
                 Just route ->
-                    ( model, cmdBatch url route )
+                    case route of
+                        RouteNoOp ->
+                            ( model, Cmd.none )
+
+                        _ ->
+                            ( model, cmdBatch url route )
 
         Browser.External href ->
             case href of
@@ -49,12 +54,22 @@ urlChanged model url =
             )
 
         Just route ->
-            ( { model
-                | view = route
-                , url = url
-              }
-            , Cmd.none
-            )
+            case route of
+                RouteNoOp ->
+                    ( { model
+                        | view = route
+                        , url = url
+                      }
+                    , Cmd.none
+                    )
+
+                _ ->
+                    ( { model
+                        | view = route
+                        , url = url
+                      }
+                    , Cmd.none
+                    )
 
 
 doPreloadWork : Model -> Route -> List (Cmd Msg)

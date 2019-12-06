@@ -153,6 +153,18 @@ nav model =
         ]
 
 
+nav : Model -> Html Msg
+nav model =
+    fixedNavbar
+        Bottom
+        { navbarModifiers
+            | color = Dark
+            , transparent = True
+        }
+        []
+        [ navbarStart [] (View.Menu.render model) ]
+
+
 displayAlert : Model -> Html Msg
 displayAlert model =
     model.error
