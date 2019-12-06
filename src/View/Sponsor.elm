@@ -5,9 +5,13 @@ module View.Sponsor exposing
     , renderPerkList
     )
 
+
+import FontAwesome.Icon as Icon exposing (Icon)
+import FontAwesome.Solid as Icon
 import Bulma.Columns exposing (..)
 import Bulma.Elements exposing (..)
 import Bulma.Form exposing (..)
+import Bulma.Modifiers exposing (..)
 import Html
     exposing
         ( Html
@@ -43,7 +47,7 @@ import Model.Sponsors
         , getClassPerks
         )
 import Model.Vehicle.Model exposing (..)
-import View.Utils exposing (expansionMarker, icon)
+import View.Utils exposing (expansionMarker)
 
 
 render : Sponsor -> Html Msg
@@ -89,16 +93,15 @@ renderBadge ms =
                 Just sponsor ->
                     ( sponsor.name, sponsor.description )
     in
-    span [ class "sponsor-badge" ]
-        [ a
-            [ class "badge badge-secondary"
-            , href "/sponsor"
-            , Html.Attributes.title description
-            ]
-            [ text name
-            , icon "exchange-alt"
-            ]
+    button
+        { buttonModifiers
+            | size = Small
+            , iconRight = Just (Small, [], Icon.exchangeAlt |> Icon.viewIcon)
+        }
+        [ href "/sponsor"
+        , Html.Attributes.title description
         ]
+        [ text name ]
 
 
 renderPerkClass : Vehicle -> PerkClass -> Html Msg

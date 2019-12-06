@@ -1,5 +1,7 @@
 module View.Vehicle exposing (renderCard, renderDetails, renderPreview, renderPrint)
 
+import FontAwesome.Icon as Icon exposing (Icon)
+import FontAwesome.Solid as Icon
 import Bootstrap.Badge as Badge
 import Bootstrap.Form.Checkbox as Checkbox
 import Bootstrap.Grid as Grid
@@ -51,7 +53,7 @@ import Model.Weapon.Model exposing (..)
 import View.Photo
 import View.Sponsor
 import View.Upgrade
-import View.Utils exposing (icon, iconClass, plural, tagGen)
+import View.Utils exposing (plural, tagGen)
 import View.Weapon exposing (defaultWeaponConfig)
 
 
@@ -189,14 +191,14 @@ configure model cfg v =
         gearCounter =
             case ( cfg.printCounters, wrecked ) of
                 ( True, _ ) ->
-                    div [ class "gear-die" ] [ iconClass "fas fa-lg" "cogs" [ "mx-auto" ] ]
+                    div [ class "gear-die" ] [ Icon.cogs |> Icon.viewIcon ]
 
                 ( _, True ) ->
                     text ""
 
                 ( _, False ) ->
                     counterElement
-                        (iconClass "fas" "cogs" [ "mx-auto" ])
+                        (Icon.cogs |> Icon.viewIcon)
                         1
                         (totalGear v)
                         v.gear.current
@@ -208,35 +210,33 @@ configure model cfg v =
             case cfg.printCounters of
                 True ->
                     Grid.row [ Row.attrs [ class "mb-2" ] ]
-                        [ Grid.col [ Col.md1 ] [ iconClass "fas fa-lg" "exclamation-triangle" [ "mx-auto", "print-icon" ] ]
+                        [ Grid.col [ Col.md1 ] [ Icon.exclamationTriangle |> Icon.viewStyled [ class "print-icon" ] ]
                         , Grid.col [ Col.md11 ] <|
                             List.repeat 6 (span [ class "hazard-check mr-1" ] [])
                         ]
 
                 False ->
-                    div []
-                        [ counterElement
-                            (iconClass "fas" "exclamation-triangle" [ "mx-auto" ])
-                            0
-                            6
-                            v.hazards
-                            (ShiftHazards v.key -1)
-                            (ShiftHazards v.key 1)
-                            (UpdateHazards v.key)
-                        ]
+                    counterElement
+                        (Icon.exclamationTriangle |> Icon.viewIcon)
+                        0
+                        6
+                        v.hazards
+                        (ShiftHazards v.key -1)
+                        (ShiftHazards v.key 1)
+                        (UpdateHazards v.key)
 
         hullCounter =
             case cfg.printCounters of
                 True ->
                     Grid.simpleRow
-                        [ Grid.col [ Col.md1 ] [ iconClass "fas fa-lg" "shield-alt" [ "mx-auto", "print-icon" ] ]
+                        [ Grid.col [ Col.md1 ] [ Icon.shieldAlt |> Icon.viewStyled [ class "print-icon" ] ]
                         , Grid.col [ Col.md11 ] <|
                             List.repeat (totalHull v) (div [ class "hazard-check mr-1" ] [])
                         ]
 
                 False ->
                     counterElement
-                        (iconClass "fas" "shield-alt" [ "mx-auto" ])
+                        (Icon.shieldAlt |> Icon.viewIcon)
                         0
                         (totalHull v)
                         v.hull.current
@@ -312,7 +312,8 @@ configure model cfg v =
                 , hidden <| not cfg.showAddonButton
                 , href href_
                 ]
-                [ icon icon_, text text_ ]
+                [  text text_ ]
+                --[ icon icon_, text text_ ]
 
         weaponsUsingSlots =
             List.sum <| List.map .slots v.weapons
@@ -382,7 +383,7 @@ configure model cfg v =
                                 , onClick (WeaponMsg <| AddWeapon v.key handgun)
                                 , hidden <| not cfg.showAddonButton
                                 ]
-                                [ icon "plus", text "Handgun" ]
+                                [ Icon.plus |> Icon.viewIcon, text "Handgun" ]
                             ]
                         ]
                         weaponsListBody
@@ -491,13 +492,13 @@ configure model cfg v =
                     }
                     [ onClick <| VehicleMsg <| DeleteVehicle v.key
                     ]
-                    [ icon "trash-alt" ]
+                    [ Icon.trashAlt |> Icon.viewIcon ]
                 , a
                     [ class "button"
                     , class "float-right"
                     , href <| "/details/" ++ v.key
                     ]
-                    [ icon "info" ]
+                    [ Icon.info |> Icon.viewIcon ]
                 ]
     in
     ( header, body, footer )
@@ -540,7 +541,7 @@ renderCard model v =
                 v
     in
     div []
-        [ h4 [] [ header ]
+        [ title H4 [] [ header ]
         , div [] body
         , div [] [ footer ]
         ]
@@ -612,18 +613,20 @@ counterElement :
 counterElement icon_ min max counterValue decrementMsg incrementMsg inputMsg =
     connectedFields Centered
         []
-        [ controlLabel
-            [ style "min-width" "4rem"
-            , style "text-align" "center"
-            ]
+        [ controlButton
+            { buttonModifiers | disabled = True }
+            []
+            []
             [ icon_ ]
         , controlButton
-            buttonModifiers
+            { buttonModifiers
+                | iconLeft = Just (Standard, [], icon_)
+            }
             []
             [ onClick <| VehicleMsg <| decrementMsg min max
             , disabled <| min == counterValue
             ]
-            [ icon "minus" ]
+            [ Icon.minus |> Icon.viewIcon ]
         , controlInput
             controlInputModifiers
             []
@@ -640,5 +643,5 @@ counterElement icon_ min max counterValue decrementMsg incrementMsg inputMsg =
             [ onClick <| VehicleMsg <| incrementMsg min max
             , disabled <| counterValue >= max
             ]
-            [ icon "plus" ]
+            [ Icon.plus |> Icon.viewIcon ]
         ]

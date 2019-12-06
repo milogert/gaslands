@@ -230,7 +230,7 @@ tagGen title value =
         Just v ->
             multitag []
                 [ titleTag
-                , easyTag { tagModifiers | color = White } [] v
+                , easyTag { tagModifiers | color = Info } [] v
                 ]
 
 

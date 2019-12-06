@@ -1,5 +1,7 @@
 module View.View exposing (view)
 
+import FontAwesome.Icon as Icon exposing (Icon)
+import FontAwesome.Styles as Icon
 import Bootstrap.Badge as Badge
 import Bootstrap.Utilities.Spacing as Spacing
 import Browser exposing (Document)
@@ -108,6 +110,7 @@ view model =
     Document
         (viewToStr model)
         [ stylesheet --CDN.stylesheet -- creates an inline style node with the Bootstrap CSS
+        , Icon.css
         , nav model
         , node "link"
             [ rel "stylesheet"
@@ -140,7 +143,14 @@ nav model =
             , transparent = True
         }
         []
-        [ navbarStart [] (View.Menu.render model) ]
+        [ navbarBrand []
+            (navbarBurger False [] [ span [] [], span [] [], span [] [] ])
+            [ navbarItemLink False
+                [ href "/" ]
+                [ text <| "Team " ++ Maybe.withDefault "NoName" model.teamName ]
+            ]
+        , navbarMenu False [] [ navbarStart [] (View.Menu.render model) ]
+        ]
 
 
 displayAlert : Model -> Html Msg

@@ -1,6 +1,7 @@
 module View.Settings exposing (view)
 
 import Bulma.Elements exposing (..)
+import Bulma.Columns exposing (..)
 import Bulma.Form exposing (..)
 import Bulma.Layout exposing (..)
 import Bulma.Modifiers exposing (..)
@@ -23,6 +24,7 @@ import Html.Attributes
         , href
         , id
         , placeholder
+        , rows
         , style
         , type_
         , value
@@ -48,11 +50,20 @@ view model =
             ]
 
 
+renderSection : String -> List (Html Msg) -> Html Msg
+renderSection sectionTitle content =
+    div [ class "settings-section" ]
+        [ title H4 [ class "settings-section-title" ]
+            [ text sectionTitle ]
+        , div [ class "settings-section-body" ]
+            content
+        ]
+
+
 renderGameSettings : Model -> Html Msg
 renderGameSettings model =
-    div []
-        [ title H4 [] [ text "Game Settings" ]
-        , field []
+    renderSection "Game Settings"
+        [ field []
             [ controlLabel [ for "teamName" ] [ text "Team Name" ]
             , controlText
                 controlInputModifiers
@@ -99,9 +110,8 @@ renderExpansionSettings model =
             model.settings.expansions.available
                 |> List.map expansionCheck
     in
-    div []
-        [ title H4 [] [ text "Expansion Settings" ] ]
-        ++ expansionChecks
+    renderSection "Expansion Settings"
+        expansionChecks
 
 
 renderAppSettings : Settings -> Html Msg
@@ -122,9 +132,8 @@ renderAppSettings settings =
                 False ->
                     maybeAppSettings
     in
-    div []
-        [ title H4 [] [ text "App Settings" ] ]
-        ++ actualSettings
+    renderSection "App Settings"
+        actualSettings
 
 
 renderImportExport : Model -> Html Msg
@@ -137,49 +146,55 @@ renderImportExport model =
 
                 Just s ->
                     s
+
+        buttonMods =
+            { buttonModifiers
+                | size = Standard
+            }
     in
-    div []
-        [ title H4 [] [ text "Import/Export" ]
-        , Grid.col [ Col.md4, Col.xs12 ]
-            [ Button.button
-                [ Button.primary
-                , Button.block
-                , Button.attrs [ class "mb-2" ]
-                , Button.onClick SaveModel
+    renderSection "Import/Export"
+        [ buttons Centered
+            []
+            [ button
+                buttonMods
+                [ class "mb-2"
+                , onClick SaveModel
                 ]
-                [ icon "download"
+                [ View.Utils.icon "download"
                 , text <| " Save Team \"" ++ teamName ++ "\""
                 ]
-            ]
-        , Grid.col [ Col.md4, Col.xs12 ]
-            [ Button.button
-                [ Button.primary
-                , Button.block
-                , Button.attrs [ class "mb-2" ]
-                , Button.onClick Share
+            , button
+                buttonMods
+                [ class "mb-2"
+                , onClick Share
                 ]
-                [ icon "share", text " Share" ]
-            ]
-        , Grid.col [ Col.md4, Col.xs12 ]
-            [ Button.button
-                [ Button.primary
-                , Button.block
-                , Button.attrs [ class "mb-2" ]
-                , Button.onClick Import
+                [ View.Utils.icon "share", text " Share" ]
+            , button
+                buttonMods
+                [ class "mb-2"
+                , onClick Import
                 ]
-                [ icon "upload", text " Import" ]
+                [ View.Utils.icon "upload", text " Import" ]
             ]
-        , Grid.col [ Col.xs4 ]
-            [ ul
+        , columns columnsModifiers
+            []
+            [ column columnModifiers
                 []
-                (List.map storageMapper model.storageKeys)
-            ]
-        , Grid.col [ Col.xs8 ]
-            [ Textarea.textarea
-                [ Textarea.onInput SetImport
-                , Textarea.rows 15
-                , Textarea.attrs [ style "font-family" "monospace" ]
-                , Textarea.value model.importValue
+                [ ul
+                    []
+                    (List.map storageMapper model.storageKeys)
+                ]
+            , column columnModifiers
+                []
+                [ controlTextArea
+                    controlTextAreaModifiers
+                    []
+                    [ onInput SetImport
+                    , rows 15
+                    , style "font-family" "monospace"
+                    , value model.importValue
+                    ]
+                    []
                 ]
             ]
         ]
@@ -187,10 +202,8 @@ renderImportExport model =
 
 renderAbout : Html Msg
 renderAbout =
-    Grid.row []
-        [ Grid.col []
-            [ title H4 [] [ text "About" ]
-            , p [] [ text "Built by Milo Gertjejansen." ]
+    renderSection "About"
+            [ p [] [ text "Built by Milo Gertjejansen." ]
             , p [] [ text "Email: milo plus glom at milogert dot com" ]
             , p []
                 [ text "Built with "
@@ -203,19 +216,26 @@ renderAbout =
                 , a [ href "https://github.com/milogert/glom" ] [ iconb "github" ]
                 ]
             ]
-        ]
 
 
 storageMapper : String -> Html Msg
 storageMapper s =
-    li []
-        [ Button.button
-            [ Button.roleLink, Button.onClick <| LoadModel s ]
+    connectedFields Left
+        []
+        [ controlButton buttonModifiers
+            []
+            [ onClick <| LoadModel s ]
             [ text s ]
-        , Button.button
-            [ Button.danger
-            , Button.small
-            , Button.onClick <| DeleteItem s
-            ]
-            [ icon "trash-alt" ]
+        , controlButton { buttonModifiers | color = Success }
+            []
+            [ onClick <| Import ]
+            [ View.Utils.icon "upload" ]
+        , controlButton { buttonModifiers | color = Info }
+            []
+            [ onClick <| Share ]
+            [ View.Utils.icon "share" ]
+        , controlButton { buttonModifiers | color = Danger }
+            []
+            [ onClick <| DeleteItem s ]
+            [ View.Utils.icon "trash-alt" ]
         ]
