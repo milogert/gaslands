@@ -1,10 +1,12 @@
 module View.SponsorSelect exposing (view)
 
-import Bootstrap.Grid as Grid
-import Bootstrap.Grid.Col as Col
+import Bulma.Elements exposing (..)
+import Bulma.Form exposing (..)
+import Bulma.Modifiers exposing (..)
 import Html
     exposing
         ( Html
+        , div
         , option
         , select
         , text
@@ -50,19 +52,25 @@ view model =
                 ]
                 [ text t ]
     in
-    Grid.row []
-        [ Grid.col [ Col.md12 ]
-            [ select
-                [ onInput SponsorUpdate
-                , class "form-control mb-3"
+    div []
+        [ horizontalFields []
+            [ fieldLabel Standard
+                []
+                [ controlLabel [] [ text "Sponsor List" ] ]
+            , fieldBody []
+                [ controlSelect controlSelectModifiers
+                    []
+                    [ onInput SponsorUpdate
+                    , class "form-control mb-3"
+                    ]
+                  <|
+                    option [] [ text "No Sponsor" ]
+                        :: (allSponsors
+                                |> List.filter (expansionFilter model.settings.expansions.enabled)
+                                |> List.map .name
+                                |> List.map optionFunc
+                           )
                 ]
-              <|
-                option [] [ text "No Sponsor" ]
-                    :: (allSponsors
-                            |> List.filter (expansionFilter model.settings.expansions.enabled)
-                            |> List.map .name
-                            |> List.map optionFunc
-                       )
-            , body
             ]
+        , box [] [ body ]
         ]

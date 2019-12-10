@@ -1,12 +1,14 @@
 module View.NewUpgrade exposing (view)
 
-import Bootstrap.Button as Button
 import Bootstrap.Form as Form
-import Bootstrap.Form.Select as Select
 import Bootstrap.Grid as Grid
 import Bootstrap.Grid.Col as Col
-import Html exposing (Html, div, hr, text)
+import Bulma.Elements exposing (..)
+import Bulma.Form exposing (..)
+import Bulma.Modifiers exposing (..)
+import Html exposing (Html, div, hr, option, text)
 import Html.Attributes exposing (class, disabled, size, value)
+import Html.Events exposing (onClick, onInput)
 import Model.Model exposing (..)
 import Model.Shared exposing (..)
 import Model.Upgrade.Common exposing (..)
@@ -18,21 +20,18 @@ import View.Upgrade
 view : Model -> Vehicle -> List Upgrade -> Html Msg
 view model vehicle weapons =
     let
-        buttonAttrs =
-            [ Button.primary
-            , Button.attrs [ class "mb-3" ]
-            ]
-
         addButton =
             case model.tmpUpgrade of
                 Just upgrade ->
-                    Button.button
-                        (Button.onClick (UpgradeMsg <| AddUpgrade vehicle.key upgrade) :: buttonAttrs)
+                    controlButton buttonModifiers
+                        []
+                        [ onClick (UpgradeMsg <| AddUpgrade vehicle.key upgrade) ]
                         [ text <| "Add " ++ upgrade.name ++ " to " ++ vehicle.name ]
 
                 Nothing ->
-                    Button.button
-                        (Button.disabled True :: buttonAttrs)
+                    controlButton buttonModifiers
+                        []
+                        [ disabled True ]
                         [ text "Choose Upgrade Type" ]
 
         body =
@@ -60,31 +59,28 @@ view model vehicle weapons =
                 |> List.map thingToTuple
                 |> List.map
                     (\( name, exp ) ->
-                        Select.item
+                        option
                             [ value name ]
                             [ text <| name ++ " (" ++ exp ++ ")" ]
                     )
-                |> (::) (Select.item [] [ text "" ])
+                |> (::) (option [] [ text "" ])
 
         selectList =
-            Select.select
-                [ Select.onChange (UpgradeMsg << TmpUpgradeUpdate)
-                , Select.attrs
-                    [ class "mb-3"
-                    ]
-                ]
+            controlSelect controlSelectModifiers
+                []
+                [ onInput (UpgradeMsg << TmpUpgradeUpdate) ]
                 options
     in
-    Grid.row []
-        [ Grid.col [ Col.md12 ]
-            [ Form.form []
-                [ Form.row []
-                    [ Form.colLabel [ Col.mdAuto ]
-                        [ Form.label [] [ text "Upgrade Type" ] ]
-                    , Form.col [] [ selectList ]
-                    ]
-                ]
+    div []
+        [ horizontalFields []
+            [ fieldLabel Standard
+                []
+                [ controlLabel [] [ text "Upgrade Type" ] ]
+            , fieldBody [] [ selectList ]
             ]
-        , Grid.col [ Col.md12 ] [ addButton ]
-        , Grid.col [ Col.md12 ] [ body ]
+        , horizontalFields []
+            [ fieldLabel Standard [] []
+            , fieldBody [] [ addButton ]
+            ]
+        , box [] [ body ]
         ]

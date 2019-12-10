@@ -27,6 +27,12 @@ import Url exposing (Url)
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
+        -- APP.
+        NavToggle toggle ->
+            ( { model | navOpen = toggle }
+            , Cmd.none
+            )
+
         -- ROUTING.
         ClickedLink request ->
             Update.Routes.urlRequested model request

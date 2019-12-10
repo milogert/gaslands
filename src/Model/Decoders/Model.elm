@@ -17,6 +17,7 @@ import Url exposing (Url)
 modelDecoder : Decoder (Url -> Nav.Key -> Model)
 modelDecoder =
     succeed Model
+        |> hardcoded False
         |> hardcoded RouteDashboard
         |> optional "teamName" (nullable string) Nothing
         |> required "pointsAllowed" int

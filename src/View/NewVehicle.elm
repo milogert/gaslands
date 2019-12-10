@@ -2,6 +2,7 @@ module View.NewVehicle exposing (addButton, view)
 
 import Bulma.Elements exposing (..)
 import Bulma.Form exposing (..)
+import Bulma.Modifiers exposing (..)
 import Html exposing (Html, div, hr, option, text)
 import Html.Attributes
     exposing
@@ -66,19 +67,25 @@ view model =
                         ]
                         []
     in
-    div []
-        [ field []
-            [ controlLabel []
-                [ text "Vehicle Type" ]
-            , selectList
+    div
+        []
+        [ horizontalFields []
+            [ fieldLabel Standard
+                []
+                [ controlLabel [] [ text "Vehicle Type" ] ]
+            , fieldBody [] [ selectList ]
             ]
-        , field []
-            [ controlLabel []
-                [ text "Vehicle Name" ]
-            , nameInput
+        , horizontalFields []
+            [ fieldLabel Standard
+                []
+                [ controlLabel [] [ text "Vehicle Name" ] ]
+            , fieldBody [] [ nameInput ]
             ]
-        , div [] [ body ]
-        , addButton model.tmpVehicle
+        , horizontalFields []
+            [ fieldLabel Standard [] []
+            , fieldBody [] [ addButton model.tmpVehicle ]
+            ]
+        , box [] [ body ]
         ]
 
 

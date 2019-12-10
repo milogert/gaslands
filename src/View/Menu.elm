@@ -1,8 +1,12 @@
-module View.Menu exposing (render)
+module View.Menu exposing (brand, end, start)
 
 import Bulma.Components exposing (..)
 import Bulma.Elements exposing (..)
+import Bulma.Form exposing (..)
+import Bulma.Modifiers exposing (..)
 import Dict
+import FontAwesome.Icon as Icon exposing (Icon)
+import FontAwesome.Solid as Icon
 import Html
     exposing
         ( Html
@@ -28,27 +32,37 @@ import Html.Events
 import Model.Model exposing (..)
 import Model.Routes exposing (Route(..))
 import Model.Vehicle.Model exposing (..)
+import View.Sponsor
 import View.Utils exposing (..)
 
 
-render : Model -> List (Html Msg)
-render model =
+brand : Model -> NavbarSection Msg
+brand model =
     let
-        gameButtons =
-            [ navbarItemLink
-                False
-                [ href "/" ]
-                [ View.Utils.icon "home" ]
-            , navbarItem
-                False
-                [ onClick <| VehicleMsg NextGearPhase ]
-                [ View.Utils.icon "cogs"
-                , easyTag tagModifiers
-                    []
-                    (String.fromInt model.gearPhase)
-                ]
+        burger =
+            navbarBurger model.navOpen
+                [ href "", onClick <| NavToggle <| not model.navOpen ]
+                [ span [] [], span [] [], span [] [] ]
+    in
+    navbarBrand []
+        burger
+        [ navbarItemLink False
+            [ href "/" ]
+            [ text <| "Team " ++ Maybe.withDefault "NoName" model.teamName ]
+        , navbarItem
+            False
+            [ onClick <| VehicleMsg NextGearPhase ]
+            [ Icon.cogs |> Icon.viewIcon
+            , easyTag tagModifiers
+                []
+                (String.fromInt model.gearPhase)
             ]
+        ]
 
+
+start : Model -> NavbarSection Msg
+start model =
+    let
         detailsButtons =
             case model.view of
                 RouteDetails key ->
@@ -63,7 +77,7 @@ render model =
 
                         activatedText =
                             case ( vehicle.activated, canActivate ) of
-                                ( True, False ) ->
+                                ( True, _ ) ->
                                     "Activated"
 
                                 ( _, False ) ->
@@ -72,46 +86,90 @@ render model =
                                 ( _, _ ) ->
                                     "Activate"
                     in
-                    [ button
-                        buttonModifiers
-                        [ onClick <| VehicleMsg <| UpdateActivated vehicle.key (not vehicle.activated)
-                        , disabled <| not canActivate || vehicle.activated
+                    [ navbarItem False
+                        []
+                        [ controlButton buttonModifiers
+                            []
+                            [ onClick <| VehicleMsg <| UpdateActivated vehicle.key (not vehicle.activated)
+                            , disabled <| not canActivate || vehicle.activated
+                            ]
+                            [ text activatedText ]
                         ]
-                        [ text activatedText ]
-                    , navbarItemLink
-                        False
+                    , navbarItemLink False
                         [ href <| "/print/" ++ vehicle.key ]
-                        [ View.Utils.icon "print" ]
+                        [ Icon.print |> Icon.viewIcon ]
                     ]
 
                 _ ->
                     []
+    in
+    [ detailsButtons ]
+        |> menuLayout
+        |> navbarStart []
+
+
+end : Model -> NavbarSide Msg
+end model =
+    let
+        currentPoints =
+            totalPoints model
+
+        maxPoints =
+            model.pointsAllowed
+
+        pointsColor =
+            case compare currentPoints maxPoints of
+                LT ->
+                    Warning
+
+                EQ ->
+                    Success
+
+                GT ->
+                    Danger
+
+        pointsBadge =
+            navbarItem False
+                []
+                [ tag
+                    { tagModifiers | color = pointsColor }
+                    [ class "ml-2" ]
+                    [ text <| String.fromInt currentPoints ++ " of " ++ String.fromInt maxPoints
+                    , View.Utils.icon "coins"
+                    ]
+                ]
 
         settingsButtons =
             [ navbarItemLink
                 False
                 [ href "/new/vehicle" ]
-                [ View.Utils.icon "plus" ]
+                [ Icon.plus |> Icon.viewIcon ]
             , navbarItemLink
                 False
                 [ disabled <| Dict.isEmpty model.vehicles
                 , href "/print"
                 ]
-                [ View.Utils.icon "print" ]
+                [ Icon.print |> Icon.viewIcon ]
+            , navbarItem False
+                []
+                [ View.Sponsor.renderBadge model.sponsor ]
+            , pointsBadge
             , navbarItemLink
                 False
                 [ attribute "aria-label" "Back Button"
                 , href "/settings"
                 ]
-                [ View.Utils.icon "wrench" ]
+                [ Icon.wrench |> Icon.viewIcon ]
             ]
-
-        menuLayout : List (List (Html Msg)) -> List (Html Msg)
-        menuLayout buttons =
-            buttons
-                |> List.filter (not << List.isEmpty)
-                |> List.intersperse [ navbarDivider [] [] ]
-                |> List.concat
     in
-    [ gameButtons, detailsButtons, settingsButtons ]
+    [ settingsButtons ]
         |> menuLayout
+        |> navbarEnd []
+
+
+menuLayout : List (List (Html Msg)) -> List (Html Msg)
+menuLayout buttons =
+    buttons
+        |> List.filter (not << List.isEmpty)
+        |> List.intersperse [ navbarDivider [] [] ]
+        |> List.concat

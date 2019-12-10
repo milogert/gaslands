@@ -1,6 +1,8 @@
 module View.Upgrade exposing (RenderConfig, render)
 
 import Bootstrap.Button as Btn
+import Bulma.Form exposing (..)
+import Bulma.Modifiers exposing (..)
 import Html
     exposing
         ( Html
@@ -19,7 +21,7 @@ import Model.Shared exposing (..)
 import Model.Upgrade.Model exposing (..)
 import Model.Vehicle.Model exposing (..)
 import View.EquipmentLayout
-import View.Utils exposing (icon, iconb)
+import View.Utils exposing (plural, tagGen)
 
 
 type alias RenderConfig =
@@ -33,47 +35,38 @@ render : RenderConfig -> Model -> Vehicle -> Upgrade -> Html Msg
 render cfg model vehicle upgrade =
     let
         slotsTakenBadge =
-            let
-                slotLabel =
-                    case upgrade.slots of
-                        1 ->
-                            "slot"
-
-                        _ ->
-                            "slots"
-            in
-            span [ class "badge badge-secondary mr-2" ]
-                [ text <| String.fromInt upgrade.slots ++ " " ++ slotLabel ++ " used" ]
+            ( "slot" ++ plural upgrade.slots ++ " used", Just <| String.fromInt upgrade.slots )
 
         pointBadge =
-            let
-                pointLabel =
-                    case upgrade.cost of
-                        1 ->
-                            "point"
-
-                        _ ->
-                            "points"
-            in
-            span [ class "badge badge-secondary mr-2" ]
-                [ text <| String.fromInt upgrade.cost ++ " " ++ pointLabel ]
+            ( "point" ++ plural upgrade.cost, Just <| String.fromInt upgrade.cost )
 
         factsHolder =
-            div []
-                [ slotsTakenBadge
-                , pointBadge
-                ]
+            [ slotsTakenBadge
+            , pointBadge
+            ]
+                |> List.map (\( title, value ) -> tagGen ( title, Bulma.Modifiers.Light ) ( value, Info ))
+                |> List.map (\t -> control controlModifiers [] [ t ])
+                |> multilineFields
+                    []
 
-        renderSpecialFunc special =
-            li [] [ View.Utils.renderSpecial cfg.previewSpecials cfg.printSpecials Nothing Nothing special ]
+        renderSpecialsFunc specialList =
+            specialList
+                |> List.map
+                    (View.Utils.specialToHeaderBody
+                        cfg.previewSpecials
+                        cfg.printSpecials
+                        Nothing
+                        Nothing
+                    )
+                |> List.map View.Utils.renderSpecialRow
 
         specials =
             case upgrade.specials of
                 [] ->
-                    text ""
+                    text <| "No special rules."
 
                 _ ->
-                    ul [] <| List.map renderSpecialFunc upgrade.specials
+                    div [] <| renderSpecialsFunc upgrade.specials
     in
     View.EquipmentLayout.render
         upgrade

@@ -1,7 +1,5 @@
 module View.View exposing (view)
 
-import FontAwesome.Icon as Icon exposing (Icon)
-import FontAwesome.Styles as Icon
 import Bootstrap.Badge as Badge
 import Bootstrap.Utilities.Spacing as Spacing
 import Browser exposing (Document)
@@ -12,6 +10,8 @@ import Bulma.Elements exposing (..)
 import Bulma.Layout exposing (..)
 import Bulma.Modifiers exposing (..)
 import Dict exposing (Dict)
+import FontAwesome.Icon as Icon exposing (Icon)
+import FontAwesome.Styles as Icon
 import Html
     exposing
         ( Html
@@ -77,33 +77,8 @@ view model =
                 [ href viewToGoTo, attribute "aria-label" "Back Button" ]
                 [ View.Utils.icon "arrow-left" ]
 
-        currentPoints =
-            totalPoints model
-
-        maxPoints =
-            model.pointsAllowed
-
-        pointsBadgeFunction =
-            case compare currentPoints maxPoints of
-                LT ->
-                    Badge.badgeWarning
-
-                EQ ->
-                    Badge.badgeSuccess
-
-                GT ->
-                    Badge.badgeDanger
-
-        pointsBadge =
-            pointsBadgeFunction
-                [ class "ml-2" ]
-                [ text <| String.fromInt currentPoints ++ " of " ++ String.fromInt maxPoints
-                , View.Utils.icon "coins"
-                ]
-
         viewDisplay =
             title H4
-                --[ style "margin-bottom" "0" ]
                 []
                 [ text <| viewToStr model ]
     in
@@ -120,17 +95,8 @@ view model =
             , attribute "crossorigin" "anonymous"
             ]
             []
-        , level
-            [ style "margin" "2rem 2rem 1rem 2rem" ]
-            [ levelLeft []
-                [ levelItem [] [ viewDisplay ] ]
-            , levelRight []
-                [ levelItem [] [ View.Sponsor.renderBadge model.sponsor ]
-                , levelItem [] [ pointsBadge ]
-                ]
-            ]
         , displayAlert model
-        , container [] [ render model ]
+        , section NotSpaced [] [ render model ]
         ]
 
 
@@ -143,36 +109,30 @@ nav model =
             , transparent = True
         }
         []
-        [ navbarBrand []
-            (navbarBurger False [] [ span [] [], span [] [], span [] [] ])
-            [ navbarItemLink False
-                [ href "/" ]
-                [ text <| "Team " ++ Maybe.withDefault "NoName" model.teamName ]
+        [ View.Menu.brand model
+        , navbarMenu model.navOpen
+            []
+            [ View.Menu.start model
+            , View.Menu.end model
             ]
-        , navbarMenu False [] [ navbarStart [] (View.Menu.render model) ]
         ]
-
-
-nav : Model -> Html Msg
-nav model =
-    fixedNavbar
-        Bottom
-        { navbarModifiers
-            | color = Dark
-            , transparent = True
-        }
-        []
-        [ navbarStart [] (View.Menu.render model) ]
 
 
 displayAlert : Model -> Html Msg
 displayAlert model =
-    model.error
-        |> List.map
-            (\x ->
-                section NotSpaced [] [ pre [] [ text <| errorToStr x ] ]
-            )
-        |> div []
+    let
+        msgBody x =
+            messageBody [] [ text <| errorToStr x ]
+    in
+    case List.isEmpty model.error of
+        True ->
+            div [] []
+
+        False ->
+            model.error
+                |> List.map msgBody
+                |> message { messageModifiers | color = Danger } []
+                |> (\m -> section NotSpaced [] [ m ])
 
 
 render : Model -> Html Msg

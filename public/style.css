@@ -46,3 +46,14 @@
     line-height: 4rem;
     text-align: center;
 }
+
+.wrecked-display {
+    position: absolute;
+    top: 19px;
+    left: 31px;
+    transform: rotate(.95turn);
+    color: red;
+    font-size: 125%;
+    z-index: 10000;
+
+}

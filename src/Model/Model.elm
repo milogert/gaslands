@@ -30,7 +30,8 @@ import Url exposing (Url)
 
 
 type alias Model =
-    { view : Route
+    { navOpen : Bool
+    , view : Route
     , teamName : Maybe String
     , pointsAllowed : Int
     , gearPhase : Int
@@ -144,6 +145,7 @@ vehicleFromKey model key =
 defaultModel : Url -> Nav.Key -> Model
 defaultModel =
     Model
+        False
         RouteDashboard
         Nothing
         50
@@ -169,8 +171,10 @@ init flags url key =
 
 type
     Msg
-    -- ROUTES.
-    = ClickedLink UrlRequest
+    -- APP.
+    = NavToggle Bool
+      -- ROUTES.
+    | ClickedLink UrlRequest
     | ChangedUrl Url
       -- VEHICLE.
     | VehicleMsg VehicleEvent

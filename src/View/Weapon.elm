@@ -6,6 +6,10 @@ import Bootstrap.Grid as Grid
 import Bootstrap.Grid.Col as Col
 import Bootstrap.Grid.Row as Row
 import Bootstrap.Utilities.Spacing as Spacing
+import Bulma.Form exposing (..)
+import Bulma.Modifiers exposing (..)
+import FontAwesome.Icon as Icon exposing (Icon)
+import FontAwesome.Solid as Icon
 import Html
     exposing
         ( Html
@@ -30,12 +34,12 @@ import Html.Attributes
 import Html.Events exposing (onClick, onInput)
 import Model.Model exposing (..)
 import Model.Shared
-import Model.Utils exposing (..)
+import Model.Vehicle.Common exposing (..)
 import Model.Vehicle.Model exposing (..)
 import Model.Weapon.Common exposing (..)
 import Model.Weapon.Model exposing (..)
 import View.EquipmentLayout
-import View.Utils exposing (icon, plural)
+import View.Utils exposing (plural, tagGen)
 
 
 type alias RenderConfig =
@@ -87,88 +91,68 @@ render cfg model vehicle weapon =
         previewDamage =
             case weapon.attack of
                 Nothing ->
-                    ""
+                    ( "damage", Just <| "none" )
 
                 Just attack ->
-                    View.Utils.renderDice attack
-
-        fireButton =
-            Button.button
-                [ Button.small
-                , Button.block
-                , Button.disabled <| not canFire
-                , Button.onClick firingToggle
-                , Button.attrs
-                    [ class "mr-2"
-                    , hidden <| not cfg.showFireButton
-                    , classList
-                        [ ( "btn-secondary", weapon.status == WeaponFired )
-                        , ( "btn-primary", weapon.status == WeaponReady )
-                        ]
-                    ]
-                ]
-                [ icon "crosshairs"
-                , span []
-                    [ text previewDamage
-                    , attackResult
-                    ]
-                ]
+                    ( "damage", Just <| View.Utils.renderDice attack )
 
         mountPoint =
             case weapon.mountPoint of
                 Just CrewFired ->
-                    fromWeaponMounting CrewFired
+                    ( fromWeaponMounting CrewFired, Nothing )
 
                 Just point ->
-                    fromWeaponMounting point
+                    ( fromWeaponMounting point, Nothing )
 
                 Nothing ->
-                    "No mount point"
+                    ( "No mount point", Nothing )
 
         slotsTakenBadge =
-            String.fromInt weapon.slots ++ " slot" ++ plural weapon.slots ++ " used"
+            ( "slot" ++ plural weapon.slots ++ " used", Just <| String.fromInt weapon.slots )
 
         typeBadge =
-            fromWeaponType weapon.wtype ++ " type"
+            ( "type", Just <| fromWeaponType weapon.wtype )
 
         rangeBadge =
-            fromWeaponRange weapon.range ++ " range"
+            ( "range", Just <| fromWeaponRange weapon.range )
 
         pointBadge =
-            String.fromInt (weaponCost weapon) ++ " point(s)"
+            ( "point" ++ (plural <| weaponCost weapon), Just <| String.fromInt (weaponCost weapon) )
 
         factsHolder =
-            View.Utils.factsHolder
-                [ mountPoint
-                , slotsTakenBadge
-                , previewDamage
-                , typeBadge
-                , rangeBadge
-                , pointBadge
-                ]
+            [ mountPoint
+            , slotsTakenBadge
+            , previewDamage
+            , typeBadge
+            , rangeBadge
+            , pointBadge
+            ]
+                |> List.map (\( title, value ) -> tagGen ( title, Bulma.Modifiers.Light ) ( value, Info ))
+                |> List.map (\t -> control controlModifiers [] [ t ])
+                |> multilineFields
+                    []
 
         ( _, mCurrentClip ) =
             Model.Shared.getAmmoClip weapon.specials
 
-        renderSpecialFunc special =
-            let
-                renderedSpecial =
-                    View.Utils.renderSpecial
+        renderSpecialsFunc specialList =
+            specialList
+                |> List.map
+                    (View.Utils.specialToHeaderBody
                         cfg.previewSpecials
                         cfg.printSpecials
                         (Just WeaponMsg)
                         (Just <| UpdateAmmoUsed vehicle.key weapon)
-                        special
-            in
-            li [] [ renderedSpecial ]
+                    )
+                |> List.map View.Utils.renderSpecialRow
 
         specials =
             case weapon.specials of
                 [] ->
-                    text ""
+                    text <| "No special rules."
 
                 _ ->
-                    ul [] <| List.map renderSpecialFunc weapon.specials
+                    div [] <| renderSpecialsFunc weapon.specials
 
         deleteMsg =
             case cfg.showDeleteButton of
@@ -181,7 +165,6 @@ render cfg model vehicle weapon =
     View.EquipmentLayout.render
         weapon
         deleteMsg
-        [ fireButton
-        , factsHolder
+        [ factsHolder
         ]
         [ specials ]

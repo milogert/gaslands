@@ -10,22 +10,24 @@ module View.Utils exposing
     , plural
     , renderCountDown
     , renderDice
-    , renderSpecial
+    , renderSpecialRow
+    , specialToHeaderBody
     , tagGen
+    , tagList
     , vehicleSponsorFilter
     , weaponSponsorFilter
     )
 
 import Bootstrap.Badge as Badge
 import Bootstrap.Form as Form
-import Bootstrap.Form.Checkbox as Checkbox
-import Bootstrap.Form.Fieldset as Fieldset
 import Bootstrap.Form.Input as Input
 import Bootstrap.Grid as Grid
 import Bootstrap.Grid.Col as Col
 import Bootstrap.Grid.Row as Row
 import Bootstrap.Utilities.Spacing as Spacing
+import Bulma.Columns exposing (..)
 import Bulma.Elements exposing (..)
+import Bulma.Form exposing (..)
 import Bulma.Modifiers exposing (..)
 import Html
     exposing
@@ -38,8 +40,8 @@ import Html
         , span
         , text
         )
-import Html.Attributes exposing (class, classList, hidden)
-import Html.Events exposing (onInput)
+import Html.Attributes exposing (checked, class, classList, hidden, id)
+import Html.Events exposing (onCheck, onInput)
 import Model.Model exposing (..)
 import Model.Shared exposing (..)
 import Model.Sponsors exposing (..)
@@ -67,99 +69,131 @@ iconClass styleOrBrand s cl =
         []
 
 
-detailSection : List (Html Msg) -> List (Html Msg) -> Html Msg
-detailSection headerContents bodyContents =
+detailSection : String -> List (Html Msg) -> Html Msg
+detailSection titleString bodyContents =
     div []
-        [ hr [] [], h5 [] headerContents, div [] bodyContents ]
+        [ hr [] [], title H5 [] [ text titleString ], div [] bodyContents ]
 
 
-renderSpecial : Bool -> Bool -> Maybe (event -> Msg) -> Maybe (Int -> Bool -> event) -> Special -> Html Msg
-renderSpecial isPreview isPrinting mMsg mEvent special =
+renderSpecialRow : Maybe ( Html Msg, Html Msg ) -> Html Msg
+renderSpecialRow mHeaderBody =
+    case mHeaderBody of
+        Nothing ->
+            div [] []
+
+        Just ( label, body ) ->
+            horizontalFields
+                []
+                [ fieldLabel Standard [] [ controlLabel [] [ label ] ]
+                , fieldBody []
+                    [ field [] [ body ] ]
+                ]
+
+
+specialToHeaderBody : Bool -> Bool -> Maybe (event -> Msg) -> Maybe (Int -> Bool -> event) -> Special -> Maybe ( Html Msg, Html Msg )
+specialToHeaderBody isPreview isPrinting mMsg mEvent special =
     case ( special, mMsg, mEvent ) of
         ( Ammo ammo, Just msg, Just event ) ->
             case ( isPreview, isPrinting ) of
                 ( True, _ ) ->
-                    div [] [ text <| "Ammo: " ++ (String.fromInt <| List.length ammo) ]
+                    Just ( text "Ammo", text (String.fromInt <| List.length ammo) )
 
                 ( _, True ) ->
-                    div [] (text "Ammo:" :: List.repeat (List.length ammo) (div [ class "hazard-check" ] []))
+                    Just
+                        ( text "Ammo"
+                        , div [] <|
+                            List.repeat
+                                (List.length ammo)
+                                (div [ class "hazard-check" ] [])
+                        )
 
                 ( False, False ) ->
-                    Form.row [ Row.middleXs, Row.attrs [ class "mb-0" ] ]
-                        [ Form.colLabel [ Col.xsAuto ] [ text "Ammo: " ]
+                    Just
+                        ( text "Ammo"
                         , renderCountDown msg event ammo
-                        ]
+                        )
 
         ( Ammo _, Nothing, _ ) ->
-            text ""
+            Nothing
 
         ( Ammo _, _, Nothing ) ->
-            text ""
+            Nothing
 
         ( HighlyExplosive, _, _ ) ->
-            text "Highly Explosive"
+            Just
+                ( text "Highly Explosive"
+                , text ""
+                )
 
         ( TreacherousSurface, _, _ ) ->
-            text "The dropped template counts as a treacherous surface."
+            Just
+                ( text "Treacherous Surface"
+                , text "The dropped template counts as a treacherous surface."
+                )
 
         ( SpecialRule rule, _, _ ) ->
-            text rule
+            Just
+                ( text "", text rule )
 
         ( NamedSpecialRule name rule, _, _ ) ->
-            span [] [ b [] [ text <| name ++ ": " ], text rule ]
+            Just ( text name, text rule )
 
         ( HandlingMod i, _, _ ) ->
-            text <| "Handling modification: " ++ String.fromInt i
+            Just ( text "Handling mod", text <| String.fromInt i )
 
         ( HullMod i, _, _ ) ->
-            text <| "Hull modification: " ++ String.fromInt i
+            Just ( text "Hull mod", text <| String.fromInt i )
 
         ( GearMod i, _, _ ) ->
-            text <| "Gear modification: " ++ String.fromInt i
+            Just ( text "Gear mod", text <| String.fromInt i )
 
         ( CrewMod i, _, _ ) ->
-            text <| "Crew modification: " ++ String.fromInt i
+            Just ( text "Crew mod", text <| String.fromInt i )
 
-        ( Blast, _, _ ) ->
-            text <| fromSpecial special
-
-        ( Fire, _, _ ) ->
-            text <| fromSpecial special
-
-        ( Explosive, _, _ ) ->
-            text <| fromSpecial special
-
-        ( Blitz, _, _ ) ->
-            text <| fromSpecial special
-
-        ( Electrical, _, _ ) ->
-            text <| fromSpecial special
-
-        ( Specialist, _, _ ) ->
-            text <| fromSpecial special
-
-        ( Entangle, _, _ ) ->
-            text <| fromSpecial special
+        ( _, _, _ ) ->
+            Just ( text <| fromSpecial special, text "" )
 
 
-renderCountDown : (event -> Msg) -> (Int -> Bool -> event) -> List Bool -> Form.Col Msg
+
+{- ( Blast, _, _ ) ->
+       Just ( text <| fromSpecial special, text "" )
+
+   ( Fire, _, _ ) ->
+       Just ( text <| fromSpecial special, text "" )
+
+   ( Explosive, _, _ ) ->
+       Just ( text <| fromSpecial special, text "" )
+
+   ( Blitz, _, _ ) ->
+       Just ( text <| fromSpecial special, text "" )
+
+   ( Electrical, _, _ ) ->
+       Just ( text <| fromSpecial special, text "" )
+
+   ( Specialist, _, _ ) ->
+       Just ( text <| fromSpecial special, text "" )
+
+   ( Entangle, _, _ ) ->
+       Just ( text <| fromSpecial special, text "" )
+-}
+
+
+renderCountDown : (event -> Msg) -> (Int -> Bool -> event) -> List Bool -> Html Msg
 renderCountDown msg event checks =
     let
         checkboxFunc index check =
-            Checkbox.checkbox
-                [ Checkbox.id <| String.fromInt index
-                , Checkbox.inline
-                , Checkbox.checked check
-                , Checkbox.onCheck (msg << event index)
+            controlCheckBox
+                False
+                []
+                []
+                [ id <| String.fromInt index
+                , checked check
+                , onCheck (msg << event index)
                 ]
-                ""
+                []
     in
-    Form.col []
-        [ Fieldset.config
-            |> Fieldset.children
-                (List.indexedMap checkboxFunc checks)
-            |> Fieldset.view
-        ]
+    multilineFields [] <|
+        List.indexedMap checkboxFunc checks
 
 
 renderDice : Dice -> String
@@ -216,27 +250,32 @@ plural i =
             "s"
 
 
-tagGen : String -> Maybe String -> Html Msg
-tagGen title value =
+tagList : List ( ( String, Color ), ( Maybe String, Color ) ) -> Html Msg
+tagList tagConfig =
+    tagConfig
+        |> List.map (\config -> tagGen (Tuple.first config) (Tuple.second config))
+        |> List.map (\t -> control controlModifiers [] [ t ])
+        |> multilineFields []
+
+
+tagGen : ( String, Color ) -> ( Maybe String, Color ) -> Html Msg
+tagGen ( title, titleColor ) ( mValue, valueColor ) =
     let
         titleTag =
-            easyTag { tagModifiers | color = Dark } [] title
+            easyTag { tagModifiers | color = titleColor } [] title
     in
-    case value of
+    case mValue of
         Nothing ->
-            multitag []
-                [ titleTag ]
+            multitag [] [ titleTag ]
 
-        Just v ->
+        Just value ->
             multitag []
                 [ titleTag
-                , easyTag { tagModifiers | color = Info } [] v
+                , easyTag { tagModifiers | color = valueColor } [] value
                 ]
 
 
 expansionMarker : Expansion -> Html Msg
 expansionMarker expansion =
-    expansion
-        |> fromExpansion
-        |> Just
-        |> tagGen "expansion"
+    ( Just <| fromExpansion expansion, Info )
+        |> tagGen ( "expansion", Bulma.Modifiers.Light )

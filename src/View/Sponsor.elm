@@ -5,12 +5,12 @@ module View.Sponsor exposing
     , renderPerkList
     )
 
-import FontAwesome.Icon as Icon exposing (Icon)
-import FontAwesome.Solid as Icon
 import Bulma.Columns exposing (..)
 import Bulma.Elements exposing (..)
 import Bulma.Form exposing (..)
 import Bulma.Modifiers exposing (..)
+import FontAwesome.Icon as Icon exposing (Icon)
+import FontAwesome.Solid as Icon
 import Html
     exposing
         ( Html
@@ -95,7 +95,7 @@ renderBadge ms =
     button
         { buttonModifiers
             | size = Small
-            , iconRight = Just (Small, [], Icon.exchangeAlt |> Icon.viewIcon)
+            , iconRight = Just ( Small, [], Icon.exchangeAlt |> Icon.viewIcon )
         }
         [ href "/sponsor"
         , Html.Attributes.title description
@@ -125,7 +125,6 @@ renderPerkList perks perkClasses =
                     |> List.filter
                         (\perk -> List.member perk perks)
                     |> List.map printPerk
-                    |> List.map text
             )
         |> List.map (\t -> p [] t)
         |> div []
@@ -141,13 +140,18 @@ renderVehiclePerk vehicle perk =
         , onCheck <| VehicleMsg << SetPerkInVehicle vehicle.key perk
         , checked <| List.member perk vehicle.perks
         ]
-        [ text <| printPerk perk ]
+        [ printPerk perk ]
 
 
-printPerk : VehiclePerk -> String
+printPerk : VehiclePerk -> Html Msg
 printPerk perk =
-    perk.name
-        ++ " ("
-        ++ String.fromInt perk.cost
-        ++ "): "
-        ++ perk.description
+    span []
+        [ b []
+            [ text <|
+                perk.name
+                    ++ " ("
+                    ++ String.fromInt perk.cost
+                    ++ "): "
+            ]
+        , text perk.description
+        ]
