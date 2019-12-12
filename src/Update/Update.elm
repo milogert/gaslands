@@ -1,6 +1,5 @@
 module Update.Update exposing (update)
 
-import Bootstrap.Modal as Modal
 import Browser
 import Browser.Navigation as Nav
 import Dict

@@ -1,8 +1,5 @@
 module View.Vehicle exposing (renderCard, renderDetails, renderPreview, renderPrint)
 
-import Bootstrap.Badge as Badge
-import Bootstrap.Form.Checkbox as Checkbox
-import Bootstrap.Utilities.Spacing as Spacing
 import Bulma.Columns exposing (..)
 import Bulma.Elements exposing (..)
 import Bulma.Form exposing (..)
@@ -600,7 +597,7 @@ renderPreview model v =
                 []
                 [ text name
                 , small
-                    [ Spacing.ml2 ]
+                    []
                     [ text <| "[" ++ Model.Shared.fromExpansion v.expansion ++ "]" ]
                 ]
 

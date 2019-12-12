@@ -1,6 +1,5 @@
 module Model.Decoders.Model exposing (modelDecoder)
 
-import Bootstrap.Modal as Modal
 import Browser.Navigation as Nav
 import Json.Decode exposing (..)
 import Json.Decode.Pipeline exposing (hardcoded, optional, required)

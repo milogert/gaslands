@@ -1,10 +1,5 @@
 module View.Dashboard exposing (view)
 
-import Bootstrap.Button as Button
-import Bootstrap.Card as Card
-import Bootstrap.Grid as Grid
-import Bootstrap.Grid.Col as Col
-import Bootstrap.Modal as Modal
 import Bulma.Layout exposing (..)
 import Bulma.Modifiers exposing (..)
 import Dict exposing (Dict)

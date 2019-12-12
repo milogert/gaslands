@@ -1,8 +1,5 @@
 module View.NewUpgrade exposing (view)
 
-import Bootstrap.Form as Form
-import Bootstrap.Grid as Grid
-import Bootstrap.Grid.Col as Col
 import Bulma.Elements exposing (..)
 import Bulma.Form exposing (..)
 import Bulma.Modifiers exposing (..)

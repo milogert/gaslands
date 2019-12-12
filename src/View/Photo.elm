@@ -1,7 +1,5 @@
 module View.Photo exposing (renderPhoto, view)
 
-import Bootstrap.Card as Card
-import Bootstrap.Text as Text
 import Html exposing (Html, a, button, div, img, text, video)
 import Html.Attributes exposing (autoplay, class, classList, href, src, style)
 import Html.Events exposing (onClick)
@@ -37,13 +35,11 @@ view model v =
                 ]
                 []
     in
-    Card.config [ Card.align Text.alignXsCenter ]
-        |> Card.imgTop []
-            [ videoDisplay
-            , renderPhoto v.photo displayPhoto
-            ]
-        |> Card.footer [] [ discardButton ]
-        |> Card.view
+    div []
+        [ videoDisplay
+        , renderPhoto v.photo displayPhoto
+        , discardButton
+        ]
 
 
 renderPhoto : Maybe String -> Bool -> Html Msg

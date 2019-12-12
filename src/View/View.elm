@@ -1,7 +1,5 @@
 module View.View exposing (view)
 
-import Bootstrap.Badge as Badge
-import Bootstrap.Utilities.Spacing as Spacing
 import Browser exposing (Document)
 import Bulma.CDN exposing (..)
 import Bulma.Columns exposing (..)
@@ -84,7 +82,7 @@ view model =
     in
     Document
         (viewToStr model)
-        [ stylesheet --CDN.stylesheet -- creates an inline style node with the Bootstrap CSS
+        [ stylesheet
         , Icon.css
         , nav model
         , node "link"

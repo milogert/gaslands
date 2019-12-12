@@ -18,13 +18,6 @@ module View.Utils exposing
     , weaponSponsorFilter
     )
 
-import Bootstrap.Badge as Badge
-import Bootstrap.Form as Form
-import Bootstrap.Form.Input as Input
-import Bootstrap.Grid as Grid
-import Bootstrap.Grid.Col as Col
-import Bootstrap.Grid.Row as Row
-import Bootstrap.Utilities.Spacing as Spacing
 import Bulma.Columns exposing (..)
 import Bulma.Elements exposing (..)
 import Bulma.Form exposing (..)
@@ -208,13 +201,13 @@ crewUsed v =
 
 factsHolder : List String -> Html Msg
 factsHolder facts =
-    div [ Spacing.mb2 ] <|
+    div [] <|
         List.map factBadge facts
 
 
 factBadge : String -> Html Msg
 factBadge fact =
-    Badge.badgeSecondary [ class "mr-2" ] [ text fact ]
+    tag tagModifiers [] [ text fact ]
 
 
 vehicleSponsorFilter : Model -> Vehicle -> Bool

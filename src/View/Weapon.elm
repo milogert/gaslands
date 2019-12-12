@@ -1,11 +1,5 @@
 module View.Weapon exposing (defaultWeaponConfig, render)
 
-import Bootstrap.Button as Button
-import Bootstrap.Form.Select as Select
-import Bootstrap.Grid as Grid
-import Bootstrap.Grid.Col as Col
-import Bootstrap.Grid.Row as Row
-import Bootstrap.Utilities.Spacing as Spacing
 import Bulma.Form exposing (..)
 import Bulma.Modifiers exposing (..)
 import FontAwesome.Icon as Icon exposing (Icon)

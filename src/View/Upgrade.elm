@@ -1,6 +1,5 @@
 module View.Upgrade exposing (RenderConfig, render)
 
-import Bootstrap.Button as Btn
 import Bulma.Form exposing (..)
 import Bulma.Modifiers exposing (..)
 import Html
