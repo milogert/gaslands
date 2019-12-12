@@ -1,0 +1,14 @@
+{
+  "main.js": "/glom/static/js/main.7439ac92.chunk.js",
+  "main.js.map": "/glom/static/js/main.7439ac92.chunk.js.map",
+  "runtime~main.js": "/glom/static/js/runtime~main.ae565693.js",
+  "runtime~main.js.map": "/glom/static/js/runtime~main.ae565693.js.map",
+  "vendors~main.js": "/glom/static/js/vendors~main.3ca81432.chunk.js",
+  "vendors~main.js.map": "/glom/static/js/vendors~main.3ca81432.chunk.js.map",
+  "./service-worker.js": "/glom/./service-worker.js",
+  "favicon.png": "/glom/favicon.png",
+  "index.html": "/glom/index.html",
+  "manifest.json": "/glom/manifest.json",
+  "precache-manifest.d59bd63501dd09871f177ac98fd5fe8a.js": "/glom/precache-manifest.d59bd63501dd09871f177ac98fd5fe8a.js",
+  "style.css": "/glom/style.css"
+}
