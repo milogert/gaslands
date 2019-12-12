@@ -29,6 +29,7 @@ import Html.Events
     exposing
         ( onClick
         )
+import Model.Features
 import Model.Model exposing (..)
 import Model.Routes exposing (Route(..))
 import Model.Vehicle.Model exposing (..)
@@ -98,6 +99,7 @@ start model =
                     , navbarItemLink False
                         [ href <| "/print/" ++ vehicle.key ]
                         [ Icon.print |> Icon.viewIcon ]
+                        |> Model.Features.withDefault "feature-printing" (text "")
                     ]
 
                 _ ->
@@ -143,13 +145,16 @@ end model =
             [ navbarItemLink
                 False
                 [ href "/new/vehicle" ]
-                [ Icon.plus |> Icon.viewIcon ]
+                [ Icon.plus |> Icon.viewStyled [ style "margin-right" ".5rem" ]
+                , text "New Vehicle"
+                ]
             , navbarItemLink
                 False
                 [ disabled <| Dict.isEmpty model.vehicles
                 , href "/print"
                 ]
                 [ Icon.print |> Icon.viewIcon ]
+                |> Model.Features.withDefault "feature-printing" (text "")
             , navbarItem False
                 []
                 [ View.Sponsor.renderBadge model.sponsor ]
