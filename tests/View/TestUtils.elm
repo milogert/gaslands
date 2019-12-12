@@ -54,7 +54,7 @@ detailsTest : List Test
 detailsTest =
     [ test "detail section" <|
         \_ ->
-            detailSection [ text "cool" ] [ text "header" ]
+            detailSection "cool" [ text "header" ]
                 |> Query.fromHtml
                 |> Query.has
                     [ Selector.tag "hr"
@@ -68,22 +68,20 @@ detailsTest =
 
 specialTests : List Test
 specialTests =
-    [ ( "ammo, no event", Ammo [ True ], [ Selector.text "" ] )
+    [ ( "ammo, no event", Ammo [ True ], [ Selector.tag "div", Selector.tag "div" ] )
     , ( "high explosive", HighlyExplosive, [ Selector.text "Highly Explosive" ] )
     , ( "TreacherousSurface", TreacherousSurface, [ Selector.text "The dropped template counts as a treacherous surface." ] )
     , ( "special rule", SpecialRule "test rule", [ Selector.text "test rule" ] )
     , ( "named special rule"
       , NamedSpecialRule "name" "desc"
-      , [ Selector.tag "span"
-        , Selector.tag "b"
-        , Selector.text "name: "
+      , [ Selector.text "name"
         , Selector.text "desc"
         ]
       )
-    , ( "mod: handling", HandlingMod 1, [ Selector.text "Handling modification: 1" ] )
-    , ( "mod: hull", HullMod 1, [ Selector.text "Hull modification: 1" ] )
-    , ( "mod: gear", GearMod 1, [ Selector.text "Gear modification: 1" ] )
-    , ( "mod: crew", CrewMod 1, [ Selector.text "Crew modification: 1" ] )
+    , ( "mod: handling", HandlingMod 1, [ Selector.text "Handling mod", Selector.text "1" ] )
+    , ( "mod: hull", HullMod 1, [ Selector.text "Hull mod", Selector.text "1" ] )
+    , ( "mod: gear", GearMod 1, [ Selector.text "Gear mod", Selector.text "1" ] )
+    , ( "mod: crew", CrewMod 1, [ Selector.text "Crew mod", Selector.text "1" ] )
     , ( "blast", Blast, [ Selector.text "Blast" ] )
     , ( "fire", Fire, [ Selector.text "Fire" ] )
     , ( "explosive", Explosive, [ Selector.text "Explosive" ] )
@@ -96,8 +94,12 @@ specialTests =
             (\( name, special, selectors ) ->
                 test name <|
                     \_ ->
-                        [ renderSpecial True True Nothing Nothing special ]
-                            |> div []
-                            |> Query.fromHtml
-                            |> Query.has selectors
+                        special
+                            |> specialToHeaderBody True True Nothing Nothing
+                            |> View.Utils.renderSpecialRow
+                            |> (\r ->
+                                    div [] [ r ]
+                                        |> Query.fromHtml
+                                        |> Query.has selectors
+                               )
             )
