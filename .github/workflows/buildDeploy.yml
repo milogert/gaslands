@@ -29,11 +29,9 @@ jobs:
       env:
         CI: true
     - name: npm build
-      run: npm run build --if-present
+      run: npm run build
       env:
         CI: true
-    - name: Checkout master (again)
-      uses: actions/checkout@master
     - name: Deploy
       uses: peaceiris/actions-gh-pages@v2
       env:
