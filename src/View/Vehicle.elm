@@ -1,20 +1,19 @@
 module View.Vehicle exposing (renderCard, renderDetails, renderPreview, renderPrint)
 
 import Bootstrap.Badge as Badge
-import Bootstrap.Button as Button
-import Bootstrap.Card as Card
-import Bootstrap.Card.Block as Block
 import Bootstrap.Form.Checkbox as Checkbox
-import Bootstrap.Form.Input as Input
-import Bootstrap.Form.InputGroup as InputGroup
-import Bootstrap.Form.Textarea as Textarea
-import Bootstrap.Grid as Grid
-import Bootstrap.Grid.Col as Col
-import Bootstrap.Grid.Row as Row
 import Bootstrap.Utilities.Spacing as Spacing
+import Bulma.Columns exposing (..)
+import Bulma.Elements exposing (..)
+import Bulma.Form exposing (..)
+import Bulma.Layout exposing (..)
+import Bulma.Modifiers exposing (..)
+import FontAwesome.Icon as Icon exposing (Icon)
+import FontAwesome.Solid as Icon
 import Html
     exposing
         ( Html
+        , a
         , div
         , h2
         , h4
@@ -24,6 +23,7 @@ import Html
         , small
         , span
         , text
+        , textarea
         , ul
         )
 import Html.Attributes
@@ -36,6 +36,7 @@ import Html.Attributes
         , href
         , placeholder
         , style
+        , value
         )
 import Html.Events exposing (onClick, onInput)
 import Model.Features
@@ -50,7 +51,7 @@ import Model.Weapon.Model exposing (..)
 import View.Photo
 import View.Sponsor
 import View.Upgrade
-import View.Utils exposing (icon, iconClass, plural)
+import View.Utils exposing (plural, tagGen, tagList)
 import View.Weapon exposing (defaultWeaponConfig)
 
 
@@ -103,20 +104,20 @@ type alias ConfiguredVehicle =
     }
 
 
-configure : Model -> RenderConfig -> Vehicle -> ( Html Msg, List (Html Msg), Html Msg )
+configure : Model -> RenderConfig -> Vehicle -> ( Html Msg, Html Msg, Html Msg )
 configure model cfg v =
     let
         ignore_currentView =
             model.view
 
         vtype =
-            fromVehicleType v.vtype
+            ( fromVehicleType v.vtype, Nothing )
 
         pointsDisplay =
-            (String.fromInt <| vehicleCost v) ++ " points"
+            ( "points", Just <| String.fromInt <| vehicleCost v )
 
         weightDisplay =
-            fromVehicleWeight v.weight ++ "-weight"
+            ( fromVehicleWeight v.weight ++ "-weight", Nothing )
 
         equipmentUsed =
             List.sum (List.map .slots v.weapons)
@@ -124,44 +125,48 @@ configure model cfg v =
         equipmentRemaining =
             String.fromInt <| v.equipment - equipmentUsed
 
+        equipmentSlotsDisplay =
+            ( "build slots", Just <| String.fromInt v.equipment )
+
         crewDisplay =
-            (String.fromInt <| totalCrew v) ++ " total crew"
+            ( "total crew", Just <| String.fromInt <| totalCrew v )
 
         handlingDisplay =
-            (String.fromInt <| totalHandling v) ++ " handling"
-
-        equipmentSlotsDisplay =
-            String.fromInt v.equipment ++ " build slot" ++ plural v.equipment
+            ( "handling", Just <| String.fromInt <| totalHandling v )
 
         maxHullDisplay =
-            v
+            ( "max hull"
+            , v
                 |> totalHull
                 |> String.fromInt
-                |> (\s -> s ++ " max hull")
+                |> Just
+            )
 
         maxGearDisplay =
-            v
+            ( "max gear"
+            , v
                 |> totalGear
                 |> String.fromInt
-                |> (\s -> s ++ " max gear")
+                |> Just
+            )
 
         isCrewAvailable =
             totalCrew v > View.Utils.crewUsed v
 
-        wrecked =
-            v.hull.current >= totalHull v
-
         factsHolder =
-            View.Utils.factsHolder
-                [ vtype
-                , pointsDisplay
-                , weightDisplay
-                , crewDisplay
-                , handlingDisplay
-                , equipmentSlotsDisplay
-                , maxHullDisplay
-                , maxGearDisplay
-                ]
+            [ vtype
+            , pointsDisplay
+            , weightDisplay
+            , crewDisplay
+            , handlingDisplay
+            , equipmentSlotsDisplay
+            , maxHullDisplay
+            , maxGearDisplay
+            ]
+                |> List.map (\( title, value ) -> tagGen ( title, Bulma.Modifiers.Light ) ( value, Info ))
+                |> List.map (\t -> control controlModifiers [] [ t ])
+                |> multilineFields
+                    []
 
         photoPlus =
             div
@@ -172,28 +177,23 @@ configure model cfg v =
                     (text "")
 
         stats =
-            Grid.simpleRow
-                [ Grid.col
-                    [ Col.xs3
-                    , Col.lg2
-                    , Col.attrs [ hidden <| not cfg.showPhoto ]
-                    ]
-                    [ photoPlus ]
-                , Grid.col [ Col.xs ]
-                    [ factsHolder ]
+            div
+                []
+                [ photoPlus
+                , factsHolder
                 ]
 
         gearCounter =
-            case ( cfg.printCounters, wrecked ) of
+            case ( cfg.printCounters, isWrecked v ) of
                 ( True, _ ) ->
-                    div [ class "gear-die" ] [ iconClass "fas fa-lg" "cogs" [ "mx-auto" ] ]
+                    div [ class "gear-die" ] [ Icon.cogs |> Icon.viewIcon ]
 
                 ( _, True ) ->
                     text ""
 
                 ( _, False ) ->
                     counterElement
-                        (iconClass "fas" "cogs" [ "mx-auto" ])
+                        (Icon.cogs |> Icon.viewIcon)
                         1
                         (totalGear v)
                         v.gear.current
@@ -204,36 +204,42 @@ configure model cfg v =
         hazardCounter =
             case cfg.printCounters of
                 True ->
-                    Grid.row [ Row.attrs [ class "mb-2" ] ]
-                        [ Grid.col [ Col.md1 ] [ iconClass "fas fa-lg" "exclamation-triangle" [ "mx-auto", "print-icon" ] ]
-                        , Grid.col [ Col.md11 ] <|
-                            List.repeat 6 (span [ class "hazard-check mr-1" ] [])
-                        ]
-
-                False ->
-                    div []
-                        [ counterElement
-                            (iconClass "fas" "exclamation-triangle" [ "mx-auto" ])
-                            0
-                            6
-                            v.hazards
-                            (ShiftHazards v.key -1)
-                            (ShiftHazards v.key 1)
-                            (UpdateHazards v.key)
-                        ]
-
-        hullCounter =
-            case cfg.printCounters of
-                True ->
-                    Grid.simpleRow
-                        [ Grid.col [ Col.md1 ] [ iconClass "fas fa-lg" "shield-alt" [ "mx-auto", "print-icon" ] ]
-                        , Grid.col [ Col.md11 ] <|
-                            List.repeat (totalHull v) (div [ class "hazard-check mr-1" ] [])
+                    columns columnsModifiers
+                        []
+                        [ column columnModifiers
+                            []
+                            [ Icon.viewStyled [ class "print-icon" ] Icon.exclamationTriangle ]
+                        , column columnModifiers
+                            []
+                            (List.repeat 6 (span [ class "hazard-check mr-1" ] []))
                         ]
 
                 False ->
                     counterElement
-                        (iconClass "fas" "shield-alt" [ "mx-auto" ])
+                        (Icon.exclamationTriangle |> Icon.viewIcon)
+                        0
+                        6
+                        v.hazards
+                        (ShiftHazards v.key -1)
+                        (ShiftHazards v.key 1)
+                        (UpdateHazards v.key)
+
+        hullCounter =
+            case cfg.printCounters of
+                True ->
+                    columns columnsModifiers
+                        []
+                        [ column columnModifiers
+                            []
+                            [ Icon.viewStyled [ class "print-icon" ] Icon.shieldAlt ]
+                        , column columnModifiers
+                            []
+                            (List.repeat (totalHull v) (span [ class "hazard-check mr-1" ] []))
+                        ]
+
+                False ->
+                    counterElement
+                        (Icon.shieldAlt |> Icon.viewIcon)
                         0
                         (totalHull v)
                         v.hull.current
@@ -246,74 +252,66 @@ configure model cfg v =
                 ( False, _ ) ->
                     text ""
 
-                ( _, True ) ->
-                    Grid.simpleRow
-                        [ Grid.col [ Col.mdAuto ] [ gearCounter ]
-                        , Grid.col [ Col.md ]
-                            [ hazardCounter
-                            , hullCounter
-                            ]
-                        ]
-
-                ( _, False ) ->
+                ( _, _ ) ->
                     div []
                         [ gearCounter
                         , hazardCounter
                         , hullCounter
                         ]
 
-        renderSpecialFunc special =
-            li [] [ View.Utils.renderSpecial False False Nothing Nothing special ]
+        renderSpecialsFunc specialList =
+            specialList
+                |> List.map (View.Utils.specialToHeaderBody False False Nothing Nothing)
+                |> List.map View.Utils.renderSpecialRow
 
         specials =
             case v.specials of
                 [] ->
-                    text ""
+                    text <| "No special rules for " ++ v.name ++ "."
 
                 _ ->
-                    ul [] <| List.map renderSpecialFunc v.specials
+                    div [] <| renderSpecialsFunc v.specials
 
         specialHolder =
             div [] [ specials ]
 
-        notes =
-            let
-                notesBody =
-                    case ( cfg.printNotes, cfg.inputNotes ) of
-                        ( True, _ ) ->
-                            text v.notes
+        mNotesBody =
+            case ( cfg.printNotes, cfg.inputNotes ) of
+                ( True, _ ) ->
+                    Just <| text v.notes
 
-                        ( _, True ) ->
-                            Textarea.textarea
-                                [ Textarea.onInput <| VehicleMsg << UpdateNotes v.key
-                                , Textarea.attrs [ placeholder "Notes" ]
-                                , Textarea.value v.notes
-                                ]
-
-                        _ ->
-                            text ""
-            in
-            case ( cfg.inputNotes, cfg.printNotes, v.notes ) of
-                ( False, False, _ ) ->
-                    text ""
-
-                ( _, True, "" ) ->
-                    text ""
+                ( _, True ) ->
+                    Just <|
+                        controlTextArea controlTextAreaModifiers
+                            []
+                            [ onInput <| VehicleMsg << UpdateNotes v.key
+                            , placeholder "Notes"
+                            ]
+                            [ text v.notes ]
 
                 _ ->
-                    View.Utils.detailSection [ text "Notes" ] [ notesBody ]
+                    Nothing
 
-        addonListButton href_ icon_ text_ =
-            Button.linkButton
-                [ Button.roleLink
-                , Button.small
-                , Button.attrs
-                    [ hidden <| not cfg.showAddonButton
-                    , href href_
-                    ]
+        notes =
+            case mNotesBody of
+                Nothing ->
+                    text ""
+
+                Just notesBody ->
+                    View.Utils.detailSection "Notes" [ notesBody ]
+
+        addonListButton href_ icon text_ =
+            button
+                { buttonModifiers
+                    | iconLeft = Just ( Standard, [], Icon.viewIcon icon )
+                }
+                [ class "button"
+                , hidden <| not cfg.showAddonButton
+                , href href_
                 ]
-                [ icon icon_, text text_ ]
+                [ text text_ ]
 
+        --[ icon icon_, text text_ ]
         weaponsUsingSlots =
             List.sum <| List.map .slots v.weapons
 
@@ -342,13 +340,13 @@ configure model cfg v =
                         )
                         v.weapons
 
-        weaponListAvailableBadge =
+        weaponListColor =
             case isCrewAvailable of
                 True ->
-                    Badge.badgeSuccess
+                    Success
 
                 False ->
-                    Badge.badgeDanger
+                    Danger
 
         weaponList =
             case ( v.weapons, cfg.printDetails, cfg.showDetails ) of
@@ -360,35 +358,38 @@ configure model cfg v =
 
                 _ ->
                     View.Utils.detailSection
-                        [ text "Weapon List"
-                        , small []
-                            [ weaponListAvailableBadge [ Spacing.ml2 ]
-                                [ " crew used"
-                                    |> (++) (String.fromInt <| totalCrew v)
-                                    |> (++) "/"
-                                    |> (++) (String.fromInt <| View.Utils.crewUsed v)
-                                    |> text
-                                ]
-                            , Badge.badgeDark [ Spacing.ml2 ]
-                                [ " slots used"
-                                    |> (++) (String.fromInt <| v.equipment)
-                                    |> (++) "/"
-                                    |> (++) (String.fromInt <| weaponsUsingSlots)
-                                    |> text
-                                ]
-                            , addonListButton ("/new/weapon/" ++ v.key) "plus" "Weapon"
-                            , Button.button
-                                [ Button.roleLink
-                                , Button.small
-                                , Button.onClick (WeaponMsg <| AddWeapon v.key handgun)
-                                , Button.attrs
-                                    [ hidden <| not cfg.showAddonButton
-                                    ]
-                                ]
-                                [ icon "plus", text "Handgun" ]
+                        "Weapon List"
+                        [ tagList
+                            [ ( ( "crew used", Bulma.Modifiers.Light )
+                              , ( Just <|
+                                    (String.fromInt <| View.Utils.crewUsed v)
+                                        ++ " / "
+                                        ++ (String.fromInt <| totalCrew v)
+                                , weaponListColor
+                                )
+                              )
+                            , ( ( "slots used", Bulma.Modifiers.Light )
+                              , ( Just <|
+                                    ((String.fromInt <| weaponsUsingSlots)
+                                        ++ " / "
+                                        ++ (String.fromInt <| v.equipment)
+                                    )
+                                , weaponListColor
+                                )
+                              )
                             ]
+                        , addonListButton ("/new/weapon/" ++ v.key) Icon.plus "Weapon"
+                        , button
+                            { buttonModifiers
+                                | iconLeft = Just ( Standard, [], Icon.plus |> Icon.viewIcon )
+                            }
+                            [ onClick (WeaponMsg <| AddWeapon v.key handgun)
+                            , hidden <| not cfg.showAddonButton
+                            , href ""
+                            ]
+                            [ text "Handgun" ]
+                        , div [] weaponsListBody
                         ]
-                        weaponsListBody
 
         upgradeListBody =
             case v.upgrades of
@@ -418,27 +419,27 @@ configure model cfg v =
 
                 _ ->
                     View.Utils.detailSection
-                        [ text "Upgrade List"
-                        , small []
-                            [ Badge.badgeDark [ Spacing.ml2 ]
-                                [ " slots used"
-                                    |> (++) (String.fromInt <| v.equipment)
-                                    |> (++) "/"
-                                    |> (++) (String.fromInt <| upgradeUsingSlots)
-                                    |> text
-                                ]
-                            , addonListButton ("/new/upgrade/" ++ v.key) "plus" "Upgrade"
+                        "Upgrade List"
+                        [ tagList
+                            [ ( ( "slots used", Bulma.Modifiers.Light )
+                              , ( Just <|
+                                    ((String.fromInt <| upgradeUsingSlots)
+                                        ++ " / "
+                                        ++ (String.fromInt <| v.equipment)
+                                    )
+                                , Success
+                                )
+                              )
                             ]
+                        , addonListButton ("/new/upgrade/" ++ v.key) Icon.plus "Upgrade"
+                        , div [] upgradeListBody
                         ]
-                        upgradeListBody
 
         availablePerks =
             case ( model.sponsor, cfg.showPerks, cfg.printPerks ) of
                 ( Just sponsor, _, True ) ->
                     View.Utils.detailSection
-                        [ text "Perks Available from "
-                        , text sponsor.name
-                        ]
+                        ("Perks available from " ++ sponsor.name)
                         [ sponsor
                             |> .grantedClasses
                             |> View.Sponsor.renderPerkList v.perks
@@ -452,10 +453,8 @@ configure model cfg v =
 
                 ( Just sponsor, True, _ ) ->
                     View.Utils.detailSection
-                        [ text "Perks Available from "
-                        , text sponsor.name
-                        ]
-                        [ Grid.simpleRow
+                        ("Perks available from " ++ sponsor.name)
+                        [ container []
                             (sponsor
                                 |> .grantedClasses
                                 |> List.map (View.Sponsor.renderPerkClass v)
@@ -465,43 +464,77 @@ configure model cfg v =
         expansion =
             Model.Shared.fromExpansion v.expansion
 
+        showWrecked =
+            case isWrecked v of
+                True ->
+                    Block
+
+                False ->
+                    Hidden
+
         header =
-            h2 []
+            title H3
+                []
                 [ text v.name
                 , small [] [ text <| " [" ++ expansion ++ "]" ]
+                , div [ class "wrecked-display", display showWrecked ] [ text "WRECKED!" ]
                 ]
 
-        body : List (Html Msg)
+        left =
+            column columnModifiers
+                [ class "vehicle-column-left" ]
+                [ factsHolder
+                , counterHolder
+                , notes
+                ]
+
+        right =
+            column columnModifiers
+                [ class "vehicle-column-right" ]
+                --[ specialHolder
+                [ weaponList
+                , upgradeList
+                ]
+
+        bottom =
+            div [ class "vehicle-body-bottom" ] [ availablePerks ]
+
         body =
-            [ stats
-            , counterHolder
-            , specialHolder
-            , notes
-            , weaponList
-            , upgradeList
-            , availablePerks
-            ]
+            div
+                [ class "vehicle-body" ]
+                [ columns columnsModifiers
+                    [ class "vehicle-columns" ]
+                    [ left, right ]
+                , bottom
+                ]
 
         footer =
-            div
-                [ class "buttons"
-                , classList [ ( "d-none", wrecked ) ]
-                ]
-                [ Button.button
-                    [ Button.danger
-                    , Button.small
-                    , Button.onClick <| VehicleMsg <| DeleteVehicle v.key
-                    ]
-                    [ icon "trash-alt" ]
-                , Button.linkButton
-                    [ Button.info
-                    , Button.small
-                    , Button.attrs
-                        [ class "float-right"
-                        , href <| "/details/" ++ v.key
+            level
+                [ class "button-bar" ]
+                [ levelLeft [] []
+                , levelRight []
+                    [ levelItem []
+                        [ button
+                            { buttonModifiers
+                                | color = Danger
+                                , iconLeft = Just ( Standard, [], Icon.trashAlt |> Icon.viewIcon )
+                            }
+                            [ onClick <| VehicleMsg <| DeleteVehicle v.key
+                            ]
+                            [ text "Delete Vehicle" ]
+                        ]
+                    , levelItem []
+                        [ button
+                            { buttonModifiers
+                                | iconLeft = Just ( Standard, [], Icon.info |> Icon.viewIcon )
+                            }
+                            [ class "button"
+                            , class "float-right"
+                            , href <| "/details/" ++ v.key
+                            ]
+                            [ text "Details" ]
                         ]
                     ]
-                    [ icon "info" ]
                 ]
     in
     ( header, body, footer )
@@ -510,7 +543,7 @@ configure model cfg v =
 renderDetails : Model -> Vehicle -> Html Msg
 renderDetails model v =
     let
-        ( _, body, _ ) =
+        ( header, body, _ ) =
             configure
                 model
                 { config
@@ -525,12 +558,13 @@ renderDetails model v =
                 }
                 v
     in
-    body
-        |> List.map (\b -> Grid.col [ Col.xs12 ] [ b ])
-        |> Grid.simpleRow
+    div []
+        [ header
+        , body
+        ]
 
 
-renderCard : Model -> Vehicle -> Card.Config Msg
+renderCard : Model -> Vehicle -> Html Msg
 renderCard model v =
     let
         ( header, body, footer ) =
@@ -542,19 +576,12 @@ renderCard model v =
                     , showDetailsButton = True
                 }
                 v
-
-        cardDisplay =
-            case v.hull.current >= totalHull v of
-                True ->
-                    [ Card.outlineDanger ]
-
-                False ->
-                    []
     in
-    Card.config cardDisplay
-        |> Card.headerH4 [] [ header ]
-        |> Card.block [] (List.map (\b -> Block.text [] [ b ]) body)
-        |> Card.footer [] [ footer ]
+    box []
+        [ title H4 [] [ header ]
+        , body
+        , footer
+        ]
 
 
 renderPreview : Model -> Vehicle -> Html Msg
@@ -569,7 +596,8 @@ renderPreview model v =
                     v.name
 
         header =
-            h4 []
+            title H4
+                []
                 [ text name
                 , small
                     [ Spacing.ml2 ]
@@ -582,9 +610,9 @@ renderPreview model v =
                 { config | previewPerks = True }
                 v
     in
-    Grid.simpleRow
-        [ Grid.col [ Col.md12 ] [ header ]
-        , Grid.col [ Col.md12 ] body
+    div []
+        [ header
+        , body
         ]
 
 
@@ -605,10 +633,10 @@ renderPrint model v =
                 }
                 v
     in
-    header
-        :: body
-        |> List.map (\b -> Grid.col [ Col.xs12 ] [ b ])
-        |> Grid.simpleRow
+    div []
+        [ header
+        , body
+        ]
 
 
 counterElement :
@@ -621,42 +649,32 @@ counterElement :
     -> (String -> VehicleEvent)
     -> Html Msg
 counterElement icon_ min max counterValue decrementMsg incrementMsg inputMsg =
-    InputGroup.config
-        (InputGroup.number
-            [ Input.onInput <| VehicleMsg << inputMsg
-            , Input.value <| String.fromInt counterValue
-            , Input.attrs
-                [ style "text-align" "center"
-                , Html.Attributes.min <| String.fromInt min
-                , Html.Attributes.max <| String.fromInt max
-                ]
+    connectedFields Left
+        []
+        [ controlButton
+            { buttonModifiers
+                | iconLeft = Just ( Standard, [], icon_ )
+            }
+            []
+            [ onClick <| VehicleMsg <| decrementMsg min max
+            , disabled <| min == counterValue
             ]
-        )
-        |> InputGroup.small
-        |> InputGroup.attrs [ class "my-2" ]
-        |> InputGroup.predecessors
-            [ InputGroup.span
-                [ style "min-width" "4rem"
-                , style "text-align" "center"
-                ]
-                [ icon_ ]
-            , InputGroup.button
-                [ Button.outlineSecondary
-                , Button.onClick <| VehicleMsg <| decrementMsg min max
-                , Button.disabled <| min == counterValue
-                ]
-                [ icon "minus" ]
+            [ Icon.minus |> Icon.viewIcon ]
+        , controlInput
+            controlInputModifiers
+            []
+            [ onInput <| VehicleMsg << inputMsg
+            , style "text-align" "center"
+            , Html.Attributes.min <| String.fromInt min
+            , Html.Attributes.max <| String.fromInt max
+            , value <| String.fromInt counterValue
             ]
-        |> InputGroup.successors
-            [ InputGroup.button
-                [ Button.outlineSecondary
-                , Button.onClick <| VehicleMsg <| incrementMsg min max
-                , Button.disabled <| counterValue >= max
-                ]
-                [ icon "plus" ]
-
-            {--, InputGroup.span
-                [ style "min-width" "4rem" ]
-                [ span [ class "mx-auto" ] [ text <| "of " ++ String.fromInt max ] ]--}
+            []
+        , controlButton
+            buttonModifiers
+            []
+            [ onClick <| VehicleMsg <| incrementMsg min max
+            , disabled <| counterValue >= max
             ]
-        |> InputGroup.view
+            [ Icon.plus |> Icon.viewIcon ]
+        ]

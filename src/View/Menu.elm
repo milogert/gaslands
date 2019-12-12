@@ -1,14 +1,12 @@
-module View.Menu exposing (side, top)
+module View.Menu exposing (brand, end, start)
 
-import Bootstrap.Badge as Badge
-import Bootstrap.Button as Button
-import Bootstrap.CDN as CDN
-import Bootstrap.Grid as Grid
-import Bootstrap.Grid.Col as Col
-import Bootstrap.Grid.Row as Row
-import Bootstrap.Text as Text
-import Bootstrap.Utilities.Spacing as Spacing
+import Bulma.Components exposing (..)
+import Bulma.Elements exposing (..)
+import Bulma.Form exposing (..)
+import Bulma.Modifiers exposing (..)
 import Dict
+import FontAwesome.Icon as Icon exposing (Icon)
+import FontAwesome.Solid as Icon
 import Html
     exposing
         ( Html
@@ -23,70 +21,49 @@ import Html.Attributes
         ( attribute
         , class
         , classList
+        , disabled
         , href
         , style
         )
+import Html.Events
+    exposing
+        ( onClick
+        )
+import Model.Features
 import Model.Model exposing (..)
 import Model.Routes exposing (Route(..))
 import Model.Vehicle.Model exposing (..)
+import View.Sponsor
 import View.Utils exposing (..)
 
 
-type MenuLocation
-    = Side
-    | Top
-
-
-side : Model -> Grid.Column Msg
-side model =
-    renderInternal model Side
-
-
-top : Model -> Grid.Column Msg
-top model =
-    renderInternal model Top
-
-
-renderInternal : Model -> MenuLocation -> Grid.Column Msg
-renderInternal model location =
+brand : Model -> NavbarSection Msg
+brand model =
     let
-        buttonSize =
-            case location of
-                Side ->
-                    [ Button.block ]
-
-                Top ->
-                    []
-
-        allButtonConfig =
-            buttonSize
-                ++ [ Button.small ]
-
-        gameButtons =
-            [ Button.linkButton
-                ((++)
-                    allButtonConfig
-                    [ Button.primary
-                    , Button.attrs
-                        [ href "/" ]
-                    ]
-                )
-                [ icon "home" ]
-            , Button.button
-                ((++)
-                    allButtonConfig
-                    [ Button.primary
-                    , Button.onClick <| VehicleMsg NextGearPhase
-                    ]
-                )
-                [ icon "cogs"
-                , Badge.badgeLight []
-                    [ text <|
-                        String.fromInt model.gearPhase
-                    ]
-                ]
+        burger =
+            navbarBurger model.navOpen
+                [ href "", onClick <| NavToggle <| not model.navOpen ]
+                [ span [] [], span [] [], span [] [] ]
+    in
+    navbarBrand []
+        burger
+        [ navbarItemLink False
+            [ href "/" ]
+            [ text <| "Team " ++ Maybe.withDefault "NoName" model.teamName ]
+        , navbarItem
+            False
+            [ onClick <| VehicleMsg NextGearPhase ]
+            [ Icon.cogs |> Icon.viewIcon
+            , easyTag tagModifiers
+                []
+                (String.fromInt model.gearPhase)
             ]
+        ]
 
+
+start : Model -> NavbarSection Msg
+start model =
+    let
         detailsButtons =
             case model.view of
                 RouteDetails key ->
@@ -101,7 +78,7 @@ renderInternal model location =
 
                         activatedText =
                             case ( vehicle.activated, canActivate ) of
-                                ( True, False ) ->
+                                ( True, _ ) ->
                                     "Activated"
 
                                 ( _, False ) ->
@@ -110,109 +87,94 @@ renderInternal model location =
                                 ( _, _ ) ->
                                     "Activate"
                     in
-                    [ Button.button
-                        ((++)
-                            allButtonConfig
-                            [ Button.primary
-                            , Button.onClick <| VehicleMsg <| UpdateActivated vehicle.key (not vehicle.activated)
-                            , Button.disabled <| not canActivate || vehicle.activated
+                    [ navbarItem False
+                        []
+                        [ controlButton buttonModifiers
+                            []
+                            [ onClick <| VehicleMsg <| UpdateActivated vehicle.key (not vehicle.activated)
+                            , disabled <| not canActivate || vehicle.activated
                             ]
-                        )
-                        [ text activatedText ]
-                    , Button.linkButton
-                        ((++)
-                            allButtonConfig
-                            [ Button.secondary
-                            , Button.attrs
-                                [ href <| "/print/" ++ vehicle.key ]
-                            ]
-                        )
-                        [ icon "print" ]
+                            [ text activatedText ]
+                        ]
+                    , navbarItemLink False
+                        [ href <| "/print/" ++ vehicle.key ]
+                        [ Icon.print |> Icon.viewIcon ]
+                        |> Model.Features.withDefault "feature-printing" (text "")
                     ]
 
                 _ ->
                     []
+    in
+    [ detailsButtons ]
+        |> menuLayout
+        |> navbarStart []
+
+
+end : Model -> NavbarSide Msg
+end model =
+    let
+        currentPoints =
+            totalPoints model
+
+        maxPoints =
+            model.pointsAllowed
+
+        pointsColor =
+            case compare currentPoints maxPoints of
+                LT ->
+                    Warning
+
+                EQ ->
+                    Success
+
+                GT ->
+                    Danger
+
+        pointsBadge =
+            navbarItem False
+                []
+                [ tag
+                    { tagModifiers | color = pointsColor }
+                    [ class "ml-2" ]
+                    [ text <| String.fromInt currentPoints ++ " of " ++ String.fromInt maxPoints
+                    , View.Utils.icon "coins"
+                    ]
+                ]
 
         settingsButtons =
-            [ Button.linkButton
-                ((++)
-                    allButtonConfig
-                    [ Button.primary
-                    , Button.attrs [ href "/new/vehicle" ]
-                    ]
-                )
-                [ icon "plus", icon "car" ]
-            , Button.linkButton
-                ((++)
-                    allButtonConfig
-                    [ Button.secondary
-                    , Button.disabled <| Dict.isEmpty model.vehicles
-                    , Button.attrs
-                        [ href "/print" ]
-                    ]
-                )
-                [ icon "print", icon "car" ]
-            , Button.linkButton
-                ((++)
-                    allButtonConfig
-                    [ Button.light
-                    , Button.attrs
-                        [ attribute "aria-label" "Back Button"
-                        , href "/settings"
-                        ]
-                    ]
-                )
-                [ icon "wrench" ]
-            ]
-
-        menuLayout : List (List (Html Msg)) -> List (Html Msg)
-        menuLayout buttons =
-            case location of
-                Side ->
-                    buttons
-                        |> List.map (List.intersperse (div [ Spacing.pb2 ] []))
-                        |> List.filter (not << List.isEmpty)
-                        |> List.map (div [])
-                        |> List.intersperse (hr [] [])
-
-                Top ->
-                    buttons
-                        |> List.map (List.intersperse (span [ Spacing.pl2 ] []))
-                        |> List.filter (not << List.isEmpty)
-                        |> List.map (span [])
-                        |> List.intersperse (span [ Spacing.mx2, style "border-left" "1px solid rgba(0,0,0,.1)" ] [])
-
-        colSize =
-            case location of
-                Side ->
-                    Col.xsAuto
-
-                Top ->
-                    Col.xs12
-
-        colAlignment =
-            case location of
-                Side ->
-                    Text.alignXsCenter
-
-                Top ->
-                    Text.alignXsLeft
-
-        displayClasses =
-            case location of
-                Side ->
-                    [ "side-menu", "d-none", "d-md-block" ]
-
-                Top ->
-                    [ "top-menu", "d-md-none" ]
-    in
-    [ gameButtons, detailsButtons, settingsButtons ]
-        |> menuLayout
-        |> Grid.col
-            [ colSize
-            , Col.textAlign colAlignment
-            , Col.attrs
-                [ class "menu"
-                , classList <| List.map (\c -> ( c, True )) <| displayClasses
+            [ navbarItemLink
+                False
+                [ href "/new/vehicle" ]
+                [ Icon.plus |> Icon.viewStyled [ style "margin-right" ".5rem" ]
+                , text "New Vehicle"
                 ]
+            , navbarItemLink
+                False
+                [ disabled <| Dict.isEmpty model.vehicles
+                , href "/print"
+                ]
+                [ Icon.print |> Icon.viewIcon ]
+                |> Model.Features.withDefault "feature-printing" (text "")
+            , navbarItem False
+                []
+                [ View.Sponsor.renderBadge model.sponsor ]
+            , pointsBadge
+            , navbarItemLink
+                False
+                [ attribute "aria-label" "Back Button"
+                , href "/settings"
+                ]
+                [ Icon.wrench |> Icon.viewIcon ]
             ]
+    in
+    [ settingsButtons ]
+        |> menuLayout
+        |> navbarEnd []
+
+
+menuLayout : List (List (Html Msg)) -> List (Html Msg)
+menuLayout buttons =
+    buttons
+        |> List.filter (not << List.isEmpty)
+        |> List.intersperse [ navbarDivider [] [] ]
+        |> List.concat

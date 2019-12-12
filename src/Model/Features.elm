@@ -8,6 +8,7 @@ flags =
     Dict.fromList
         [ ( "feature-generate-team", False )
         , ( "feature-car-photo", False )
+        , ( "feature-printing", False )
         ]
 
 

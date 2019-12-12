@@ -1,20 +1,18 @@
 module View.NewVehicle exposing (addButton, view)
 
-import Bootstrap.Button as Button
-import Bootstrap.Form as Form
-import Bootstrap.Form.Input as Input
-import Bootstrap.Form.Select as Select
-import Bootstrap.Grid as Grid
-import Bootstrap.Grid.Col as Col
-import Bootstrap.Utilities.Spacing as Spacing
-import Html exposing (Html, hr, text)
+import Bulma.Elements exposing (..)
+import Bulma.Form exposing (..)
+import Bulma.Modifiers exposing (..)
+import Html exposing (Html, div, hr, option, text)
 import Html.Attributes
     exposing
         ( class
         , disabled
+        , placeholder
         , size
         , value
         )
+import Html.Events exposing (onClick, onInput)
 import Model.Model exposing (..)
 import Model.Vehicle.Common exposing (..)
 import Model.Vehicle.Model exposing (..)
@@ -37,54 +35,63 @@ view model =
             allVehicles
                 |> List.filter (View.Utils.vehicleSponsorFilter model)
                 |> List.indexedMap vehicleOption
-                |> (::) (Select.item [ value "-1" ] [ text "Select Vehicle" ])
+                |> (::) (option [ value "-1" ] [ text "Select Vehicle" ])
 
         selectList =
-            Select.select
-                [ Select.onChange <| VehicleMsg << TmpVehicleType
-                , Select.attrs [ class "mb-3" ]
+            controlSelect
+                controlSelectModifiers
+                []
+                [ onInput <| VehicleMsg << TmpVehicleType
+                , class "mb-3"
                 ]
                 options
 
         nameInput =
             case model.tmpVehicle of
                 Nothing ->
-                    Input.text
-                        [ Input.placeholder "Select a vehicle type above"
-                        , Input.attrs [ disabled True, Spacing.mr1 ]
+                    controlText
+                        { controlInputModifiers | disabled = True }
+                        []
+                        [ placeholder "Select a vehicle type above"
+                        , disabled True
                         ]
+                        []
 
                 Just vehicle ->
-                    Input.text
-                        [ Input.placeholder "Name"
-                        , Input.onInput <| VehicleMsg << TmpName
-                        , Input.value vehicle.name
-                        , Input.attrs [ Spacing.mr1 ]
+                    controlText
+                        controlInputModifiers
+                        []
+                        [ placeholder "Name"
+                        , onInput <| VehicleMsg << TmpName
+                        , value vehicle.name
                         ]
+                        []
     in
-    Grid.row []
-        [ Grid.col [ Col.md12 ]
-            [ Form.form []
-                [ Form.row []
-                    [ Form.colLabel [ Col.mdAuto ]
-                        [ Form.label [] [ text "Vehicle Type" ] ]
-                    , Form.col [] [ selectList ]
-                    ]
-                , Form.row []
-                    [ Form.colLabel [ Col.mdAuto ]
-                        [ Form.label [] [ text "Vehicle Name" ] ]
-                    , Form.col [] [ nameInput ]
-                    ]
-                ]
+    div
+        []
+        [ horizontalFields []
+            [ fieldLabel Standard
+                []
+                [ controlLabel [] [ text "Vehicle Type" ] ]
+            , fieldBody [] [ selectList ]
             ]
-        , Grid.col [ Col.md12 ] [ body ]
-        , Grid.col [ Col.md12 ] [ addButton model.tmpVehicle ]
+        , horizontalFields []
+            [ fieldLabel Standard
+                []
+                [ controlLabel [] [ text "Vehicle Name" ] ]
+            , fieldBody [] [ nameInput ]
+            ]
+        , horizontalFields []
+            [ fieldLabel Standard [] []
+            , fieldBody [] [ addButton model.tmpVehicle ]
+            ]
+        , box [] [ body ]
         ]
 
 
-vehicleOption : Int -> Vehicle -> Select.Item Msg
+vehicleOption : Int -> Vehicle -> Html Msg
 vehicleOption i vt =
-    Select.item
+    option
         [ value <| String.fromInt i ]
         [ text <| fromVehicleType vt.vtype ]
 
@@ -111,17 +118,12 @@ addButton tmpVehicle =
                     []
 
                 Just v ->
-                    [ Button.onClick <| VehicleMsg (AddVehicle v) ]
+                    [ onClick <| VehicleMsg (AddVehicle v) ]
 
         attrs =
             List.append
                 event
-                [ Button.primary
-
-                --, Button.block
-                , Button.attrs [ class "mb-3" ]
-                , Button.disabled disabledButton
-                ]
+                []
 
         buttonText =
             case tmpVehicle of
@@ -136,6 +138,8 @@ addButton tmpVehicle =
                 Nothing ->
                     "Select Vehicle"
     in
-    Button.button
+    controlButton
+        { buttonModifiers | disabled = disabledButton }
+        []
         attrs
         [ text buttonText ]

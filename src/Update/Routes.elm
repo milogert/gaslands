@@ -29,7 +29,12 @@ urlRequested model request =
                     ( model, cmdBatch url route )
 
         Browser.External href ->
-            ( model, Nav.load href )
+            case href of
+                "" ->
+                    ( model, Cmd.none )
+
+                _ ->
+                    ( model, Nav.load href )
 
 
 urlChanged : Model -> Url -> ( Model, Cmd Msg )

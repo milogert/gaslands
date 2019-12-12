@@ -1,14 +1,17 @@
 module View.View exposing (view)
 
 import Bootstrap.Badge as Badge
-import Bootstrap.Button as Button
-import Bootstrap.CDN as CDN
-import Bootstrap.Grid as Grid
-import Bootstrap.Grid.Col as Col
-import Bootstrap.Grid.Row as Row
 import Bootstrap.Utilities.Spacing as Spacing
 import Browser exposing (Document)
+import Bulma.CDN exposing (..)
+import Bulma.Columns exposing (..)
+import Bulma.Components exposing (..)
+import Bulma.Elements exposing (..)
+import Bulma.Layout exposing (..)
+import Bulma.Modifiers exposing (..)
 import Dict exposing (Dict)
+import FontAwesome.Icon as Icon exposing (Icon)
+import FontAwesome.Styles as Icon
 import Html
     exposing
         ( Html
@@ -66,89 +69,70 @@ view model =
                     "/"
 
         backButton =
-            Button.linkButton
-                [ Button.disabled <| model.view == RouteDashboard
-                , Button.light
-                , Button.small
-                , Button.block
-                , Button.attrs [ href viewToGoTo, attribute "aria-label" "Back Button" ]
-                ]
-                [ icon "arrow-left" ]
-
-        currentPoints =
-            totalPoints model
-
-        maxPoints =
-            model.pointsAllowed
-
-        pointsBadgeFunction =
-            case compare currentPoints maxPoints of
-                LT ->
-                    Badge.badgeWarning
-
-                EQ ->
-                    Badge.badgeSuccess
-
-                GT ->
-                    Badge.badgeDanger
-
-        pointsBadge =
-            pointsBadgeFunction
-                [ class "ml-2" ]
-                [ text <| String.fromInt currentPoints ++ " of " ++ String.fromInt maxPoints
-                , icon "coins"
-                ]
+            button
+                { buttonModifiers
+                    | disabled = model.view == RouteDashboard
+                    , size = Small
+                }
+                [ href viewToGoTo, attribute "aria-label" "Back Button" ]
+                [ View.Utils.icon "arrow-left" ]
 
         viewDisplay =
-            h2 [ style "margin-bottom" "0" ]
+            title H4
+                []
                 [ text <| viewToStr model ]
     in
     Document
         (viewToStr model)
-        [ Grid.container [ Spacing.mt3 ]
-            [ CDN.stylesheet -- creates an inline style node with the Bootstrap CSS
-            , node "link"
-                [ rel "stylesheet"
-                , href "https://use.fontawesome.com/releases/v5.0.13/css/all.css"
-                , attribute "integrity" "sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp"
-                , attribute "async" "true"
-                , attribute "crossorigin" "anonymous"
-                ]
-                []
-            , Grid.simpleRow
-                [ View.Menu.side model
-                , View.Menu.top model
-                , Grid.col []
-                    [ Grid.row [ Row.attrs [ Spacing.mb2 ] ]
-                        [ Grid.col [] [ viewDisplay ]
-                        , Grid.col
-                            [ Col.xs12
-                            , Col.mdAuto
-                            ]
-                            [ View.Sponsor.renderBadge model.sponsor
-                            , pointsBadge
-                            ]
-                        ]
-                    , Grid.simpleRow
-                        [ Grid.col []
-                            [ displayAlert model
-                            , render model
-                            ]
-                        ]
-                    ]
-                ]
+        [ stylesheet --CDN.stylesheet -- creates an inline style node with the Bootstrap CSS
+        , Icon.css
+        , nav model
+        , node "link"
+            [ rel "stylesheet"
+            , href "https://use.fontawesome.com/releases/v5.0.13/css/all.css"
+            , attribute "integrity" "sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp"
+            , attribute "async" "true"
+            , attribute "crossorigin" "anonymous"
+            ]
+            []
+        , displayAlert model
+        , section NotSpaced [] [ render model ]
+        ]
+
+
+nav : Model -> Html Msg
+nav model =
+    fixedNavbar
+        Bottom
+        { navbarModifiers
+            | color = Dark
+            , transparent = True
+        }
+        []
+        [ View.Menu.brand model
+        , navbarMenu model.navOpen
+            []
+            [ View.Menu.start model
+            , View.Menu.end model
             ]
         ]
 
 
 displayAlert : Model -> Html Msg
 displayAlert model =
-    model.error
-        |> List.map
-            (\x ->
-                Grid.simpleRow [ Grid.col [] [ pre [] [ text <| errorToStr x ] ] ]
-            )
-        |> div []
+    let
+        msgBody x =
+            messageBody [] [ text <| errorToStr x ]
+    in
+    case List.isEmpty model.error of
+        True ->
+            div [] []
+
+        False ->
+            model.error
+                |> List.map msgBody
+                |> message { messageModifiers | color = Danger } []
+                |> (\m -> section NotSpaced [] [ m ])
 
 
 render : Model -> Html Msg

@@ -1,12 +1,11 @@
 module View.NewWeapon exposing (view)
 
-import Bootstrap.Button as Button
-import Bootstrap.Form as Form
-import Bootstrap.Form.Select as Select
-import Bootstrap.Grid as Grid
-import Bootstrap.Grid.Col as Col
-import Html exposing (Html, div, hr, text)
+import Bulma.Elements exposing (..)
+import Bulma.Form exposing (..)
+import Bulma.Modifiers exposing (..)
+import Html exposing (Html, div, hr, option, text)
 import Html.Attributes exposing (class, disabled, size, value)
+import Html.Events exposing (onClick, onInput)
 import Model.Model exposing (..)
 import Model.Shared exposing (..)
 import Model.Vehicle.Model exposing (..)
@@ -18,28 +17,26 @@ import View.Weapon exposing (defaultWeaponConfig)
 view : Model -> Vehicle -> List Weapon -> Html Msg
 view model vehicle weapons =
     let
-        buttonAttrs =
-            [ Button.primary
-            , Button.attrs [ class "mb-3" ]
-            ]
-
         addButton =
             case model.tmpWeapon of
                 Just weapon ->
                     case weapon.mountPoint of
                         Nothing ->
-                            Button.button
-                                (Button.disabled True :: buttonAttrs)
+                            controlButton buttonModifiers
+                                []
+                                [ disabled True ]
                                 [ text "Select Mount Point" ]
 
                         Just _ ->
-                            Button.button
-                                (Button.onClick (WeaponMsg <| AddWeapon vehicle.key weapon) :: buttonAttrs)
+                            controlButton buttonModifiers
+                                []
+                                [ onClick (WeaponMsg <| AddWeapon vehicle.key weapon) ]
                                 [ text <| "Add " ++ weapon.name ++ " to " ++ vehicle.name ]
 
                 Nothing ->
-                    Button.button
-                        (Button.disabled True :: buttonAttrs)
+                    controlButton buttonModifiers
+                        []
+                        [ disabled True ]
                         [ text "Choose Weapon Type" ]
 
         body =
@@ -67,32 +64,30 @@ view model vehicle weapons =
                 |> List.map thingToTuple
                 |> List.map
                     (\( name, exp ) ->
-                        Select.item
+                        option
                             [ value name ]
                             [ text <| name ++ " (" ++ exp ++ ")" ]
                     )
-                |> (::) (Select.item [] [ text "" ])
+                |> (::) (option [] [ text "" ])
 
         selectList =
-            Select.select
-                [ Select.onChange (WeaponMsg << TmpWeaponUpdate)
-                , Select.attrs
-                    [ class "mb-3"
-                    ]
-                ]
+            controlSelect controlSelectModifiers
+                []
+                [ onInput (WeaponMsg << TmpWeaponUpdate) ]
                 options
 
         mountPointOption mountPoint =
             mountPoint
                 |> fromWeaponMounting
-                |> (\mp -> Select.item [ value mp ] [ text mp ])
+                |> (\mp -> option [ value mp ] [ text mp ])
 
         mountPointSelector =
             case model.tmpWeapon of
                 Nothing ->
-                    Select.select
-                        [ Select.attrs [ disabled True ] ]
-                        [ Select.item
+                    controlSelect controlSelectModifiers
+                        []
+                        [ disabled True ]
+                        [ option
                             [ value "" ]
                             [ text "Select a weapon type above" ]
                         ]
@@ -100,9 +95,10 @@ view model vehicle weapons =
                 Just weapon ->
                     case Just CrewFired == weapon.mountPoint of
                         True ->
-                            Select.select
-                                [ Select.attrs [ disabled True ] ]
-                                [ Select.item
+                            controlSelect controlSelectModifiers
+                                []
+                                [ disabled True ]
+                                [ option
                                     [ value "" ]
                                     [ text "Crew Fired" ]
                                 ]
@@ -110,28 +106,28 @@ view model vehicle weapons =
                         False ->
                             [ Full, Front, LeftSide, RightSide, Rear ]
                                 |> List.map mountPointOption
-                                |> (::) (Select.item [ value "" ] [ text "" ])
-                                |> Select.select
-                                    [ Select.onChange <| WeaponMsg << TmpWeaponMountPoint
+                                |> (::) (option [ value "" ] [ text "" ])
+                                |> controlSelect controlSelectModifiers
+                                    []
+                                    [ onInput <| WeaponMsg << TmpWeaponMountPoint
                                     ]
     in
-    Grid.row []
-        [ Grid.col [ Col.md12 ]
-            [ Form.form []
-                [ Form.row []
-                    [ Form.colLabel [ Col.mdAuto ]
-                        [ Form.label [] [ text "Weapon Type" ] ]
-                    , Form.col [] [ selectList ]
-                    ]
-                , Form.row []
-                    [ Form.colLabel [ Col.mdAuto ]
-                        [ Form.label [] [ text "Mount Point" ] ]
-                    , Form.col [] [ mountPointSelector ]
-                    ]
-                ]
+    div []
+        [ horizontalFields []
+            [ fieldLabel Standard
+                []
+                [ controlLabel [] [ text "Weapon Type" ] ]
+            , fieldBody [] [ selectList ]
             ]
-        , Grid.col [ Col.md12 ] [ body ]
-        , Grid.col [ Col.md12 ]
-            [ addButton
+        , horizontalFields []
+            [ fieldLabel Standard
+                []
+                [ controlLabel [] [ text "Mount Point" ] ]
+            , fieldBody [] [ mountPointSelector ]
             ]
+        , horizontalFields []
+            [ fieldLabel Standard [] []
+            , fieldBody [] [ addButton ]
+            ]
+        , box [] [ body ]
         ]
