@@ -24,7 +24,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/glom/static/js/vendors~main.3ca81432.chunk.js"
   },
   {
-    "revision": "6ef937cb75acb80b3450f18e46135e2f",
+    "revision": "a49346b2d462e42ebd18b2b39d048977",
     "url": "/glom/style.css"
   }
 ]);
