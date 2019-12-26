@@ -22,7 +22,6 @@ import Html.Attributes
         , class
         , classList
         , disabled
-        , href
         , style
         )
 import Html.Events
@@ -31,8 +30,8 @@ import Html.Events
         )
 import Model.Features
 import Model.Model exposing (..)
-import Model.Routes exposing (Route(..))
 import Model.Vehicle.Model exposing (..)
+import Model.Views exposing (NewType(..), ViewEvent(..))
 import View.Sponsor
 import View.Utils exposing (..)
 
@@ -42,13 +41,13 @@ brand model =
     let
         burger =
             navbarBurger model.navOpen
-                [ href "", onClick <| NavToggle <| not model.navOpen ]
+                [ onClick <| NavToggle <| not model.navOpen ]
                 [ span [] [], span [] [], span [] [] ]
     in
     navbarBrand []
         burger
         [ navbarItemLink False
-            [ href "/" ]
+            [ onClick <| ViewMsg ViewDashboard ]
             [ text <| "Team " ++ Maybe.withDefault "NoName" model.teamName ]
         , navbarItem
             False
@@ -66,7 +65,7 @@ start model =
     let
         detailsButtons =
             case model.view of
-                RouteDetails key ->
+                ViewDetails key ->
                     let
                         vehicle =
                             model.vehicles
@@ -97,7 +96,7 @@ start model =
                             [ text activatedText ]
                         ]
                     , navbarItemLink False
-                        [ href <| "/print/" ++ vehicle.key ]
+                        [ onClick <| ViewMsg <| ViewPrint vehicle.key ]
                         [ Icon.print |> Icon.viewIcon ]
                         |> Model.Features.withDefault "feature-printing" (text "")
                     ]
@@ -144,14 +143,14 @@ end model =
         settingsButtons =
             [ navbarItemLink
                 False
-                [ href "/new/vehicle" ]
+                [ onClick <| ViewMsg <| ViewNew NewVehicle ]
                 [ Icon.plus |> Icon.viewStyled [ style "margin-right" ".5rem" ]
                 , text "New Vehicle"
                 ]
             , navbarItemLink
                 False
                 [ disabled <| Dict.isEmpty model.vehicles
-                , href "/print"
+                , onClick <| ViewMsg ViewPrintAll
                 ]
                 [ Icon.print |> Icon.viewIcon ]
                 |> Model.Features.withDefault "feature-printing" (text "")
@@ -162,7 +161,7 @@ end model =
             , navbarItemLink
                 False
                 [ attribute "aria-label" "Back Button"
-                , href "/settings"
+                , onClick <| ViewMsg ViewSettings
                 ]
                 [ Icon.wrench |> Icon.viewIcon ]
             ]

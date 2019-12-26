@@ -30,7 +30,6 @@ import Html.Attributes
     exposing
         ( checked
         , class
-        , href
         , id
         )
 import Html.Events exposing (onCheck, onClick)
@@ -46,6 +45,7 @@ import Model.Sponsors
         , getClassPerks
         )
 import Model.Vehicle.Model exposing (..)
+import Model.Views exposing (ViewEvent(..))
 import View.Utils exposing (expansionMarker)
 
 
@@ -97,7 +97,7 @@ renderBadge ms =
             | size = Small
             , iconRight = Just ( Small, [], Icon.exchangeAlt |> Icon.viewIcon )
         }
-        [ href "/sponsor"
+        [ onClick <| ViewMsg ViewSponsor
         , Html.Attributes.title description
         ]
         [ text name ]

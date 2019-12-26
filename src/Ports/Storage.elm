@@ -3,8 +3,8 @@ port module Ports.Storage exposing
     , delete
     , deleteSub
     , get
-    , getKeys
-    , getKeysSub
+    , getStorage
+    , getStorageSub
     , getSub
     , set
     , setSub
@@ -27,10 +27,10 @@ port get : String -> Cmd msg
 port getSub : (String -> msg) -> Sub msg
 
 
-port getKeys : String -> Cmd msg
+port getStorage : String -> Cmd msg
 
 
-port getKeysSub : (List String -> msg) -> Sub msg
+port getStorageSub : (List ( String, String ) -> msg) -> Sub msg
 
 
 port set : StorageEntry -> Cmd msg

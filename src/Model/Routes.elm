@@ -1,6 +1,6 @@
 module Model.Routes exposing (NewType(..), Route(..), routeMap)
 
-import Url.Parser exposing ((</>), Parser, int, map, oneOf, s, string, top, fragment)
+import Url.Parser exposing ((</>), Parser, fragment, int, map, oneOf, s, string, top)
 
 
 type Route

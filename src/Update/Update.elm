@@ -1,7 +1,5 @@
 module Update.Update exposing (update)
 
-import Browser
-import Browser.Navigation as Nav
 import Dict
 import Model.Model exposing (..)
 import Model.Settings exposing (..)
@@ -33,11 +31,8 @@ update msg model =
             )
 
         -- ROUTING.
-        ClickedLink request ->
-            Update.Routes.urlRequested model request
-
-        ChangedUrl url ->
-            Update.Routes.urlChanged model url
+        ViewMsg viewEvent ->
+            Update.View.update model viewEvent
 
         -- GAME SETTINGS.
         UpdatePointsAllowed s ->
@@ -76,30 +71,30 @@ update msg model =
             Update.Sponsor.set model <| stringToSponsor sponsorName
 
         -- DATA.
-        Import ->
-            Update.Data.import_ model
+        GetAllStorage data ->
+            ( { model | storageData = Dict.fromList data }
+            , Cmd.none
+            )
+
+        Import key jsonModel ->
+            Update.Data.import_ model key jsonModel
 
         SetImport json ->
             ( { model | importValue = json }
             , Cmd.none
             )
 
-        Share ->
-            Update.Data.share model
+        Share key jsonModel ->
+            Update.Data.share model key jsonModel
 
         GetStorage value ->
             ( { model | importValue = value }
             , Cmd.none
             )
 
-        GetStorageKeys keys ->
-            ( { model | storageKeys = keys }
-            , Cmd.none
-            )
-
         SetStorageCallback entry ->
             ( model
-            , Cmd.batch [ Ports.Storage.getKeys "", Task.perform SetImport (Task.succeed entry.value) ]
+            , Cmd.batch [ Ports.Storage.getStorage "", Task.perform SetImport (Task.succeed entry.value) ]
             )
 
         SaveModel ->
@@ -117,7 +112,7 @@ update msg model =
 
         DeleteItemCallback deletedKey ->
             ( model
-            , Ports.Storage.getKeys ""
+            , Ports.Storage.getStorage ""
             )
 
         SettingsMsg event ->

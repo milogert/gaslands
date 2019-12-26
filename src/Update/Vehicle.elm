@@ -1,13 +1,12 @@
 module Update.Vehicle exposing (update)
 
-import Browser.Navigation as Nav
 import Dict exposing (Dict)
 import List.Extra as ListE
 import Model.Model exposing (..)
-import Model.Routes exposing (Route(..))
 import Model.Sponsors exposing (..)
 import Model.Vehicle.Common exposing (..)
 import Model.Vehicle.Model exposing (..)
+import Model.Views exposing (ViewEvent(..))
 import Model.Weapon.Model exposing (..)
 import Ports.Photo
 import Update.Utils exposing (..)
@@ -45,7 +44,7 @@ update model event =
                             1
             in
             ( { model
-                | view = RouteDashboard
+                | view = ViewDashboard
                 , gearPhase = gearPhase
                 , vehicles = vs
               }
@@ -150,7 +149,7 @@ update model event =
 
         SetPhotoUrlCallback url ->
             case model.view of
-                RouteDetails key ->
+                ViewDetails key ->
                     setUrlForVehicle model key url
 
                 _ ->
@@ -180,12 +179,11 @@ addVehicle model vehicle =
 
         ( _, _ ) ->
             ( { model
-                | view = RouteDashboard
-                , vehicles = newDict
+                | vehicles = newDict
                 , tmpVehicle = Nothing
                 , error = []
               }
-            , Nav.pushUrl model.key "/"
+            , goTo ViewDashboard
             )
 
 
@@ -214,17 +212,16 @@ updateActivated model key activated =
 
                 newView =
                     case model.view of
-                        RouteDetails currentVehicle ->
-                            RouteDetails nv.key
+                        ViewDetails currentVehicle ->
+                            ViewDetails nv.key
 
                         _ ->
                             model.view
             in
             ( { model
-                | view = newView
-                , vehicles = Dict.insert key nv model.vehicles
+                | vehicles = Dict.insert key nv model.vehicles
               }
-            , Cmd.none
+            , goTo newView
             )
 
 
@@ -243,8 +240,8 @@ updateGear model key newGear =
 
                 newView =
                     case model.view of
-                        RouteDetails _ ->
-                            RouteDetails nv.key
+                        ViewDetails _ ->
+                            ViewDetails nv.key
 
                         _ ->
                             model.view
@@ -267,8 +264,8 @@ updateHazards model key newHazards =
 
                 newView =
                     case model.view of
-                        RouteDetails _ ->
-                            RouteDetails nv.key
+                        ViewDetails _ ->
+                            ViewDetails nv.key
 
                         _ ->
                             model.view
@@ -297,8 +294,8 @@ updateHull model key currentHull =
 
                 newView =
                     case model.view of
-                        RouteDetails _ ->
-                            RouteDetails nv.key
+                        ViewDetails _ ->
+                            ViewDetails nv.key
 
                         _ ->
                             model.view
@@ -362,7 +359,7 @@ updateNotes model key notes =
             in
             ( { model
                 | vehicles = Dict.insert key newVehicle model.vehicles
-                , view = RouteDetails newVehicle.key
+                , view = ViewDetails newVehicle.key
               }
             , Cmd.none
             )
@@ -371,7 +368,7 @@ updateNotes model key notes =
 deleteVehicle : Model -> String -> ( Model, Cmd Msg )
 deleteVehicle model key =
     ( { model
-        | view = RouteDashboard
+        | view = ViewDashboard
         , vehicles = Dict.remove key model.vehicles
       }
     , Cmd.none
@@ -390,7 +387,7 @@ rollSkidDice model key skidResults =
                     { vehicle | skidResults = skidResults }
             in
             ( { model
-                | view = RouteDetails nv.key
+                | view = ViewDetails nv.key
                 , vehicles = Dict.insert key nv model.vehicles
               }
             , Cmd.none
@@ -420,7 +417,7 @@ setPerkInVehicle model key perk isSet =
                     { vehicle | perks = perkList }
             in
             ( { model
-                | view = RouteDetails nv.key
+                | view = ViewDetails nv.key
                 , vehicles = Dict.insert key nv model.vehicles
               }
             , Cmd.none
@@ -453,7 +450,7 @@ setUrlForVehicle model key url =
                     { vehicle | photo = Just url }
             in
             ( { model
-                | view = RouteDetails nv.key
+                | view = ViewDetails nv.key
                 , vehicles = Dict.insert key nv model.vehicles
               }
             , Ports.Photo.destroyStream ""
@@ -472,7 +469,7 @@ discardPhoto model key =
                     { vehicle | photo = Nothing }
             in
             ( { model
-                | view = RouteDetails nv.key
+                | view = ViewDetails nv.key
                 , vehicles = Dict.insert key nv model.vehicles
               }
             , Ports.Photo.getStream ""

@@ -1,37 +1,47 @@
 module Update.View exposing (update)
 
 import Model.Model exposing (..)
-import Model.Routes exposing (Route(..))
+import Model.Views exposing (ViewEvent(..))
 import Ports.Photo
 import Ports.Storage
 import Update.Utils exposing (doSaveModel)
 
 
-update : Model -> Route -> ( Model, Cmd Msg )
+update : Model -> ViewEvent -> ( Model, Cmd Msg )
 update model currentView =
+    let
+        changedView =
+            { model | view = currentView }
+    in
     case currentView of
-        RouteDashboard ->
-            ( { model
-                | view = RouteDashboard
-                , tmpVehicle = Nothing
+        ViewDashboard ->
+            ( { changedView
+                | tmpVehicle = Nothing
                 , tmpWeapon = Nothing
                 , tmpUpgrade = Nothing
               }
             , doSaveModel
             )
 
-        RouteDetails v ->
-            ( { model | view = RouteDetails v }
+        ViewDetails v ->
+            ( changedView
             , Cmd.batch
                 [ Ports.Photo.destroyStream ""
                 , doSaveModel
                 ]
             )
 
-        RoutePrint v ->
-            ( { model | view = RoutePrint v }
+        ViewPrint v ->
+            ( changedView
             , Cmd.none
             )
 
+        ViewSettings ->
+            ( changedView
+            , Ports.Storage.getStorage ""
+            )
+
         _ ->
-            ( model, Cmd.none )
+            ( { model | view = currentView }
+            , Cmd.none
+            )
