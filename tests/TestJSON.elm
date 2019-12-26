@@ -19,75 +19,69 @@ import Model.Weapon.Model exposing (defaultWeapon)
 import Test exposing (..)
 
 
-suite : String
+suite : Test
 suite =
-    "undo disable"
+    describe "Encode/Decode tests"
+        [ test "model encodes and decodes are the same" <|
+            \_ ->
+                let
+                    expected =
+                        { defaultModel
+                            | sponsor = List.head allSponsors
+                        }
+
+                    decodedActual =
+                        expected
+                            |> modelEncoder
+                            |> decodeValue modelDecoder
+                in
+                expectEncodeDecode expected decodedActual
+        , test "vehicle encodes and decodes are the same" <|
+            \_ ->
+                let
+                    expected =
+                        defaultVehicle
+
+                    decodedActual =
+                        expected
+                            |> vehicleEncoder
+                            |> decodeValue vehicleDecoder
+                in
+                expectEncodeDecode expected decodedActual
+        , test "weapon encodes and decodes are the same" <|
+            \_ ->
+                let
+                    expected =
+                        defaultWeapon
+
+                    decodedActual =
+                        expected
+                            |> weaponEncoder
+                            |> Json.Encode.object
+                            |> decodeValue weaponDecoder
+                in
+                expectEncodeDecode expected decodedActual
+        , test "upgrade encodes and decodes are the same" <|
+            \_ ->
+                let
+                    expected =
+                        defaultUpgrade
+
+                    decodedActual =
+                        expected
+                            |> upgradeEncoder
+                            |> Json.Encode.object
+                            |> decodeValue upgradeDecoder
+                in
+                expectEncodeDecode expected decodedActual
+        ]
 
 
+expectEncodeDecode : a -> Result Json.Decode.Error a -> Expect.Expectation
+expectEncodeDecode expected decodedActual =
+    case decodedActual of
+        Ok value ->
+            Expect.equal expected value
 
-{-
-       describe "Encode/Decode tests"
-           [ test "model encodes and decodes are the same" <|
-               \_ ->
-                   let
-                       expected =
-                           { defaultModel
-                               | sponsor = List.head allSponsors
-                           }
-
-                       decodedActual =
-                           expected
-                               |> modelEncoder
-                               |> decodeValue modelDecoder
-                   in
-                   expectEncodeDecode expected decodedActual
-           , test "vehicle encodes and decodes are the same" <|
-               \_ ->
-                   let
-                       expected =
-                           defaultVehicle
-
-                       decodedActual =
-                           expected
-                               |> vehicleEncoder
-                               |> decodeValue vehicleDecoder
-                   in
-                   expectEncodeDecode expected decodedActual
-           , test "weapon encodes and decodes are the same" <|
-               \_ ->
-                   let
-                       expected =
-                           defaultWeapon
-
-                       decodedActual =
-                           expected
-                               |> weaponEncoder
-                               |> Json.Encode.object
-                               |> decodeValue weaponDecoder
-                   in
-                   expectEncodeDecode expected decodedActual
-           , test "upgrade encodes and decodes are the same" <|
-               \_ ->
-                   let
-                       expected =
-                           defaultUpgrade
-
-                       decodedActual =
-                           expected
-                               |> upgradeEncoder
-                               |> Json.Encode.object
-                               |> decodeValue upgradeDecoder
-                   in
-                   expectEncodeDecode expected decodedActual
-           ]
-
-
-   expectEncodeDecode : a -> Result Json.Decode.Error a -> Expect.Expectation
-   expectEncodeDecode expected decodedActual =
-       case decodedActual of
-           Ok value ->
-               Expect.equal expected value
-
-           Err error ->
-               Expect.fail <| "Failed to decode: " ++ errorToString error
--}
+        Err error ->
+            Expect.fail <| "Failed to decode: " ++ errorToString error
