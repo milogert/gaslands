@@ -1,10 +1,11 @@
 module View.Settings exposing (view)
 
-import Bulma.Elements exposing (..)
 import Bulma.Columns exposing (..)
+import Bulma.Elements exposing (..)
 import Bulma.Form exposing (..)
 import Bulma.Layout exposing (..)
 import Bulma.Modifiers exposing (..)
+import Dict exposing (Dict)
 import Html
     exposing
         ( Html
@@ -53,7 +54,8 @@ view model =
 renderSection : String -> List (Html Msg) -> Html Msg
 renderSection sectionTitle content =
     div [ class "settings-section" ]
-        [ title H4 [ class "settings-section-title" ]
+        [ title H4
+            [ class "settings-section-title" ]
             [ text sectionTitle ]
         , div [ class "settings-section-body" ]
             content
@@ -166,13 +168,13 @@ renderImportExport model =
             , button
                 buttonMods
                 [ class "mb-2"
-                , onClick Share
+                , onClick <| Share "" ""
                 ]
                 [ View.Utils.icon "share", text " Share" ]
             , button
                 buttonMods
                 [ class "mb-2"
-                , onClick Import
+                , onClick <| Import "" ""
                 ]
                 [ View.Utils.icon "upload", text " Import" ]
             ]
@@ -182,7 +184,10 @@ renderImportExport model =
                 []
                 [ ul
                     []
-                    (List.map storageMapper model.storageKeys)
+                    (model.storageData
+                        |> Dict.toList
+                        |> List.map storageMapper
+                    )
                 ]
             , column columnModifiers
                 []
@@ -203,39 +208,39 @@ renderImportExport model =
 renderAbout : Html Msg
 renderAbout =
     renderSection "About"
-            [ p [] [ text "Built by Milo Gertjejansen." ]
-            , p [] [ text "Email: milo plus glom at milogert dot com" ]
-            , p []
-                [ text "Built with "
-                , a [ href "http://elm-lang.org" ]
-                    [ text "Elm" ]
-                , text "."
-                ]
-            , p []
-                [ text "Check out the "
-                , a [ href "https://github.com/milogert/glom" ] [ iconb "github" ]
-                ]
+        [ p [] [ text "Built by Milo Gertjejansen." ]
+        , p [] [ text "Email: milo plus glom at milogert dot com" ]
+        , p []
+            [ text "Built with "
+            , a [ href "http://elm-lang.org" ]
+                [ text "Elm" ]
+            , text "."
             ]
+        , p []
+            [ text "Check out the "
+            , a [ href "https://github.com/milogert/glom" ] [ iconb "github" ]
+            ]
+        ]
 
 
-storageMapper : String -> Html Msg
-storageMapper s =
+storageMapper : ( String, String ) -> Html Msg
+storageMapper ( key, jsonModel ) =
     connectedFields Left
         []
         [ controlButton buttonModifiers
             []
-            [ onClick <| LoadModel s ]
-            [ text s ]
+            [ onClick <| LoadModel key ]
+            [ text key ]
         , controlButton { buttonModifiers | color = Success }
             []
-            [ onClick <| Import ]
+            [ onClick <| Import key jsonModel ]
             [ View.Utils.icon "upload" ]
         , controlButton { buttonModifiers | color = Info }
             []
-            [ onClick <| Share ]
+            [ onClick <| Share key jsonModel ]
             [ View.Utils.icon "share" ]
         , controlButton { buttonModifiers | color = Danger }
             []
-            [ onClick <| DeleteItem s ]
+            [ onClick <| DeleteItem key ]
             [ View.Utils.icon "trash-alt" ]
         ]

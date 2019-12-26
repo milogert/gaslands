@@ -1,7 +1,7 @@
 module View.Photo exposing (renderPhoto, view)
 
 import Html exposing (Html, a, button, div, img, text, video)
-import Html.Attributes exposing (autoplay, class, classList, href, src, style)
+import Html.Attributes exposing (autoplay, class, classList, src, style)
 import Html.Events exposing (onClick)
 import Model.Model exposing (..)
 import Model.Vehicle.Model exposing (..)
@@ -12,8 +12,7 @@ view model v =
     let
         discardButton =
             a
-                [ href "#"
-                , class "text-danger"
+                [ class "text-danger"
                 , onClick <| VehicleMsg <| DiscardPhoto v.key
                 ]
                 [ text "(Re)Take Photo" ]

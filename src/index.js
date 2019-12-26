@@ -23,8 +23,8 @@ app.ports.get.subscribe(function(str) {
     app.ports.getSub.send(storage.getItem(str));
 });
 
-app.ports.getKeys.subscribe(function(str) {
-    app.ports.getKeysSub.send(storage.getKeys(str));
+app.ports.getStorage.subscribe(function(str) {
+    app.ports.getStorageSub.send(storage.getStorage(str));
 });
 
 app.ports.set.subscribe(function(storageObj) {

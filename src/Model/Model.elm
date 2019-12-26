@@ -10,12 +10,8 @@ module Model.Model exposing
     , viewToStr
     )
 
-import Browser exposing (UrlRequest)
-import Browser.Navigation as Nav
 import Dict exposing (Dict)
 import Model.Features
-import Model.Router.Model exposing (..)
-import Model.Routes exposing (NewType(..), Route(..))
 import Model.Settings exposing (..)
 import Model.Shared exposing (..)
 import Model.Sponsors exposing (..)
@@ -23,6 +19,7 @@ import Model.Upgrade.Common exposing (..)
 import Model.Upgrade.Model exposing (..)
 import Model.Vehicle.Common exposing (..)
 import Model.Vehicle.Model exposing (..)
+import Model.Views exposing (NewType(..), ViewEvent(..))
 import Model.Weapon.Common exposing (..)
 import Model.Weapon.Model exposing (..)
 import Ports.Storage exposing (StorageEntry)
@@ -31,7 +28,7 @@ import Url exposing (Url)
 
 type alias Model =
     { navOpen : Bool
-    , view : Route
+    , view : ViewEvent
     , teamName : Maybe String
     , pointsAllowed : Int
     , gearPhase : Int
@@ -43,10 +40,9 @@ type alias Model =
     , error : List ErrorType
     , importValue : String
     , storageKeys : List String
+    , storageData : Dict String String
     , settings : Settings
     , featureFlags : Dict String Bool
-    , url : Url
-    , key : Nav.Key
     }
 
 
@@ -84,10 +80,10 @@ errorToStr e =
 viewToStr : Model -> String
 viewToStr model =
     case model.view of
-        RouteDashboard ->
+        ViewDashboard ->
             "Team " ++ Maybe.withDefault "NoName" model.teamName
 
-        RouteNew newType ->
+        ViewNew newType ->
             case newType of
                 NewVehicle ->
                     "New Vehicle"
@@ -108,7 +104,7 @@ viewToStr model =
                         Just { name } ->
                             "New Upgrade for " ++ name
 
-        RouteDetails key ->
+        ViewDetails key ->
             case vehicleFromKey model key of
                 Nothing ->
                     "Not a vehicle"
@@ -116,16 +112,16 @@ viewToStr model =
                 Just vehicle ->
                     vehicle.name
 
-        RouteSponsor ->
+        ViewSponsor ->
             "Sponsor Select"
 
-        RoutePrintAll ->
+        ViewPrintAll ->
             "Printing " ++ String.fromInt (Dict.size model.vehicles) ++ " vehicle(s)"
 
-        RoutePrint key ->
+        ViewPrint key ->
             "Printing vehicle"
 
-        RouteSettings ->
+        ViewSettings ->
             "Settings"
 
 
@@ -142,11 +138,11 @@ vehicleFromKey model key =
     Dict.get key model.vehicles
 
 
-defaultModel : Url -> Nav.Key -> Model
+defaultModel : Model
 defaultModel =
     Model
         False
-        RouteDashboard
+        ViewDashboard
         Nothing
         50
         1
@@ -158,14 +154,15 @@ defaultModel =
         []
         ""
         []
+        Dict.empty
         Model.Settings.init
         Model.Features.flags
 
 
-init : () -> Url -> Nav.Key -> ( Model, Cmd Msg )
-init flags url key =
-    ( defaultModel url key
-    , Nav.pushUrl key <| Url.toString url
+init : flags -> ( Model, Cmd Msg )
+init flags =
+    ( defaultModel
+    , Cmd.none
     )
 
 
@@ -174,8 +171,7 @@ type
     -- APP.
     = NavToggle Bool
       -- ROUTES.
-    | ClickedLink UrlRequest
-    | ChangedUrl Url
+    | ViewMsg ViewEvent
       -- VEHICLE.
     | VehicleMsg VehicleEvent
       -- WEAPON.
@@ -185,11 +181,11 @@ type
       -- SPONSOR.
     | SponsorUpdate String
       -- DATA.
-    | Import
+    | GetAllStorage (List ( String, String ))
+    | Import String String
     | SetImport String
-    | Share
+    | Share String String
     | GetStorage String
-    | GetStorageKeys (List String)
     | SetStorageCallback StorageEntry
     | SaveModel
     | LoadModel String

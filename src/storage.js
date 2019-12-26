@@ -1,33 +1,46 @@
-function checkStorage() {
-    let good = "localStorage" in window;
+const ns = "glom/teams/"
+const checkStorage = () => {
+    const good = "localStorage" in window
     if (!good) {
-        alert("Local storage is not supported currently.");
+        alert("Local storage is not supported currently.")
     }
-    return good;
+    return good
 }
 
-let storage = {
-    getItem: function(str) {
-        if (!checkStorage()) return;
-        return window.localStorage.getItem(str);
-    },
+const getTeamStore = () => JSON.parse(window.localStorage.getItem(ns) || "{}")
+const setTeamStore = obj => window.localStorage.setItem(ns, JSON.stringify(obj))
+
+const storage = {
+  getItem: str => {
+    if (!checkStorage()) return;
+    return getTeamStore()[str]
+  },
     
-    getKeys: function(str) {
-        if (!checkStorage()) return;
-        return Object.keys(window.localStorage);
-    },
+  getKeys: str => {
+    if (!checkStorage()) return;
+    return Object.keys(getTeamStore());
+  },
 
-    setItem: function(storageObj) {
-        if (!checkStorage()) return;
-        window.localStorage.setItem(storageObj.key, storageObj.value);
-        return storageObj;
-    },
+  getStorage: str => {
+    if (!checkStorage()) return
+    const teams = getTeamStore()
+    return Object.keys(teams).map(k => [k, teams[k]])
+  },
 
-    deleteItem: function(key) {
-        if (!checkStorage()) return;
-        window.localStorage.removeItem(key);
-        return key;
-    },
+  setItem: storageObj => {
+    if (!checkStorage()) return;
+    const teams = getTeamStore()
+    setTeamStore({...teams, [storageObj.key]: storageObj.value});
+    return storageObj;
+  },
+
+  deleteItem: key => {
+    if (!checkStorage()) return;
+    const teams = getTeamStore()
+    delete teams[key]
+    setTeamStore(teams);
+    return key;
+  },
 }
 
 export { storage };

@@ -32,12 +32,12 @@ import Html.Attributes
         )
 import Html.Events exposing (onClick, onInput)
 import Model.Model exposing (..)
-import Model.Routes exposing (NewType(..), Route(..))
 import Model.Shared exposing (..)
 import Model.Upgrade.Common as UpgradeC
 import Model.Upgrade.Model exposing (..)
 import Model.Vehicle.Common as VehicleC
 import Model.Vehicle.Model exposing (..)
+import Model.Views exposing (..)
 import Model.Weapon.Common as WeaponC
 import Model.Weapon.Model exposing (..)
 import View.Dashboard
@@ -60,19 +60,19 @@ view model =
     let
         viewToGoTo =
             case model.view of
-                RoutePrint key ->
-                    "/details/" ++ key
+                ViewPrint key ->
+                    ViewDetails key
 
                 _ ->
-                    "/"
+                    ViewDashboard
 
         backButton =
             button
                 { buttonModifiers
-                    | disabled = model.view == RouteDashboard
+                    | disabled = model.view == ViewDashboard
                     , size = Small
                 }
-                [ href viewToGoTo, attribute "aria-label" "Back Button" ]
+                [ onClick <| ViewMsg viewToGoTo, attribute "aria-label" "Back Button" ]
                 [ View.Utils.icon "arrow-left" ]
 
         viewDisplay =
@@ -136,10 +136,10 @@ displayAlert model =
 render : Model -> Html Msg
 render model =
     case model.view of
-        RouteDashboard ->
+        ViewDashboard ->
             View.Dashboard.view model
 
-        RouteNew type_ ->
+        ViewNew type_ ->
             case type_ of
                 NewVehicle ->
                     View.NewVehicle.view model
@@ -178,7 +178,7 @@ render model =
                                         (\x -> x.slots <= VehicleC.slotsRemaining vehicle)
                                 )
 
-        RouteDetails key ->
+        ViewDetails key ->
             case vehicleFromKey model key of
                 Nothing ->
                     View.Dashboard.view model
@@ -186,22 +186,22 @@ render model =
                 Just vehicle ->
                     View.Details.view model vehicle
 
-        RouteSponsor ->
+        ViewSponsor ->
             View.SponsorSelect.view model
 
-        RoutePrint key ->
+        ViewPrint key ->
             model.vehicles
                 |> Dict.get key
                 |> Maybe.withDefault defaultVehicle
                 |> List.singleton
                 |> View.PrinterFriendly.view model
 
-        RoutePrintAll ->
+        ViewPrintAll ->
             model.vehicles
                 |> Dict.values
                 |> View.PrinterFriendly.view model
 
-        RouteSettings ->
+        ViewSettings ->
             View.Settings.view model
 
 

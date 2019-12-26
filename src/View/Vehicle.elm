@@ -30,7 +30,6 @@ import Html.Attributes
         , classList
         , disabled
         , hidden
-        , href
         , placeholder
         , style
         , value
@@ -43,6 +42,7 @@ import Model.Sponsors exposing (..)
 import Model.Utils exposing (..)
 import Model.Vehicle.Common exposing (..)
 import Model.Vehicle.Model exposing (..)
+import Model.Views exposing (..)
 import Model.Weapon.Common exposing (handgun)
 import Model.Weapon.Model exposing (..)
 import View.Photo
@@ -297,14 +297,14 @@ configure model cfg v =
                 Just notesBody ->
                     View.Utils.detailSection "Notes" [ notesBody ]
 
-        addonListButton href_ icon text_ =
+        addonListButton buttonMsg icon text_ =
             button
                 { buttonModifiers
                     | iconLeft = Just ( Standard, [], Icon.viewIcon icon )
                 }
                 [ class "button"
                 , hidden <| not cfg.showAddonButton
-                , href href_
+                , onClick <| ViewMsg buttonMsg
                 ]
                 [ text text_ ]
 
@@ -375,14 +375,13 @@ configure model cfg v =
                                 )
                               )
                             ]
-                        , addonListButton ("/new/weapon/" ++ v.key) Icon.plus "Weapon"
+                        , addonListButton (ViewNew <| NewWeapon v.key) Icon.plus "Weapon"
                         , button
                             { buttonModifiers
                                 | iconLeft = Just ( Standard, [], Icon.plus |> Icon.viewIcon )
                             }
                             [ onClick (WeaponMsg <| AddWeapon v.key handgun)
                             , hidden <| not cfg.showAddonButton
-                            , href ""
                             ]
                             [ text "Handgun" ]
                         , div [] weaponsListBody
@@ -428,7 +427,7 @@ configure model cfg v =
                                 )
                               )
                             ]
-                        , addonListButton ("/new/upgrade/" ++ v.key) Icon.plus "Upgrade"
+                        , addonListButton (ViewNew <| NewUpgrade v.key) Icon.plus "Upgrade"
                         , div [] upgradeListBody
                         ]
 
@@ -527,7 +526,7 @@ configure model cfg v =
                             }
                             [ class "button"
                             , class "float-right"
-                            , href <| "/details/" ++ v.key
+                            , onClick <| ViewMsg <| ViewDetails v.key
                             ]
                             [ text "Details" ]
                         ]

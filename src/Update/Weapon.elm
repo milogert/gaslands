@@ -1,15 +1,15 @@
 module Update.Weapon exposing (update)
 
-import Browser.Navigation as Nav
 import Dict exposing (..)
 import List.Extra as ListE
 import Model.Model exposing (..)
-import Model.Routes exposing (Route(..))
 import Model.Shared exposing (..)
 import Model.Vehicle.Model exposing (..)
+import Model.Views exposing (ViewEvent(..))
 import Model.Weapon.Common exposing (..)
 import Model.Weapon.Model exposing (..)
 import Random
+import Update.Utils exposing (goTo)
 
 
 update : Model -> WeaponEvent -> ( Model, Cmd Msg )
@@ -84,12 +84,11 @@ addWeapon model key w =
 
                 ( _, _ ) ->
                     ( { model
-                        | view = RouteDetails nv.key
-                        , error = []
+                        | error = []
                         , vehicles = Dict.insert key nv model.vehicles
                         , tmpWeapon = Nothing
                       }
-                    , Nav.pushUrl model.key ("/details/" ++ key)
+                    , goTo <| ViewDetails key
                     )
 
 
@@ -118,10 +117,9 @@ updateAmmoUsed model key weapon index check =
                     { vehicle | weapons = weaponsNew }
             in
             ( { model
-                | view = RouteDetails nv.key
-                , vehicles = Dict.insert key nv model.vehicles
+                | vehicles = Dict.insert key nv model.vehicles
               }
-            , Cmd.none
+            , goTo <| ViewDetails key
             )
 
         ( _, _, _ ) ->
@@ -162,7 +160,7 @@ setWeaponFired model key w =
                             0
             in
             ( { model
-                | view = RouteDetails nv.key
+                | view = ViewDetails nv.key
                 , vehicles = Dict.insert key nv model.vehicles
               }
             , Random.generate (WeaponMsg << RollWeaponDie key weaponUpdated) (Random.int minRoll maxRoll)
@@ -187,7 +185,7 @@ rollWeaponDie model key w result =
                     { vehicle | weapons = newWeapons }
             in
             ( { model
-                | view = RouteDetails nv.key
+                | view = ViewDetails nv.key
                 , vehicles = Dict.insert key nv model.vehicles
               }
             , Cmd.none
@@ -210,7 +208,7 @@ deleteWeapon model key w =
                     { vehicle | weapons = weaponsNew }
             in
             ( { model
-                | view = RouteDetails nv.key
+                | view = ViewDetails nv.key
                 , vehicles = Dict.insert key nv model.vehicles
               }
             , Cmd.none

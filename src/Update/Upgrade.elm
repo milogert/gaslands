@@ -4,10 +4,11 @@ import Browser.Navigation as Nav
 import Dict exposing (Dict)
 import List.Extra
 import Model.Model exposing (..)
-import Model.Routes exposing (Route(..))
 import Model.Upgrade.Common exposing (..)
 import Model.Upgrade.Model exposing (..)
 import Model.Vehicle.Common exposing (..)
+import Model.Views exposing (ViewEvent(..))
+import Update.Utils exposing (goTo)
 
 
 update : Model -> UpgradeEvent -> ( Model, Cmd Msg )
@@ -44,12 +45,12 @@ addUpgrade model key u =
                     { vehicle | upgrades = upgradeList }
             in
             ( { model
-                | view = RouteDetails nv.key
-                , error = []
+                --| view = ViewDetails nv.key
+                | error = []
                 , vehicles = Dict.insert key nv model.vehicles
                 , tmpUpgrade = Nothing
               }
-            , Nav.pushUrl model.key ("/details/" ++ key)
+            , goTo <| ViewDetails key
             )
 
 
@@ -69,7 +70,7 @@ deleteUpgrade model key u =
                     { vehicle | upgrades = upgradesNew }
             in
             ( { model
-                | view = RouteDetails nv.key
+                | view = ViewDetails nv.key
                 , vehicles = Dict.insert key nv model.vehicles
               }
             , Cmd.none

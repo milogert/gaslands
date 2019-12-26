@@ -10,11 +10,9 @@ import View.View as View
 
 main : Program () Model Msg
 main =
-    Browser.application
+    Browser.document
         { init = Model.init
         , view = View.view
         , update = Update.update
         , subscriptions = Subscriptions.subscriptions
-        , onUrlRequest = ClickedLink
-        , onUrlChange = ChangedUrl
         }

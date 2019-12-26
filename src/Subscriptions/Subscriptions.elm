@@ -9,8 +9,8 @@ import Ports.Storage
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
-        [ Ports.Storage.getSub GetStorage
-        , Ports.Storage.getKeysSub GetStorageKeys
+        [ Ports.Storage.getStorageSub GetAllStorage
+        , Ports.Storage.getSub GetStorage
         , Ports.Storage.setSub SetStorageCallback
         , Ports.Storage.deleteSub DeleteItemCallback
         , Ports.Photo.getPhotoUrl <| VehicleMsg << SetPhotoUrlCallback
