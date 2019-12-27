@@ -19,6 +19,7 @@ modelDecoder =
     succeed Model
         |> hardcoded False
         |> hardcoded ViewDashboard
+        |> hardcoded Nothing
         |> optional "teamName" (nullable string) Nothing
         |> required "pointsAllowed" int
         |> hardcoded 1

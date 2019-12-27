@@ -1,4 +1,4 @@
-module Update.Utils exposing (doOtherMsg, doSaveModel, goTo)
+module Update.Utils exposing (doOtherMsg, doSaveModel, goTo, goToTab)
 
 import Model.Model exposing (..)
 import Model.Views exposing (ViewEvent)
@@ -18,3 +18,8 @@ doSaveModel =
 goTo : ViewEvent -> Cmd Msg
 goTo viewEvent =
     doOtherMsg <| ViewMsg viewEvent
+
+
+goToTab : ViewEvent -> Cmd Msg
+goToTab viewEvent =
+    doOtherMsg <| ViewTab viewEvent

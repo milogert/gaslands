@@ -3,6 +3,7 @@ module View.EquipmentLayout exposing (render)
 import Bulma.Columns exposing (..)
 import Bulma.Elements exposing (..)
 import Bulma.Form exposing (..)
+import Bulma.Layout exposing (..)
 import Bulma.Modifiers exposing (..)
 import FontAwesome.Icon as Icon exposing (Icon)
 import FontAwesome.Solid as Icon
@@ -14,7 +15,7 @@ import Html
         , small
         , text
         )
-import Html.Attributes exposing (hidden, style)
+import Html.Attributes exposing (class, hidden, style)
 import Html.Events exposing (onClick)
 import Model.Model exposing (..)
 import Model.Shared exposing (..)
@@ -22,12 +23,13 @@ import View.Utils exposing (icon)
 
 
 render :
-    { a | name : String, expansion : Expansion, specials : List Special }
+    List (Html.Attribute Msg)
+    -> { a | name : String, expansion : Expansion, specials : List Special }
     -> Maybe ({ a | name : String, expansion : Expansion, specials : List Special } -> Msg)
     -> List (Html Msg)
     -> List (Html Msg)
     -> Html Msg
-render thing mRemoveMsg leftCol rightCol =
+render attrs thing mRemoveMsg factsHolderBody specialsBody =
     let
         deleteButton =
             case mRemoveMsg of
@@ -38,6 +40,8 @@ render thing mRemoveMsg leftCol rightCol =
                     controlButton
                         { buttonModifiers
                             | iconLeft = Just ( Standard, [], Icon.viewIcon Icon.times )
+                            , size = Small
+                            , color = Danger
                         }
                         []
                         [ onClick <| removeMsg thing
@@ -45,16 +49,16 @@ render thing mRemoveMsg leftCol rightCol =
                         ]
                         []
     in
-    div []
+    div attrs
         [ title H6
             []
-            [ text ""
-            , text <| thing.name ++ " "
-            , small []
-                [ text <| Model.Shared.fromExpansion thing.expansion ]
+            [ level []
+                [ levelLeft []
+                    [ levelItem [] [ text thing.name ] ]
+                , levelRight []
+                    [ levelItem [] [ deleteButton ] ]
+                ]
             ]
-        , div [] leftCol
-        , div
-            []
-            rightCol
+        , div [ class "facts-holder" ] factsHolderBody
+        , div [ class "special-holder" ] specialsBody
         ]

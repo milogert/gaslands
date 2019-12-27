@@ -13,7 +13,7 @@ import Html
         , text
         , ul
         )
-import Html.Attributes exposing (class, hidden)
+import Html.Attributes exposing (class, classList, hidden)
 import Html.Events exposing (onClick, onInput)
 import Model.Model exposing (..)
 import Model.Shared exposing (..)
@@ -27,6 +27,7 @@ type alias RenderConfig =
     { previewSpecials : Bool
     , printSpecials : Bool
     , showDeleteButton : Bool
+    , highlightRow : Bool
     }
 
 
@@ -68,6 +69,7 @@ render cfg model vehicle upgrade =
                     div [] <| renderSpecialsFunc upgrade.specials
     in
     View.EquipmentLayout.render
+        [ class "upgrade", classList [ ( "alternate", cfg.highlightRow ) ] ]
         upgrade
         (Just <| UpgradeMsg << DeleteUpgrade vehicle.key)
         [ factsHolder ]
