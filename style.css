@@ -49,10 +49,29 @@
 
 .wrecked-display {
   position: absolute;
-  top: 19px;
+  top: 65px;
   left: 31px;
   transform: rotate(.95turn);
   color: red;
   font-size: 125%;
   z-index: 10000;
+}
+
+.thing-list {
+  margin-left: 1.5rem;
+}
+
+.weapon,
+.upgrade {
+  padding: .2rem;
+  border-radius: .2rem;
+}
+
+.weapon.alternate,
+.upgrade.alternate {
+  background: linear-gradient(to right, lightgray, white);
+}
+
+.special-holder {
+  margin-top: .75rem;
 }
