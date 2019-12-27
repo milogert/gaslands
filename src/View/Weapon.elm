@@ -41,12 +41,13 @@ type alias RenderConfig =
     , previewSpecials : Bool
     , printSpecials : Bool
     , showDeleteButton : Bool
+    , highlightRow : Bool
     }
 
 
 defaultWeaponConfig : RenderConfig
 defaultWeaponConfig =
-    RenderConfig True True False True
+    RenderConfig True True False True False
 
 
 render : RenderConfig -> Model -> Vehicle -> Weapon -> Html Msg
@@ -124,7 +125,7 @@ render cfg model vehicle weapon =
                 |> List.map (\( title, value ) -> tagGen ( title, Bulma.Modifiers.Light ) ( value, Info ))
                 |> List.map (\t -> control controlModifiers [] [ t ])
                 |> multilineFields
-                    []
+                    [ class "weapon-facts" ]
 
         ( _, mCurrentClip ) =
             Model.Shared.getAmmoClip weapon.specials
@@ -157,8 +158,8 @@ render cfg model vehicle weapon =
                     Nothing
     in
     View.EquipmentLayout.render
+        [ class "weapon", classList [ ( "alternate", cfg.highlightRow ) ] ]
         weapon
         deleteMsg
-        [ factsHolder
-        ]
+        [ factsHolder ]
         [ specials ]

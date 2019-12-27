@@ -26,9 +26,9 @@ view model vehicle weapons =
                         [ text <| "Add " ++ upgrade.name ++ " to " ++ vehicle.name ]
 
                 Nothing ->
-                    controlButton buttonModifiers
+                    controlButton { buttonModifiers | disabled = True }
                         []
-                        [ disabled True ]
+                        []
                         [ text "Choose Upgrade Type" ]
 
         body =
@@ -37,6 +37,7 @@ view model vehicle weapons =
                     View.Upgrade.render
                         (View.Upgrade.RenderConfig
                             True
+                            False
                             False
                             False
                         )

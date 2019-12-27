@@ -22,9 +22,12 @@ view model vehicle weapons =
                 Just weapon ->
                     case weapon.mountPoint of
                         Nothing ->
-                            controlButton buttonModifiers
+                            controlButton
+                                { buttonModifiers
+                                    | disabled = True
+                                }
                                 []
-                                [ disabled True ]
+                                []
                                 [ text "Select Mount Point" ]
 
                         Just _ ->
@@ -34,9 +37,12 @@ view model vehicle weapons =
                                 [ text <| "Add " ++ weapon.name ++ " to " ++ vehicle.name ]
 
                 Nothing ->
-                    controlButton buttonModifiers
+                    controlButton
+                        { buttonModifiers
+                            | disabled = True
+                        }
                         []
-                        [ disabled True ]
+                        []
                         [ text "Choose Weapon Type" ]
 
         body =

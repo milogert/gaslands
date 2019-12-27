@@ -196,7 +196,6 @@ configure model cfg v =
                         v.gear.current
                         (ShiftGear v.key -1)
                         (ShiftGear v.key 1)
-                        (UpdateGear v.key)
 
         hazardCounter =
             case cfg.printCounters of
@@ -219,7 +218,6 @@ configure model cfg v =
                         v.hazards
                         (ShiftHazards v.key -1)
                         (ShiftHazards v.key 1)
-                        (UpdateHazards v.key)
 
         hullCounter =
             case cfg.printCounters of
@@ -242,7 +240,6 @@ configure model cfg v =
                         v.hull.current
                         (ShiftHull v.key -1)
                         (ShiftHull v.key 1)
-                        (UpdateHull v.key)
 
         counterHolder =
             case ( cfg.showCounters, cfg.printCounters ) of
@@ -250,10 +247,10 @@ configure model cfg v =
                     text ""
 
                 ( _, _ ) ->
-                    div []
-                        [ gearCounter
-                        , hazardCounter
-                        , hullCounter
+                    level []
+                        [ levelItem [] [ gearCounter ]
+                        , levelItem [] [ hazardCounter ]
+                        , levelItem [] [ hullCounter ]
                         ]
 
         renderSpecialsFunc specialList =
@@ -270,7 +267,9 @@ configure model cfg v =
                     div [] <| renderSpecialsFunc v.specials
 
         specialHolder =
-            div [] [ specials ]
+            View.Utils.detailSection "Special List"
+                []
+                [ specials ]
 
         mNotesBody =
             case ( cfg.printNotes, cfg.inputNotes ) of
@@ -289,18 +288,11 @@ configure model cfg v =
                 _ ->
                     Nothing
 
-        notes =
-            case mNotesBody of
-                Nothing ->
-                    text ""
-
-                Just notesBody ->
-                    View.Utils.detailSection "Notes" [ notesBody ]
-
         addonListButton buttonMsg icon text_ =
             button
                 { buttonModifiers
                     | iconLeft = Just ( Standard, [], Icon.viewIcon icon )
+                    , size = Small
                 }
                 [ class "button"
                 , hidden <| not cfg.showAddonButton
@@ -308,7 +300,6 @@ configure model cfg v =
                 ]
                 [ text text_ ]
 
-        --[ icon icon_, text text_ ]
         weaponsUsingSlots =
             List.sum <| List.map .slots v.weapons
 
@@ -324,18 +315,21 @@ configure model cfg v =
                     [ text "No Equipped Weapons" ]
 
                 _ ->
-                    List.map
-                        (View.Weapon.render
-                            { defaultWeaponConfig
-                                | showFireButton = not cfg.printDetails
-                                , previewSpecials = False
-                                , printSpecials = cfg.printDetails
-                                , showDeleteButton = not cfg.printDetails
-                            }
-                            model
-                            v
-                        )
-                        v.weapons
+                    v.weapons
+                        |> List.indexedMap
+                            (\index weapon ->
+                                View.Weapon.render
+                                    { defaultWeaponConfig
+                                        | showFireButton = not cfg.printDetails
+                                        , previewSpecials = False
+                                        , printSpecials = cfg.printDetails
+                                        , showDeleteButton = not cfg.printDetails
+                                        , highlightRow = 1 == modBy 2 index
+                                    }
+                                    model
+                                    v
+                                    weapon
+                            )
 
         weaponListColor =
             case isCrewAvailable of
@@ -356,6 +350,17 @@ configure model cfg v =
                 _ ->
                     View.Utils.detailSection
                         "Weapon List"
+                        [ addonListButton (ViewNew <| NewWeapon v.key) Icon.plus "Weapon"
+                        , button
+                            { buttonModifiers
+                                | iconLeft = Just ( Standard, [], Icon.plus |> Icon.viewIcon )
+                                , size = Small
+                            }
+                            [ onClick (WeaponMsg <| AddWeapon v.key handgun)
+                            , hidden <| not cfg.showAddonButton
+                            ]
+                            [ text "Handgun" ]
+                        ]
                         [ tagList
                             [ ( ( "crew used", Bulma.Modifiers.Light )
                               , ( Just <|
@@ -375,16 +380,7 @@ configure model cfg v =
                                 )
                               )
                             ]
-                        , addonListButton (ViewNew <| NewWeapon v.key) Icon.plus "Weapon"
-                        , button
-                            { buttonModifiers
-                                | iconLeft = Just ( Standard, [], Icon.plus |> Icon.viewIcon )
-                            }
-                            [ onClick (WeaponMsg <| AddWeapon v.key handgun)
-                            , hidden <| not cfg.showAddonButton
-                            ]
-                            [ text "Handgun" ]
-                        , div [] weaponsListBody
+                        , div [ class "thing-list weapon-list" ] weaponsListBody
                         ]
 
         upgradeListBody =
@@ -393,15 +389,18 @@ configure model cfg v =
                     [ text "No Equipped Upgrades" ]
 
                 _ ->
-                    List.map
-                        (View.Upgrade.render
-                            (View.Upgrade.RenderConfig
-                                False
-                                cfg.printDetails
-                                (not cfg.printDetails)
-                            )
-                            model
-                            v
+                    List.indexedMap
+                        (\index upgrade ->
+                            View.Upgrade.render
+                                (View.Upgrade.RenderConfig
+                                    False
+                                    cfg.printDetails
+                                    (not cfg.printDetails)
+                                    (modBy 2 index == 1)
+                                )
+                                model
+                                v
+                                upgrade
                         )
                         v.upgrades
 
@@ -416,6 +415,7 @@ configure model cfg v =
                 _ ->
                     View.Utils.detailSection
                         "Upgrade List"
+                        [ addonListButton (ViewNew <| NewUpgrade v.key) Icon.plus "Upgrade" ]
                         [ tagList
                             [ ( ( "slots used", Bulma.Modifiers.Light )
                               , ( Just <|
@@ -427,8 +427,7 @@ configure model cfg v =
                                 )
                               )
                             ]
-                        , addonListButton (ViewNew <| NewUpgrade v.key) Icon.plus "Upgrade"
-                        , div [] upgradeListBody
+                        , div [ class "thing-list upgrade-list" ] upgradeListBody
                         ]
 
         availablePerks =
@@ -436,6 +435,7 @@ configure model cfg v =
                 ( Just sponsor, _, True ) ->
                     View.Utils.detailSection
                         ("Perks available from " ++ sponsor.name)
+                        []
                         [ sponsor
                             |> .grantedClasses
                             |> View.Sponsor.renderPerkList v.perks
@@ -450,6 +450,7 @@ configure model cfg v =
                 ( Just sponsor, True, _ ) ->
                     View.Utils.detailSection
                         ("Perks available from " ++ sponsor.name)
+                        []
                         [ container []
                             (sponsor
                                 |> .grantedClasses
@@ -468,12 +469,47 @@ configure model cfg v =
                 False ->
                     Hidden
 
+        canActivate =
+            model.gearPhase <= v.gear.current && not (isWrecked v)
+
+        activatedText =
+            case ( v.activated, canActivate ) of
+                ( _, False ) ->
+                    "Cannot be Activated"
+
+                ( True, _ ) ->
+                    "Activated"
+
+                ( _, _ ) ->
+                    "Activate"
+
+        activateButton =
+            div
+                [ class "vehicle-activate-button-holder mb-2"
+                , hidden <| not cfg.showActivateButton
+                ]
+                [ button
+                    { buttonModifiers
+                        | color = Primary
+                        , disabled = not canActivate || v.activated
+                    }
+                    [ onClick <| VehicleMsg <| UpdateActivated v.key (not v.activated)
+                    ]
+                    [ text activatedText ]
+                ]
+
         header =
-            title H3
-                []
-                [ text v.name
-                , small [] [ text <| " [" ++ expansion ++ "]" ]
-                , div [ class "wrecked-display", display showWrecked ] [ text "WRECKED!" ]
+            level []
+                [ levelLeft []
+                    [ title H3
+                        []
+                        [ text v.name
+                        , small [] [ text <| " [" ++ expansion ++ "]" ]
+                        , div [ class "wrecked-display", display showWrecked ] [ text "WRECKED!" ]
+                        ]
+                    ]
+                , levelRight []
+                    [ activateButton ]
                 ]
 
         left =
@@ -481,19 +517,20 @@ configure model cfg v =
                 [ class "vehicle-column-left" ]
                 [ factsHolder
                 , counterHolder
-                , notes
+                , specialHolder
                 ]
 
         right =
             column columnModifiers
                 [ class "vehicle-column-right" ]
-                --[ specialHolder
                 [ weaponList
                 , upgradeList
                 ]
 
         bottom =
-            div [ class "vehicle-body-bottom" ] [ availablePerks ]
+            div [ class "vehicle-body-bottom" ]
+                [ availablePerks
+                ]
 
         body =
             div
@@ -519,17 +556,6 @@ configure model cfg v =
                             ]
                             [ text "Delete Vehicle" ]
                         ]
-                    , levelItem []
-                        [ button
-                            { buttonModifiers
-                                | iconLeft = Just ( Standard, [], Icon.info |> Icon.viewIcon )
-                            }
-                            [ class "button"
-                            , class "float-right"
-                            , onClick <| ViewMsg <| ViewDetails v.key
-                            ]
-                            [ text "Details" ]
-                        ]
                     ]
                 ]
     in
@@ -539,7 +565,7 @@ configure model cfg v =
 renderDetails : Model -> Vehicle -> Html Msg
 renderDetails model v =
     let
-        ( header, body, _ ) =
+        ( header, body, footer ) =
             configure
                 model
                 { config
@@ -557,6 +583,7 @@ renderDetails model v =
     div []
         [ header
         , body
+        , footer
         ]
 
 
@@ -642,35 +669,32 @@ counterElement :
     -> Int
     -> (Int -> Int -> VehicleEvent)
     -> (Int -> Int -> VehicleEvent)
-    -> (String -> VehicleEvent)
     -> Html Msg
-counterElement icon_ min max counterValue decrementMsg incrementMsg inputMsg =
-    connectedFields Left
-        []
-        [ controlButton
-            { buttonModifiers
-                | iconLeft = Just ( Standard, [], icon_ )
-            }
-            []
-            [ onClick <| VehicleMsg <| decrementMsg min max
-            , disabled <| min == counterValue
+counterElement icon_ min max counterValue decrementMsg incrementMsg =
+    level [ class "is-mobile" ]
+        [ levelItem []
+            [ controlButton
+                { buttonModifiers
+                    | iconLeft = Just ( Standard, [], icon_ )
+                    , size = Small
+                }
+                []
+                [ onClick <| VehicleMsg <| decrementMsg min max
+                , disabled <| min == counterValue
+                ]
+                [ Icon.minus |> Icon.viewIcon ]
             ]
-            [ Icon.minus |> Icon.viewIcon ]
-        , controlInput
-            controlInputModifiers
-            []
-            [ onInput <| VehicleMsg << inputMsg
-            , style "text-align" "center"
-            , Html.Attributes.min <| String.fromInt min
-            , Html.Attributes.max <| String.fromInt max
-            , value <| String.fromInt counterValue
+        , levelItem [ style "min-width" "3rem" ]
+            [ text <| String.fromInt counterValue ]
+        , levelItem []
+            [ controlButton
+                { buttonModifiers
+                    | size = Small
+                }
+                []
+                [ onClick <| VehicleMsg <| incrementMsg min max
+                , disabled <| counterValue >= max
+                ]
+                [ Icon.plus |> Icon.viewIcon ]
             ]
-            []
-        , controlButton
-            buttonModifiers
-            []
-            [ onClick <| VehicleMsg <| incrementMsg min max
-            , disabled <| counterValue >= max
-            ]
-            [ Icon.plus |> Icon.viewIcon ]
         ]

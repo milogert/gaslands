@@ -87,20 +87,20 @@ renderBadge ms =
         ( name, description ) =
             case ms of
                 Nothing ->
-                    ( "No Sponsor", "" )
+                    ( "None", "" )
 
                 Just sponsor ->
                     ( sponsor.name, sponsor.description )
     in
-    button
-        { buttonModifiers
-            | size = Small
-            , iconRight = Just ( Small, [], Icon.exchangeAlt |> Icon.viewIcon )
-        }
-        [ onClick <| ViewMsg ViewSponsor
-        , Html.Attributes.title description
+    multitag
+        [ Html.Attributes.title description ]
+        [ easyTag tagModifiers
+            []
+            "sponsor"
+        , easyTag { tagModifiers | color = Success }
+            []
+            name
         ]
-        [ text name ]
 
 
 renderPerkClass : Vehicle -> PerkClass -> Html Msg

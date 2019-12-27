@@ -49,13 +49,16 @@ brand model =
         [ navbarItemLink False
             [ onClick <| ViewMsg ViewDashboard ]
             [ text <| "Team " ++ Maybe.withDefault "NoName" model.teamName ]
-        , navbarItem
-            False
+        , navbarItemLink False
             [ onClick <| VehicleMsg NextGearPhase ]
-            [ Icon.cogs |> Icon.viewIcon
-            , easyTag tagModifiers
-                []
-                (String.fromInt model.gearPhase)
+            [ multitag []
+                [ easyTag tagModifiers
+                    []
+                    "gear phase"
+                , easyTag { tagModifiers | color = Success }
+                    []
+                    (String.fromInt model.gearPhase)
+                ]
             ]
         ]
 
@@ -132,38 +135,35 @@ end model =
         pointsBadge =
             navbarItem False
                 []
-                [ tag
-                    { tagModifiers | color = pointsColor }
-                    [ class "ml-2" ]
-                    [ text <| String.fromInt currentPoints ++ " of " ++ String.fromInt maxPoints
-                    , View.Utils.icon "coins"
+                [ multitag [ Html.Attributes.title "Cans availabled" ]
+                    [ tag { tagModifiers | color = pointsColor }
+                        []
+                        [ Icon.coins |> Icon.viewIcon ]
+                    , tag { tagModifiers | color = pointsColor }
+                        []
+                        [ text <| String.fromInt currentPoints ++ " of " ++ String.fromInt maxPoints ]
                     ]
                 ]
 
         settingsButtons =
             [ navbarItemLink
                 False
-                [ onClick <| ViewMsg <| ViewNew NewVehicle ]
-                [ Icon.plus |> Icon.viewStyled [ style "margin-right" ".5rem" ]
-                , text "New Vehicle"
-                ]
-            , navbarItemLink
-                False
                 [ disabled <| Dict.isEmpty model.vehicles
                 , onClick <| ViewMsg ViewPrintAll
                 ]
                 [ Icon.print |> Icon.viewIcon ]
                 |> Model.Features.withDefault "feature-printing" (text "")
-            , navbarItem False
-                []
+            , navbarItemLink False
+                [ onClick <| ViewMsg ViewSponsor ]
                 [ View.Sponsor.renderBadge model.sponsor ]
             , pointsBadge
-            , navbarItemLink
-                False
+            , navbarItemLink False
                 [ attribute "aria-label" "Back Button"
                 , onClick <| ViewMsg ViewSettings
                 ]
-                [ Icon.wrench |> Icon.viewIcon ]
+                [ Icon.wrench |> Icon.viewStyled [ style "margin-right" ".5rem" ]
+                , text "Settings"
+                ]
             ]
     in
     [ settingsButtons ]

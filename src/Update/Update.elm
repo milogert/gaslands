@@ -34,6 +34,11 @@ update msg model =
         ViewMsg viewEvent ->
             Update.View.update model viewEvent
 
+        ViewTab viewEvent ->
+            ( { model | tabOpened = Just viewEvent }
+            , Cmd.none
+            )
+
         -- GAME SETTINGS.
         UpdatePointsAllowed s ->
             ( { model

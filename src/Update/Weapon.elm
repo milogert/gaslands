@@ -9,7 +9,7 @@ import Model.Views exposing (ViewEvent(..))
 import Model.Weapon.Common exposing (..)
 import Model.Weapon.Model exposing (..)
 import Random
-import Update.Utils exposing (goTo)
+import Update.Utils exposing (goTo, goToTab)
 
 
 update : Model -> WeaponEvent -> ( Model, Cmd Msg )
@@ -88,7 +88,10 @@ addWeapon model key w =
                         , vehicles = Dict.insert key nv model.vehicles
                         , tmpWeapon = Nothing
                       }
-                    , goTo <| ViewDetails key
+                    , Cmd.batch
+                        [ goToTab <| ViewDetails key
+                        , goTo ViewDashboard
+                        ]
                     )
 
 
@@ -119,7 +122,7 @@ updateAmmoUsed model key weapon index check =
             ( { model
                 | vehicles = Dict.insert key nv model.vehicles
               }
-            , goTo <| ViewDetails key
+            , Cmd.none
             )
 
         ( _, _, _ ) ->
@@ -160,8 +163,7 @@ setWeaponFired model key w =
                             0
             in
             ( { model
-                | view = ViewDetails nv.key
-                , vehicles = Dict.insert key nv model.vehicles
+                | vehicles = Dict.insert key nv model.vehicles
               }
             , Random.generate (WeaponMsg << RollWeaponDie key weaponUpdated) (Random.int minRoll maxRoll)
             )
@@ -185,8 +187,7 @@ rollWeaponDie model key w result =
                     { vehicle | weapons = newWeapons }
             in
             ( { model
-                | view = ViewDetails nv.key
-                , vehicles = Dict.insert key nv model.vehicles
+                | vehicles = Dict.insert key nv model.vehicles
               }
             , Cmd.none
             )
@@ -208,8 +209,7 @@ deleteWeapon model key w =
                     { vehicle | weapons = weaponsNew }
             in
             ( { model
-                | view = ViewDetails nv.key
-                , vehicles = Dict.insert key nv model.vehicles
+                | vehicles = Dict.insert key nv model.vehicles
               }
             , Cmd.none
             )

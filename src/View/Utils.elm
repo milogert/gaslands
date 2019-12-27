@@ -21,6 +21,7 @@ module View.Utils exposing
 import Bulma.Columns exposing (..)
 import Bulma.Elements exposing (..)
 import Bulma.Form exposing (..)
+import Bulma.Layout exposing (..)
 import Bulma.Modifiers exposing (..)
 import Html
     exposing
@@ -62,10 +63,20 @@ iconClass styleOrBrand s cl =
         []
 
 
-detailSection : String -> List (Html Msg) -> Html Msg
-detailSection titleString bodyContents =
+detailSection : String -> List (Html Msg) -> List (Html Msg) -> Html Msg
+detailSection titleString detailButtons bodyContents =
     div []
-        [ hr [] [], title H5 [] [ text titleString ], div [] bodyContents ]
+        [ hr [] []
+        , level []
+            [ levelLeft []
+                [ levelItem []
+                    [ title H5 [] [ text titleString ] ]
+                ]
+            , levelRight [ classList [ ( "is-hidden", List.isEmpty detailButtons ) ] ]
+                [ levelItem [] detailButtons ]
+            ]
+        , div [] bodyContents
+        ]
 
 
 renderSpecialRow : Maybe ( Html Msg, Html Msg ) -> Html Msg
@@ -78,8 +89,7 @@ renderSpecialRow mHeaderBody =
             horizontalFields
                 []
                 [ fieldLabel Standard [] [ controlLabel [] [ label ] ]
-                , fieldBody []
-                    [ field [] [ body ] ]
+                , fieldBody [] [ field [] [ body ] ]
                 ]
 
 
@@ -126,49 +136,47 @@ specialToHeaderBody isPreview isPrinting mMsg mEvent special =
 
         ( SpecialRule rule, _, _ ) ->
             Just
-                ( text "", text rule )
+                ( text "Note", text rule )
 
         ( NamedSpecialRule name rule, _, _ ) ->
             Just ( text name, text rule )
 
         ( HandlingMod i, _, _ ) ->
-            Just ( text "Handling mod", text <| String.fromInt i )
+            Just
+                ( text "Handling mod"
+                , text <| needPlus i ++ " modification to the vehicle's base Handling value."
+                )
 
         ( HullMod i, _, _ ) ->
-            Just ( text "Hull mod", text <| String.fromInt i )
+            Just
+                ( text "Hull mod"
+                , text <| needPlus i ++ " modification to the vehicle's base Hull value."
+                )
 
         ( GearMod i, _, _ ) ->
-            Just ( text "Gear mod", text <| String.fromInt i )
+            Just
+                ( text "Gear mod"
+                , text <| needPlus i ++ " modification to the vehicle's maximum Gear."
+                )
 
         ( CrewMod i, _, _ ) ->
-            Just ( text "Crew mod", text <| String.fromInt i )
+            Just
+                ( text "Crew mod"
+                , text <| needPlus i ++ " modification to the vehicle's base Crew value."
+                )
 
         ( _, _, _ ) ->
             Just ( text <| fromSpecial special, text "" )
 
 
+needPlus : Int -> String
+needPlus i =
+    case compare i 0 of
+        LT ->
+            String.fromInt i
 
-{- ( Blast, _, _ ) ->
-       Just ( text <| fromSpecial special, text "" )
-
-   ( Fire, _, _ ) ->
-       Just ( text <| fromSpecial special, text "" )
-
-   ( Explosive, _, _ ) ->
-       Just ( text <| fromSpecial special, text "" )
-
-   ( Blitz, _, _ ) ->
-       Just ( text <| fromSpecial special, text "" )
-
-   ( Electrical, _, _ ) ->
-       Just ( text <| fromSpecial special, text "" )
-
-   ( Specialist, _, _ ) ->
-       Just ( text <| fromSpecial special, text "" )
-
-   ( Entangle, _, _ ) ->
-       Just ( text <| fromSpecial special, text "" )
--}
+        _ ->
+            "+" ++ String.fromInt i
 
 
 renderCountDown : (event -> Msg) -> (Int -> Bool -> event) -> List Bool -> Html Msg

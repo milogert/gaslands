@@ -8,7 +8,7 @@ import Model.Upgrade.Common exposing (..)
 import Model.Upgrade.Model exposing (..)
 import Model.Vehicle.Common exposing (..)
 import Model.Views exposing (ViewEvent(..))
-import Update.Utils exposing (goTo)
+import Update.Utils exposing (goTo, goToTab)
 
 
 update : Model -> UpgradeEvent -> ( Model, Cmd Msg )
@@ -45,12 +45,14 @@ addUpgrade model key u =
                     { vehicle | upgrades = upgradeList }
             in
             ( { model
-                --| view = ViewDetails nv.key
                 | error = []
                 , vehicles = Dict.insert key nv model.vehicles
                 , tmpUpgrade = Nothing
               }
-            , goTo <| ViewDetails key
+            , Cmd.batch
+                [ goToTab <| ViewDetails key
+                , goTo ViewDashboard
+                ]
             )
 
 
@@ -70,8 +72,10 @@ deleteUpgrade model key u =
                     { vehicle | upgrades = upgradesNew }
             in
             ( { model
-                | view = ViewDetails nv.key
-                , vehicles = Dict.insert key nv model.vehicles
+                | vehicles = Dict.insert key nv model.vehicles
               }
-            , Cmd.none
+            , Cmd.batch
+                [ goToTab <| ViewDetails key
+                , goTo ViewDashboard
+                ]
             )

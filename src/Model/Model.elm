@@ -29,6 +29,7 @@ import Url exposing (Url)
 type alias Model =
     { navOpen : Bool
     , view : ViewEvent
+    , tabOpened : Maybe ViewEvent
     , teamName : Maybe String
     , pointsAllowed : Int
     , gearPhase : Int
@@ -144,6 +145,7 @@ defaultModel =
         False
         ViewDashboard
         Nothing
+        Nothing
         50
         1
         Dict.empty
@@ -172,6 +174,7 @@ type
     = NavToggle Bool
       -- ROUTES.
     | ViewMsg ViewEvent
+    | ViewTab ViewEvent
       -- VEHICLE.
     | VehicleMsg VehicleEvent
       -- WEAPON.

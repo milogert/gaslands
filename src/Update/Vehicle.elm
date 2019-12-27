@@ -44,8 +44,7 @@ update model event =
                             1
             in
             ( { model
-                | view = ViewDashboard
-                , gearPhase = gearPhase
+                | gearPhase = gearPhase
                 , vehicles = vs
               }
             , Cmd.none
@@ -183,7 +182,7 @@ addVehicle model vehicle =
                 , tmpVehicle = Nothing
                 , error = []
               }
-            , goTo ViewDashboard
+            , goToTab <| ViewDetails key
             )
 
 
@@ -237,16 +236,8 @@ updateGear model key newGear =
                     { vehicle
                         | gear = GearTracker newGear vehicle.gear.max
                     }
-
-                newView =
-                    case model.view of
-                        ViewDetails _ ->
-                            ViewDetails nv.key
-
-                        _ ->
-                            model.view
             in
-            ( { model | view = newView, vehicles = Dict.insert key nv model.vehicles }
+            ( { model | vehicles = Dict.insert key nv model.vehicles }
             , Cmd.none
             )
 
@@ -261,18 +252,9 @@ updateHazards model key newHazards =
             let
                 nv =
                     { vehicle | hazards = newHazards }
-
-                newView =
-                    case model.view of
-                        ViewDetails _ ->
-                            ViewDetails nv.key
-
-                        _ ->
-                            model.view
             in
             ( { model
-                | view = newView
-                , vehicles = Dict.insert key nv model.vehicles
+                | vehicles = Dict.insert key nv model.vehicles
               }
             , Cmd.none
             )
@@ -291,18 +273,9 @@ updateHull model key currentHull =
 
                 nv =
                     { vehicle | hull = { nhull | current = currentHull } }
-
-                newView =
-                    case model.view of
-                        ViewDetails _ ->
-                            ViewDetails nv.key
-
-                        _ ->
-                            model.view
             in
             ( { model
-                | view = newView
-                , vehicles = Dict.insert key nv model.vehicles
+                | vehicles = Dict.insert key nv model.vehicles
               }
             , Cmd.none
             )
@@ -359,7 +332,6 @@ updateNotes model key notes =
             in
             ( { model
                 | vehicles = Dict.insert key newVehicle model.vehicles
-                , view = ViewDetails newVehicle.key
               }
             , Cmd.none
             )
@@ -368,7 +340,7 @@ updateNotes model key notes =
 deleteVehicle : Model -> String -> ( Model, Cmd Msg )
 deleteVehicle model key =
     ( { model
-        | view = ViewDashboard
+        | tabOpened = Nothing
         , vehicles = Dict.remove key model.vehicles
       }
     , Cmd.none
@@ -387,8 +359,7 @@ rollSkidDice model key skidResults =
                     { vehicle | skidResults = skidResults }
             in
             ( { model
-                | view = ViewDetails nv.key
-                , vehicles = Dict.insert key nv model.vehicles
+                | vehicles = Dict.insert key nv model.vehicles
               }
             , Cmd.none
             )
@@ -417,8 +388,7 @@ setPerkInVehicle model key perk isSet =
                     { vehicle | perks = perkList }
             in
             ( { model
-                | view = ViewDetails nv.key
-                , vehicles = Dict.insert key nv model.vehicles
+                | vehicles = Dict.insert key nv model.vehicles
               }
             , Cmd.none
             )
