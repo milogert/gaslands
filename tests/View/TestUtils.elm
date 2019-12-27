@@ -54,7 +54,7 @@ detailsTest : List Test
 detailsTest =
     [ test "detail section" <|
         \_ ->
-            detailSection "cool" [ text "header" ]
+            detailSection "cool" [] [ text "header" ]
                 |> Query.fromHtml
                 |> Query.has
                     [ Selector.tag "hr"
