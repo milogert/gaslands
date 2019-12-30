@@ -9,6 +9,7 @@ import Model.Decoders.Sponsors exposing (sponsorDecoder)
 import Model.Decoders.Vehicles exposing (vehicleDecoder)
 import Model.Features
 import Model.Model exposing (..)
+import Model.Settings
 import Model.Sponsors exposing (stringToSponsor)
 import Model.Views exposing (ViewEvent(..))
 import Url exposing (Url)
@@ -21,9 +22,9 @@ modelDecoder =
         |> hardcoded ViewDashboard
         |> hardcoded Nothing
         |> optional "teamName" (nullable string) Nothing
-        |> required "pointsAllowed" int
+        |> optional "pointsAllowed" int defaultModel.pointsAllowed
         |> hardcoded 1
-        |> required "vehicles" (dict vehicleDecoder)
+        |> optional "vehicles" (dict vehicleDecoder) defaultModel.vehicles
         |> optional "sponsor" (nullable sponsorDecoder) Nothing
         |> hardcoded Nothing
         |> hardcoded Nothing
@@ -31,6 +32,7 @@ modelDecoder =
         |> hardcoded []
         |> hardcoded ""
         |> hardcoded []
-        |> hardcoded Dict.empty
-        |> required "settings" settingsDecoder
+        |> hardcoded []
+        |> optional "settings" settingsDecoder defaultModel.settings
         |> hardcoded Model.Features.flags
+        |> optional "storageKey" string ""

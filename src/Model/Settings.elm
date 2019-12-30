@@ -16,6 +16,7 @@ type SettingsEvent
     | UpdatePerkCount Int
     | GenerateTeam
     | EnableExpansion Expansion Bool
+    | NewTeamVersion
 
 
 type alias Settings =

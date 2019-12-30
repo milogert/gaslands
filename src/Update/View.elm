@@ -4,7 +4,7 @@ import Model.Model exposing (..)
 import Model.Views exposing (ViewEvent(..))
 import Ports.Photo
 import Ports.Storage
-import Update.Utils exposing (doSaveModel)
+import Update.Utils exposing (doNavClose, doSaveModel)
 
 
 update : Model -> ViewEvent -> ( Model, Cmd Msg )
@@ -20,7 +20,10 @@ update model currentView =
                 , tmpWeapon = Nothing
                 , tmpUpgrade = Nothing
               }
-            , doSaveModel
+            , Cmd.batch
+                [ doSaveModel
+                , doNavClose
+                ]
             )
 
         ViewDetails v ->
@@ -28,6 +31,7 @@ update model currentView =
             , Cmd.batch
                 [ Ports.Photo.destroyStream ""
                 , doSaveModel
+                , doNavClose
                 ]
             )
 
@@ -38,7 +42,10 @@ update model currentView =
 
         ViewSettings ->
             ( changedView
-            , Ports.Storage.getStorage ""
+            , Cmd.batch
+                [ Ports.Storage.getStorage ""
+                , doNavClose
+                ]
             )
 
         _ ->

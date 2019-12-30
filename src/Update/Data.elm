@@ -36,6 +36,7 @@ import_ model key jsonModel =
         , error = newModel.error
         , importValue = newModel.importValue
         , sponsor = newModel.sponsor
+        , storageKey = newModel.storageKey
       }
     , Cmd.none
     )
@@ -59,17 +60,10 @@ share model key jsonModel =
 saveModel : Model -> ( Model, Cmd Msg )
 saveModel model =
     let
-        storageKey =
-            case model.teamName of
-                Nothing ->
-                    "NoName"
-
-                Just str ->
-                    str
-
         storageEntry =
             Ports.Storage.StorageEntry
-                storageKey
+                model.storageKey
+                (Maybe.withDefault "" model.teamName)
                 (Json.Encode.encode 2 <| modelEncoder model)
     in
     ( model

@@ -23,6 +23,9 @@ import Model.Views exposing (NewType(..), ViewEvent(..))
 import Model.Weapon.Common exposing (..)
 import Model.Weapon.Model exposing (..)
 import Ports.Storage exposing (StorageEntry)
+import Task
+import Time
+import Update.UtilsGeneric exposing (do)
 import Url exposing (Url)
 
 
@@ -41,9 +44,10 @@ type alias Model =
     , error : List ErrorType
     , importValue : String
     , storageKeys : List String
-    , storageData : Dict String String
+    , storageData : List StorageEntry
     , settings : Settings
     , featureFlags : Dict String Bool
+    , storageKey : String
     }
 
 
@@ -156,15 +160,19 @@ defaultModel =
         []
         ""
         []
-        Dict.empty
+        []
         Model.Settings.init
         Model.Features.flags
+        ""
 
 
 init : flags -> ( Model, Cmd Msg )
 init flags =
     ( defaultModel
-    , Cmd.none
+    , Cmd.batch
+        [ do <| GetLastTeam ""
+        , Task.perform CurrentTimeCallback Time.now
+        ]
     )
 
 
@@ -184,16 +192,21 @@ type
       -- SPONSOR.
     | SponsorUpdate String
       -- DATA.
-    | GetAllStorage (List ( String, String ))
+    | GetAllStorage (List StorageEntry)
     | Import String String
     | SetImport String
     | Share String String
-    | GetStorage String
+    | GetStorage StorageEntry
     | SetStorageCallback StorageEntry
     | SaveModel
     | LoadModel String
     | DeleteItem String
     | DeleteItemCallback String
+    | GetLastTeam String
+    | GetLastTeamCallback StorageEntry
+    | SetLastTeam String
+    | SetLastTeamCallback String
+    | CurrentTimeCallback Time.Posix
       -- SETTINGS.
     | SettingsMsg SettingsEvent
     | UpdatePointsAllowed String

@@ -10,6 +10,7 @@ import Html
     exposing
         ( Html
         , a
+        , b
         , div
         , hr
         , li
@@ -35,6 +36,7 @@ import Model.Features
 import Model.Model exposing (..)
 import Model.Settings exposing (..)
 import Model.Shared exposing (..)
+import Ports.Storage exposing (StorageEntry)
 import View.Settings.SquadGeneration
 import View.Utils exposing (icon, iconb)
 
@@ -67,15 +69,21 @@ renderGameSettings model =
     renderSection "Game Settings"
         [ field []
             [ controlLabel [ for "teamName" ] [ text "Team Name" ]
-            , controlText
-                controlInputModifiers
+            , connectedFields Left
                 []
-                [ id "teamName"
-                , onInput UpdateTeamName
-                , value <| Maybe.withDefault "" model.teamName
-                , placeholder "Team Name"
+                [ controlText controlInputModifiers
+                    [ class "is-expanded" ]
+                    [ id "teamName"
+                    , onInput UpdateTeamName
+                    , value <| Maybe.withDefault "" model.teamName
+                    , placeholder "Team Name"
+                    ]
+                    []
                 ]
+            , controlButton { buttonModifiers | color = Warning }
                 []
+                [ onClick <| SettingsMsg NewTeamVersion ]
+                [ text "Create New Team Version" ]
             ]
         , field []
             [ controlLabel [ for "squadPoints" ] [ text "Maxiumum Points Allowed" ]
@@ -185,8 +193,7 @@ renderImportExport model =
                 [ ul
                     []
                     (model.storageData
-                        |> Dict.toList
-                        |> List.map storageMapper
+                        |> List.map (storageMapper model.storageKey)
                     )
                 ]
             , column columnModifiers
@@ -223,24 +230,35 @@ renderAbout =
         ]
 
 
-storageMapper : ( String, String ) -> Html Msg
-storageMapper ( key, jsonModel ) =
+storageMapper : String -> StorageEntry -> Html Msg
+storageMapper currentStorageKey entry =
+    let
+        display =
+            case compare currentStorageKey entry.key of
+                EQ ->
+                    b [] [ text <| entry.name ++ " (current team)" ]
+
+                _ ->
+                    text entry.name
+    in
     connectedFields Left
         []
         [ controlButton buttonModifiers
-            []
-            [ onClick <| LoadModel key ]
-            [ text key ]
+            [ class "is-expanded" ]
+            [ class "is-fullwidth"
+            , onClick <| LoadModel entry.key
+            ]
+            [ display ]
         , controlButton { buttonModifiers | color = Success }
             []
-            [ onClick <| Import key jsonModel ]
+            [ onClick <| Import entry.key entry.value ]
             [ View.Utils.icon "upload" ]
         , controlButton { buttonModifiers | color = Info }
             []
-            [ onClick <| Share key jsonModel ]
+            [ onClick <| Share entry.key entry.value ]
             [ View.Utils.icon "share" ]
         , controlButton { buttonModifiers | color = Danger }
             []
-            [ onClick <| DeleteItem key ]
+            [ onClick <| DeleteItem entry.key ]
             [ View.Utils.icon "trash-alt" ]
         ]

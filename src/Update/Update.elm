@@ -10,11 +10,14 @@ import Ports.Modals
 import Ports.Photo
 import Ports.Storage
 import Task
+import Time
 import Update.Data
 import Update.Routes
 import Update.Settings
 import Update.Sponsor
 import Update.Upgrade
+import Update.Utils exposing (doNavClose)
+import Update.UtilsGeneric exposing (do)
 import Update.Vehicle
 import Update.View
 import Update.Weapon
@@ -36,7 +39,7 @@ update msg model =
 
         ViewTab viewEvent ->
             ( { model | tabOpened = Just viewEvent }
-            , Cmd.none
+            , doNavClose
             )
 
         -- GAME SETTINGS.
@@ -51,12 +54,16 @@ update msg model =
             case s of
                 "" ->
                     ( { model | teamName = Nothing }
-                    , Cmd.none
+                    , do <| SetLastTeam s
                     )
 
                 _ ->
                     ( { model | teamName = Just s }
-                    , Cmd.none
+                    , Cmd.batch <|
+                        List.map do
+                            [ SetLastTeam s
+                            , SaveModel
+                            ]
                     )
 
         -- VEHICLE.
@@ -77,7 +84,7 @@ update msg model =
 
         -- DATA.
         GetAllStorage data ->
-            ( { model | storageData = Dict.fromList data }
+            ( { model | storageData = data }
             , Cmd.none
             )
 
@@ -92,8 +99,8 @@ update msg model =
         Share key jsonModel ->
             Update.Data.share model key jsonModel
 
-        GetStorage value ->
-            ( { model | importValue = value }
+        GetStorage storageEntry ->
+            ( { model | importValue = storageEntry.value }
             , Cmd.none
             )
 
@@ -118,6 +125,33 @@ update msg model =
         DeleteItemCallback deletedKey ->
             ( model
             , Ports.Storage.getStorage ""
+            )
+
+        GetLastTeam _ ->
+            ( model
+            , Ports.Storage.getLastTeam ""
+            )
+
+        GetLastTeamCallback { key, value } ->
+            ( model
+            , do <| Import key value
+            )
+
+        SetLastTeam teamName ->
+            ( model
+            , Ports.Storage.setLastTeam model.storageKey
+            )
+
+        SetLastTeamCallback _ ->
+            ( model, Cmd.none )
+
+        CurrentTimeCallback posixTime ->
+            ( { model
+                | storageKey =
+                    String.fromInt <|
+                        Time.posixToMillis posixTime
+              }
+            , Cmd.none
             )
 
         SettingsMsg event ->

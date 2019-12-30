@@ -13,5 +13,7 @@ subscriptions model =
         , Ports.Storage.getSub GetStorage
         , Ports.Storage.setSub SetStorageCallback
         , Ports.Storage.deleteSub DeleteItemCallback
+        , Ports.Storage.getLastTeamSub GetLastTeamCallback
+        , Ports.Storage.setLastTeamSub SetLastTeamCallback
         , Ports.Photo.getPhotoUrl <| VehicleMsg << SetPhotoUrlCallback
         ]
