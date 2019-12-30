@@ -3,6 +3,8 @@ module Update.Settings exposing (update)
 import List.Extra as ListE
 import Model.Model exposing (..)
 import Model.Settings exposing (..)
+import Task
+import Time
 
 
 update : Model -> SettingsEvent -> ( Model, Cmd Msg )
@@ -36,6 +38,9 @@ update model event =
 
         GenerateTeam ->
             ( model, Cmd.none )
+
+        NewTeamVersion ->
+            ( model, Task.perform CurrentTimeCallback Time.now )
 
         _ ->
             ( model, Cmd.none )

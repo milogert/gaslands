@@ -14,8 +14,8 @@ import Test exposing (..)
 suite : Test
 suite =
     describe "Model tests" <|
-        [ test "init" <| \_ -> Expect.equal ( defaultModel, Cmd.none ) (init ())
-        , totalPointsTest
+        --[ test "init" <| \_ -> Expect.equal ( defaultModel, Cmd.none ) (init ())
+        [ totalPointsTest
 
         --, viewTests
         , errorTests

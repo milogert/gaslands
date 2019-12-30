@@ -16,6 +16,7 @@ modelEncoder model =
         , ( "vehicles", dict identity vehicleEncoder model.vehicles )
         , ( "sponsor", sponsorEncoder model.sponsor )
         , ( "settings", object <| settingsEncoder model.settings )
+        , ( "storageKey", string model.storageKey )
         ]
 
 

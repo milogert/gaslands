@@ -1,25 +1,26 @@
-module Update.Utils exposing (doOtherMsg, doSaveModel, goTo, goToTab)
+module Update.Utils exposing (doNavClose, doSaveModel, goTo, goToTab)
 
 import Model.Model exposing (..)
 import Model.Views exposing (ViewEvent)
 import Task
-
-
-doOtherMsg : Msg -> Cmd Msg
-doOtherMsg msg =
-    Task.perform (\_ -> msg) (Task.succeed msg)
+import Update.UtilsGeneric exposing (do)
 
 
 doSaveModel : Cmd Msg
 doSaveModel =
-    doOtherMsg SaveModel
+    do SaveModel
+
+
+doNavClose : Cmd Msg
+doNavClose =
+    do <| NavToggle False
 
 
 goTo : ViewEvent -> Cmd Msg
 goTo viewEvent =
-    doOtherMsg <| ViewMsg viewEvent
+    do <| ViewMsg viewEvent
 
 
 goToTab : ViewEvent -> Cmd Msg
 goToTab viewEvent =
-    doOtherMsg <| ViewTab viewEvent
+    do <| ViewTab viewEvent

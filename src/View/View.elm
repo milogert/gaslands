@@ -130,7 +130,7 @@ displayAlert model =
             model.error
                 |> List.map msgBody
                 |> message { messageModifiers | color = Danger } []
-                |> (\m -> section NotSpaced [] [ m ])
+                |> (\m -> container [ class "alert-section" ] [ m ])
 
 
 render : Model -> Html Msg

@@ -182,7 +182,10 @@ addVehicle model vehicle =
                 , tmpVehicle = Nothing
                 , error = []
               }
-            , goToTab <| ViewDetails key
+            , Cmd.batch
+                [ goToTab <| ViewDetails key
+                , doSaveModel
+                ]
             )
 
 

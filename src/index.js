@@ -35,6 +35,14 @@ app.ports.delete.subscribe(function(key) {
     app.ports.deleteSub.send(storage.deleteItem(key));
 });
 
+app.ports.getLastTeam.subscribe(str => {
+  app.ports.getLastTeamSub.send(storage.getLastTeam(str))
+})
+
+app.ports.setLastTeam.subscribe(team => {
+  app.ports.setLastTeamSub.send(storage.setLastTeam(team))
+})
+
 // Photo capabilities.
 import { photo } from './photo.js';
 app.ports.getStream.subscribe(function(nothing) {
