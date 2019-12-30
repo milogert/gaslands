@@ -1,6 +1,6 @@
 {
-  "main.js": "/glom/static/js/main.8bfd4eb4.chunk.js",
-  "main.js.map": "/glom/static/js/main.8bfd4eb4.chunk.js.map",
+  "main.js": "/glom/static/js/main.b8612a82.chunk.js",
+  "main.js.map": "/glom/static/js/main.b8612a82.chunk.js.map",
   "runtime~main.js": "/glom/static/js/runtime~main.ae565693.js",
   "runtime~main.js.map": "/glom/static/js/runtime~main.ae565693.js.map",
   "vendors~main.js": "/glom/static/js/vendors~main.3ca81432.chunk.js",
@@ -9,6 +9,6 @@
   "favicon.png": "/glom/favicon.png",
   "index.html": "/glom/index.html",
   "manifest.json": "/glom/manifest.json",
-  "precache-manifest.e9d9dfe75eac54fc9c4213779f8f97dc.js": "/glom/precache-manifest.e9d9dfe75eac54fc9c4213779f8f97dc.js",
+  "precache-manifest.b2b8cc8009545484ecf9ff520776bd39.js": "/glom/precache-manifest.b2b8cc8009545484ecf9ff520776bd39.js",
   "style.css": "/glom/style.css"
 }

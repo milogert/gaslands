@@ -22,6 +22,10 @@
   }
 }
 
+.alert-section {
+  margin-top: 1rem !important;
+}
+
 .print-icon {
   height: 2rem;
   width: 2rem;
@@ -74,4 +78,30 @@
 
 .special-holder {
   margin-top: .75rem;
+}
+
+@media screen and (max-width:1087px) {
+  .navbar-menu {
+    display: block !important;
+    max-height: 0;
+    opacity: 0;
+    padding: 0 !important;
+    transition: all .3s;
+  }
+
+  .navbar-menu.is-active {
+    display: block !important;
+    max-height: 500px;
+    opacity: 1;
+    padding: .5rem 0 !important;
+    transition: all .3s;
+  }
+}
+
+.navbar.is-warning .navbar-burger {
+  color:rgba(0,0,0,.7)
+}
+
+.navbar.is-dark .navbar-burger {
+  color:#fff;
 }
