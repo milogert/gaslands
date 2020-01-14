@@ -5,50 +5,36 @@ import Bulma.Elements exposing (..)
 import Bulma.Form exposing (..)
 import Bulma.Layout exposing (..)
 import Bulma.Modifiers exposing (..)
-import FontAwesome.Icon as Icon exposing (Icon)
+import FontAwesome.Icon as Icon
 import FontAwesome.Solid as Icon
 import Html
     exposing
         ( Html
-        , a
         , div
-        , h2
-        , h4
-        , h5
-        , hr
-        , li
-        , small
         , span
         , text
-        , textarea
-        , ul
         )
 import Html.Attributes
     exposing
-        ( checked
-        , class
-        , classList
+        ( class
         , disabled
         , hidden
-        , placeholder
         , style
         , value
         )
-import Html.Events exposing (onClick, onInput)
+import Html.Events exposing (onClick)
 import Model.Features
 import Model.Model exposing (..)
-import Model.Shared
 import Model.Sponsors exposing (..)
-import Model.Utils exposing (..)
+import Model.Vehicle exposing (..)
 import Model.Vehicle.Common exposing (..)
-import Model.Vehicle.Model exposing (..)
 import Model.Views exposing (..)
+import Model.Weapon exposing (..)
 import Model.Weapon.Common exposing (handgun)
-import Model.Weapon.Model exposing (..)
 import View.Photo
 import View.Sponsor
 import View.Upgrade
-import View.Utils exposing (plural, tagGen, tagList)
+import View.Utils exposing (tagGen, tagList)
 import View.Weapon exposing (defaultWeaponConfig)
 
 
@@ -89,26 +75,11 @@ config =
         False
 
 
-type alias ConfiguredVehicle =
-    { header : Html Msg
-    , activationButton : Html Msg
-    , badges : List (Html Msg)
-    , counters : List (Html Msg)
-    , weapons : Html Msg
-    , upgrades : Html Msg
-    , availalbePerks : Html Msg
-    , footer : Html Msg
-    }
-
-
 configure : Model -> RenderConfig -> Vehicle -> ( Html Msg, Html Msg, Html Msg )
 configure model cfg v =
     let
-        ignore_currentView =
-            model.view
-
         vtype =
-            ( fromVehicleType v.vtype, Nothing )
+            ( v.type_, Nothing )
 
         pointsDisplay =
             ( "points", Just <| String.fromInt <| vehicleCost v )
@@ -172,13 +143,6 @@ configure model cfg v =
                 |> Model.Features.withDefault
                     "feature-car-photo"
                     (text "")
-
-        stats =
-            div
-                []
-                [ photoPlus
-                , factsHolder
-                ]
 
         gearCounter =
             case ( cfg.printCounters, isWrecked v ) of
@@ -267,26 +231,9 @@ configure model cfg v =
                     div [] <| renderSpecialsFunc v.specials
 
         specialHolder =
-            View.Utils.detailSection "Special List"
+            View.Utils.detailSection "Vehicle Specials"
                 []
                 [ specials ]
-
-        mNotesBody =
-            case ( cfg.printNotes, cfg.inputNotes ) of
-                ( True, _ ) ->
-                    Just <| text v.notes
-
-                ( _, True ) ->
-                    Just <|
-                        controlTextArea controlTextAreaModifiers
-                            []
-                            [ onInput <| VehicleMsg << UpdateNotes v.key
-                            , placeholder "Notes"
-                            ]
-                            [ text v.notes ]
-
-                _ ->
-                    Nothing
 
         addonListButton buttonMsg icon text_ =
             button
@@ -306,9 +253,10 @@ configure model cfg v =
         upgradeUsingSlots =
             List.sum <| List.map .slots v.upgrades
 
+        {--TODO
         totalSlotsUsed =
             weaponsUsingSlots + upgradeUsingSlots
-
+            --}
         weaponsListBody =
             case v.weapons of
                 [] ->
@@ -349,7 +297,7 @@ configure model cfg v =
 
                 _ ->
                     View.Utils.detailSection
-                        "Weapon List"
+                        "Weapons"
                         [ addonListButton (ViewNew <| NewWeapon v.key) Icon.plus "Weapon"
                         , button
                             { buttonModifiers
@@ -414,7 +362,7 @@ configure model cfg v =
 
                 _ ->
                     View.Utils.detailSection
-                        "Upgrade List"
+                        "Upgrades"
                         [ addonListButton (ViewNew <| NewUpgrade v.key) Icon.plus "Upgrade" ]
                         [ tagList
                             [ ( ( "slots used", Bulma.Modifiers.Light )
@@ -458,9 +406,6 @@ configure model cfg v =
                             )
                         ]
 
-        expansion =
-            Model.Shared.fromExpansion v.expansion
-
         showWrecked =
             case isWrecked v of
                 True ->
@@ -501,10 +446,10 @@ configure model cfg v =
         header =
             level []
                 [ levelLeft []
-                    [ title H3
+                    [ photoPlus
+                    , title H3
                         []
                         [ text v.name
-                        , small [] [ text <| " [" ++ expansion ++ "]" ]
                         , div [ class "wrecked-display", display showWrecked ] [ text "WRECKED!" ]
                         ]
                     ]
@@ -619,13 +564,7 @@ renderPreview model v =
                     v.name
 
         header =
-            title H4
-                []
-                [ text name
-                , small
-                    []
-                    [ text <| "[" ++ Model.Shared.fromExpansion v.expansion ++ "]" ]
-                ]
+            title H4 [] [ text name ]
 
         ( _, body, _ ) =
             configure

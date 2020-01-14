@@ -9,19 +9,13 @@ import Bulma.Columns exposing (..)
 import Bulma.Elements exposing (..)
 import Bulma.Form exposing (..)
 import Bulma.Modifiers exposing (..)
-import FontAwesome.Icon as Icon exposing (Icon)
-import FontAwesome.Solid as Icon
 import Html
     exposing
         ( Html
-        , a
         , b
         , div
-        , h3
-        , h6
         , li
         , p
-        , small
         , span
         , text
         , ul
@@ -29,12 +23,10 @@ import Html
 import Html.Attributes
     exposing
         ( checked
-        , class
         , id
         )
-import Html.Events exposing (onCheck, onClick)
+import Html.Events exposing (onCheck)
 import Model.Model exposing (..)
-import Model.Shared exposing (fromExpansion)
 import Model.Sponsors
     exposing
         ( PerkClass
@@ -44,13 +36,12 @@ import Model.Sponsors
         , fromPerkClass
         , getClassPerks
         )
-import Model.Vehicle.Model exposing (..)
+import Model.Vehicle exposing (..)
 import Model.Views exposing (ViewEvent(..))
-import View.Utils exposing (expansionMarker)
 
 
 render : Sponsor -> Html Msg
-render { name, description, perks, grantedClasses, expansion } =
+render { name, description, perks, grantedClasses } =
     div []
         [ title H5 [] [ text name ]
         , p [] [ text description ]
@@ -62,7 +53,6 @@ render { name, description, perks, grantedClasses, expansion } =
                         |> List.intersperse ", "
                         |> List.map text
                    )
-        , expansionMarker expansion
         ]
 
 
@@ -126,7 +116,7 @@ renderPerkList perks perkClasses =
                         (\perk -> List.member perk perks)
                     |> List.map printPerk
             )
-        |> List.map (\t -> p [] t)
+        |> List.map (p [])
         |> div []
 
 

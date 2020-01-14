@@ -4,10 +4,10 @@ import Dict exposing (..)
 import List.Extra as ListE
 import Model.Model exposing (..)
 import Model.Shared exposing (..)
-import Model.Vehicle.Model exposing (..)
+import Model.Vehicle exposing (..)
 import Model.Views exposing (ViewEvent(..))
+import Model.Weapon exposing (..)
 import Model.Weapon.Common exposing (..)
-import Model.Weapon.Model exposing (..)
 import Random
 import Update.Utils exposing (goTo, goToTab)
 
@@ -76,13 +76,13 @@ addWeapon model key w =
                 nv =
                     { vehicle | weapons = weaponList }
             in
-            case ( w.wtype, w.mountPoint ) of
-                ( _, Nothing ) ->
+            case w.mountPoint of
+                Nothing ->
                     ( { model | error = [ WeaponMountPointError ] }
                     , Cmd.none
                     )
 
-                ( _, _ ) ->
+                Just mountPoint ->
                     ( { model
                         | error = []
                         , vehicles = Dict.insert key nv model.vehicles
@@ -211,17 +211,5 @@ deleteWeapon model key w =
             ( { model
                 | vehicles = Dict.insert key nv model.vehicles
               }
-            , Cmd.none
-            )
-
-
-rollAttackDice : Model -> String -> Weapon -> ( Model, Cmd Msg )
-rollAttackDice model key w =
-    case Dict.get key model.vehicles of
-        Nothing ->
-            ( model, Cmd.none )
-
-        Just vehicle ->
-            ( model
             , Cmd.none
             )

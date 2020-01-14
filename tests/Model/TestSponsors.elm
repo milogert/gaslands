@@ -5,7 +5,7 @@ import Json.Decode exposing (decodeValue, errorToString)
 import Json.Encode
 import Model.Model exposing (..)
 import Model.Sponsors exposing (..)
-import Model.Vehicle.Model exposing (defaultVehicle)
+import Model.Vehicle exposing (defaultVehicle)
 import Test exposing (..)
 
 

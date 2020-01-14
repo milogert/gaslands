@@ -5,15 +5,13 @@ module Model.Upgrade.Common exposing
 
 import Dict
 import Model.Shared exposing (..)
+import Model.Upgrade exposing (Upgrade)
 import Model.Upgrade.BaseGame
-import Model.Upgrade.Model exposing (Upgrade)
-import Model.Upgrade.TimeExtended2
 
 
 allUpgradesList : List Upgrade
 allUpgradesList =
-    Model.Upgrade.BaseGame.weapons
-        ++ Model.Upgrade.TimeExtended2.weapons
+    Model.Upgrade.BaseGame.upgrades
 
 
 nameToUpgrade : String -> Maybe Upgrade

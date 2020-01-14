@@ -2,7 +2,7 @@ module View.Details exposing (view)
 
 import Html exposing (Html)
 import Model.Model exposing (..)
-import Model.Vehicle.Model exposing (..)
+import Model.Vehicle exposing (..)
 import View.Vehicle
 
 

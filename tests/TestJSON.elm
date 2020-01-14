@@ -13,9 +13,9 @@ import Model.Encoders.Vehicles exposing (vehicleEncoder)
 import Model.Encoders.Weapons exposing (weaponEncoder)
 import Model.Model exposing (defaultModel)
 import Model.Sponsors exposing (allSponsors)
-import Model.Upgrade.Model exposing (Upgrade, defaultUpgrade)
-import Model.Vehicle.Model exposing (defaultVehicle)
-import Model.Weapon.Model exposing (defaultWeapon)
+import Model.Upgrade exposing (Upgrade, defaultUpgrade)
+import Model.Vehicle exposing (defaultVehicle)
+import Model.Weapon exposing (defaultWeapon)
 import Test exposing (..)
 
 

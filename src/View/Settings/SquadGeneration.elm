@@ -2,7 +2,7 @@ module View.Settings.SquadGeneration exposing (render)
 
 import Bulma.Columns exposing (..)
 import Bulma.Elements exposing (..)
-import FontAwesome.Icon as Icon exposing (Icon)
+import FontAwesome.Icon as Icon
 import FontAwesome.Solid as Icon
 import Html
     exposing
@@ -11,15 +11,8 @@ import Html
         , h4
         , text
         )
-import Html.Attributes
-    exposing
-        ( class
-        , for
-        )
-import Html.Events exposing (onClick)
 import Model.Model exposing (..)
 import Model.Settings exposing (..)
-import View.Utils exposing (icon, iconb)
 
 
 render : Settings -> Html Msg

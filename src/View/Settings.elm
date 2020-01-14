@@ -5,23 +5,22 @@ import Bulma.Elements exposing (..)
 import Bulma.Form exposing (..)
 import Bulma.Layout exposing (..)
 import Bulma.Modifiers exposing (..)
-import Dict exposing (Dict)
+import FontAwesome.Brands as Icon
+import FontAwesome.Icon as Icon
+import FontAwesome.Solid as Icon
 import Html
     exposing
         ( Html
         , a
         , b
         , div
-        , hr
-        , li
         , p
         , text
         , ul
         )
 import Html.Attributes
     exposing
-        ( checked
-        , class
+        ( class
         , for
         , href
         , id
@@ -31,14 +30,15 @@ import Html.Attributes
         , type_
         , value
         )
-import Html.Events exposing (onCheck, onClick, onInput)
+import Html.Events exposing (onClick, onInput)
 import Model.Features
 import Model.Model exposing (..)
 import Model.Settings exposing (..)
 import Model.Shared exposing (..)
+import Model.Vehicle.Common exposing (allVehicles, fromVehicleWeight)
+import Model.Weapon.Common exposing (allWeaponsList, fromDice, fromWeaponRange)
 import Ports.Storage exposing (StorageEntry)
 import View.Settings.SquadGeneration
-import View.Utils exposing (icon, iconb)
 
 
 view : Model -> Html Msg
@@ -46,9 +46,9 @@ view model =
     div [] <|
         List.map (\s -> section NotSpaced [] [ s ])
             [ renderGameSettings model
-            , renderExpansionSettings model
             , renderAppSettings model.settings
             , renderImportExport model
+            , renderReferenceSection model.settings
             , renderAbout
             ]
 
@@ -100,30 +100,6 @@ renderGameSettings model =
         ]
 
 
-renderExpansionSettings : Model -> Html Msg
-renderExpansionSettings model =
-    let
-        expansionCheck : Expansion -> Html Msg
-        expansionCheck e =
-            controlCheckBox
-                (e == BaseGame)
-                []
-                []
-                [ id <| fromExpansionAbbrev e
-                , checked <| List.member e model.settings.expansions.enabled
-                , onCheck <| SettingsMsg << EnableExpansion e
-                ]
-                [ text <| fromExpansion e ]
-
-        expansionChecks : List (Html Msg)
-        expansionChecks =
-            model.settings.expansions.available
-                |> List.map expansionCheck
-    in
-    renderSection "Expansion Settings"
-        expansionChecks
-
-
 renderAppSettings : Settings -> Html Msg
 renderAppSettings settings =
     let
@@ -146,6 +122,100 @@ renderAppSettings settings =
         actualSettings
 
 
+renderReferenceSection : Settings -> Html Msg
+renderReferenceSection settings =
+    renderSection "Reference"
+        [ controlButton buttonModifiers
+            []
+            []
+            --[ onClick <| SettingsMsg ToggleReferences ]
+            [ text "Toggle references" ]
+        , dataTable
+            "Vehicles"
+            [ "Type", "Weight", "Hull", "Handling", "Max Gear", "Crew", "Build Slots", "Special Rules", "Cost", "Category" ]
+            (\v ->
+                tableRow False
+                    []
+                    [ tableCell [] [ text v.type_ ]
+                    , tableCell [] [ text <| fromVehicleWeight v.weight ]
+                    , tableCell [] [ text <| String.fromInt v.hull.max ]
+                    , tableCell [] [ text <| String.fromInt v.handling ]
+                    , tableCell [] [ text <| String.fromInt v.gear.max ]
+                    , tableCell [] [ text <| String.fromInt v.crew ]
+                    , tableCell [] [ text <| String.fromInt v.equipment ]
+                    , tableCell [] [ text "specials here" ]
+
+                    --, tableCell [] [ text <| String.fromInt v.specials ]
+                    , tableCell [] [ text <| String.fromInt v.cost ]
+                    , tableCell [] [ text <| fromCategory v.category ]
+                    ]
+            )
+            allVehicles
+        , dataTable
+            "Weapons"
+            [ "Type", "Range", "Attack", "Build Slots", "Special Rules", "Cost", "Sponsor", "Category" ]
+            (\weapon ->
+                let
+                    attack =
+                        case weapon.attack of
+                            Nothing ->
+                                "-"
+
+                            Just dice ->
+                                fromDice dice
+
+                    sponsor =
+                        case weapon.requiredSponsor of
+                            Nothing ->
+                                "-"
+
+                            Just s ->
+                                s.name
+                in
+                tableRow False
+                    []
+                    [ tableCell [] [ text weapon.name ]
+                    , tableCell [] [ text <| fromWeaponRange weapon.range ]
+                    , tableCell [] [ text attack ]
+                    , tableCell [] [ text <| String.fromInt weapon.slots ]
+                    , tableCell [] [ text "specials here" ]
+
+                    --, tableCell [] [ text <| String.fromInt v.specials ]
+                    , tableCell [] [ text <| String.fromInt weapon.cost ]
+                    , tableCell [] [ text sponsor ]
+                    , tableCell [] [ text <| fromCategory weapon.category ]
+                    ]
+            )
+            allWeaponsList
+        ]
+
+
+dataTable : String -> List String -> (a -> Html Msg) -> List a -> Html Msg
+dataTable name headerList rowFunc data =
+    let
+        header =
+            tableHead []
+                [ tableRow True
+                    []
+                    (List.map (\s -> tableCellHead [] [ text s ]) headerList)
+                ]
+
+        body =
+            tableBody []
+                (List.map rowFunc data)
+    in
+    div []
+        [ title H5
+            []
+            [ text name ]
+        , table tableModifiers
+            []
+            [ header
+            , body
+            ]
+        ]
+
+
 renderImportExport : Model -> Html Msg
 renderImportExport model =
     let
@@ -163,34 +233,34 @@ renderImportExport model =
             }
     in
     renderSection "Import/Export"
-        [ buttons Centered
-            []
-            [ button
-                buttonMods
-                [ class "mb-2"
-                , onClick SaveModel
-                ]
-                [ View.Utils.icon "download"
-                , text <| " Save Team \"" ++ teamName ++ "\""
-                ]
-            , button
-                buttonMods
-                [ class "mb-2"
-                , onClick <| Share "" ""
-                ]
-                [ View.Utils.icon "share", text " Share" ]
-            , button
-                buttonMods
-                [ class "mb-2"
-                , onClick <| Import "" ""
-                ]
-                [ View.Utils.icon "upload", text " Import" ]
-            ]
-        , columns columnsModifiers
+        [ columns columnsModifiers
             []
             [ column columnModifiers
                 []
-                [ ul
+                [ buttons Centered
+                    []
+                    [ button
+                        buttonMods
+                        [ class "mb-2"
+                        , onClick SaveModel
+                        ]
+                        [ Icon.download |> Icon.viewIcon
+                        , text <| " Save Team \"" ++ teamName ++ "\""
+                        ]
+                    , button
+                        buttonMods
+                        [ class "mb-2"
+                        , onClick <| Share "" ""
+                        ]
+                        [ Icon.share |> Icon.viewIcon, text " Share" ]
+                    , button
+                        buttonMods
+                        [ class "mb-2"
+                        , onClick <| Import "" ""
+                        ]
+                        [ Icon.upload |> Icon.viewIcon, text " Import" ]
+                    ]
+                , ul
                     []
                     (model.storageData
                         |> List.map (storageMapper model.storageKey)
@@ -202,7 +272,7 @@ renderImportExport model =
                     controlTextAreaModifiers
                     []
                     [ onInput SetImport
-                    , rows 15
+                    , rows 5
                     , style "font-family" "monospace"
                     , value model.importValue
                     ]
@@ -225,7 +295,7 @@ renderAbout =
             ]
         , p []
             [ text "Check out the "
-            , a [ href "https://github.com/milogert/glom" ] [ iconb "github" ]
+            , a [ href "https://github.com/milogert/glom" ] [ Icon.github |> Icon.viewIcon ]
             ]
         ]
 
@@ -252,13 +322,13 @@ storageMapper currentStorageKey entry =
         , controlButton { buttonModifiers | color = Success }
             []
             [ onClick <| Import entry.key entry.value ]
-            [ View.Utils.icon "upload" ]
+            [ Icon.upload |> Icon.viewIcon ]
         , controlButton { buttonModifiers | color = Info }
             []
             [ onClick <| Share entry.key entry.value ]
-            [ View.Utils.icon "share" ]
+            [ Icon.share |> Icon.viewIcon ]
         , controlButton { buttonModifiers | color = Danger }
             []
             [ onClick <| DeleteItem entry.key ]
-            [ View.Utils.icon "trash-alt" ]
+            [ Icon.trashAlt |> Icon.viewIcon ]
         ]

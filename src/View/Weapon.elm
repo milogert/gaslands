@@ -2,36 +2,24 @@ module View.Weapon exposing (defaultWeaponConfig, render)
 
 import Bulma.Form exposing (..)
 import Bulma.Modifiers exposing (..)
-import FontAwesome.Icon as Icon exposing (Icon)
-import FontAwesome.Solid as Icon
 import Html
     exposing
         ( Html
-        , a
         , div
-        , h6
-        , li
-        , small
-        , span
         , text
-        , ul
         )
 import Html.Attributes
     exposing
         ( class
         , classList
-        , disabled
-        , hidden
-        , style
         , value
         )
-import Html.Events exposing (onClick, onInput)
 import Model.Model exposing (..)
 import Model.Shared
+import Model.Vehicle exposing (..)
 import Model.Vehicle.Common exposing (..)
-import Model.Vehicle.Model exposing (..)
+import Model.Weapon exposing (..)
 import Model.Weapon.Common exposing (..)
-import Model.Weapon.Model exposing (..)
 import View.EquipmentLayout
 import View.Utils exposing (plural, tagGen)
 
@@ -89,7 +77,7 @@ render cfg model vehicle weapon =
                     ( "damage", Just <| "none" )
 
                 Just attack ->
-                    ( "damage", Just <| View.Utils.renderDice attack )
+                    ( "damage", Just <| fromDice attack )
 
         mountPoint =
             case weapon.mountPoint of
@@ -105,9 +93,6 @@ render cfg model vehicle weapon =
         slotsTakenBadge =
             ( "slot" ++ plural weapon.slots ++ " used", Just <| String.fromInt weapon.slots )
 
-        typeBadge =
-            ( "type", Just <| fromWeaponType weapon.wtype )
-
         rangeBadge =
             ( "range", Just <| fromWeaponRange weapon.range )
 
@@ -118,7 +103,6 @@ render cfg model vehicle weapon =
             [ mountPoint
             , slotsTakenBadge
             , previewDamage
-            , typeBadge
             , rangeBadge
             , pointBadge
             ]

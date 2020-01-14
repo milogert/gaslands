@@ -3,9 +3,8 @@ module Model.TestUtils exposing (suite)
 import Expect exposing (Expectation)
 import Model.Shared exposing (..)
 import Model.Upgrade.Common
-import Model.Utils exposing (..)
+import Model.Vehicle exposing (defaultVehicle)
 import Model.Vehicle.Common exposing (..)
-import Model.Vehicle.Model exposing (defaultVehicle)
 import Test exposing (..)
 
 

@@ -1,10 +1,11 @@
-module Model.Upgrade.Model exposing
+module Model.Upgrade exposing
     ( Upgrade
     , UpgradeEvent(..)
     , defaultUpgrade
     )
 
 import Model.Shared exposing (..)
+import Model.Sponsors exposing (Sponsor)
 
 
 type UpgradeEvent
@@ -18,10 +19,10 @@ type alias Upgrade =
     , slots : Int
     , specials : List Special
     , cost : Int
-    , expansion : Expansion
+    , requiredSponsor : Maybe Sponsor
     }
 
 
 defaultUpgrade : Upgrade
 defaultUpgrade =
-    Upgrade "" 0 [] 0 BaseGame
+    Upgrade "TODO" 0 [] 0 Nothing

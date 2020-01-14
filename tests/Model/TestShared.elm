@@ -1,9 +1,9 @@
-module Model.TestShared exposing (expansionSuite, specialSuite)
+module Model.TestShared exposing (specialSuite)
 
 import Expect exposing (Expectation)
 import Model.Shared exposing (..)
 import Model.Upgrade.Common
-import Model.Vehicle.Model exposing (defaultVehicle)
+import Model.Vehicle exposing (defaultVehicle)
 import Model.Weapon.BaseGame
 import Test exposing (..)
 
@@ -70,32 +70,3 @@ specialToStringItems =
     , ( Specialist, "Specialist" )
     , ( Entangle, "Entangle" )
     ]
-
-
-expansionSuite : Test
-expansionSuite =
-    describe "tests for expansions"
-        [ test "expansion types to names, full" <|
-            \_ ->
-                Expect.equal
-                    [ "Base Game", "Time Extended 10" ]
-                    (List.map fromExpansion [ BaseGame, TX 10 ])
-        , test "expansion types to names, abbreviation" <|
-            \_ ->
-                Expect.equal
-                    [ "BG", "TX#10" ]
-                    (List.map fromExpansionAbbrev [ BaseGame, TX 10 ])
-        , test "check expansion filter is operating" <|
-            \_ ->
-                let
-                    actual =
-                        Model.Weapon.BaseGame.weapons
-                            |> List.map (expansionFilter [ TX 2 ])
-
-                    expected =
-                        List.repeat (List.length Model.Weapon.BaseGame.weapons) False
-                in
-                Expect.equal
-                    expected
-                    actual
-        ]

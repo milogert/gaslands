@@ -2,7 +2,6 @@ module Model.Decoders.Vehicles exposing
     ( gearDecoder
     , hullDecoder
     , vehicleDecoder
-    , vtypeDecoder
     , weightDecoder
     )
 
@@ -12,16 +11,17 @@ import Model.Decoders.Shared exposing (..)
 import Model.Decoders.Sponsors exposing (..)
 import Model.Decoders.Upgrades exposing (..)
 import Model.Decoders.Weapons exposing (..)
+import Model.Vehicle exposing (..)
 import Model.Vehicle.Common exposing (..)
-import Model.Vehicle.Model exposing (..)
 
 
 vehicleDecoder : Decoder Vehicle
 vehicleDecoder =
     succeed Vehicle
         |> required "name" string
+        |> required "category" (string |> andThen categoryDecoderHelper)
         |> optional "photo" (nullable string) Nothing
-        |> required "vtype" vtypeDecoder
+        |> required "type_" string
         |> required "gear" gearDecoder
         |> hardcoded 0
         |> required "handling" int
@@ -39,25 +39,6 @@ vehicleDecoder =
         |> required "specials" (list specialDecoder)
         |> required "perks" (list vehiclePerkDecoder)
         |> optional "requiredSponsor" (string |> andThen requiredSponsorDecoderHelper) Nothing
-        |> required "expansion" expansionDecoder
-
-
-vtypeDecoder : Decoder VehicleType
-vtypeDecoder =
-    string
-        |> andThen
-            (\str ->
-                let
-                    vtype =
-                        strToVT str
-                in
-                case vtype of
-                    Just vt ->
-                        succeed vt
-
-                    Nothing ->
-                        fail <| str ++ " is not a valid vehicle type"
-            )
 
 
 gearDecoder : Decoder GearTracker

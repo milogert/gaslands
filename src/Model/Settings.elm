@@ -1,12 +1,9 @@
 module Model.Settings exposing
-    ( ExpansionTracker
-    , Settings
+    ( Settings
     , SettingsEvent(..)
     , SpinResult
     , init
     )
-
-import Model.Shared exposing (Expansion(..))
 
 
 type SettingsEvent
@@ -15,7 +12,6 @@ type SettingsEvent
     | UpdateUpgradeCount Int
     | UpdatePerkCount Int
     | GenerateTeam
-    | EnableExpansion Expansion Bool
     | NewTeamVersion
 
 
@@ -26,7 +22,6 @@ type alias Settings =
     , percentPerks : Int
     , pointsAllowed : Int
     , spinResults : List SpinResult
-    , expansions : ExpansionTracker
     }
 
 
@@ -36,18 +31,6 @@ type alias SpinResult =
     }
 
 
-type alias ExpansionTracker =
-    { enabled : List Expansion
-    , available : List Expansion
-    }
-
-
 init : Settings
 init =
-    Settings 60 30 10 0 50 [] initExpansionTracker
-
-
-initExpansionTracker : ExpansionTracker
-initExpansionTracker =
-    ExpansionTracker [ BaseGame ]
-        [ BaseGame, TX 2 ]
+    Settings 60 30 10 0 50 []

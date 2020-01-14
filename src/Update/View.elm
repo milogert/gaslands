@@ -48,7 +48,17 @@ update model currentView =
                 ]
             )
 
-        _ ->
-            ( { model | view = currentView }
+        ViewSponsor ->
+            ( changedView
+            , doNavClose
+            )
+
+        ViewPrintAll ->
+            ( changedView
+            , Cmd.none
+            )
+
+        ViewNew _ ->
+            ( changedView
             , Cmd.none
             )

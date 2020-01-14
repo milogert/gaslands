@@ -1,13 +1,13 @@
 module Update.Vehicle exposing (update)
 
-import Dict exposing (Dict)
+import Dict
 import List.Extra as ListE
 import Model.Model exposing (..)
 import Model.Sponsors exposing (..)
+import Model.Vehicle exposing (..)
 import Model.Vehicle.Common exposing (..)
-import Model.Vehicle.Model exposing (..)
 import Model.Views exposing (ViewEvent(..))
-import Model.Weapon.Model exposing (..)
+import Model.Weapon exposing (..)
 import Ports.Photo
 import Update.Utils exposing (..)
 import View.Utils
@@ -170,13 +170,13 @@ addVehicle model vehicle =
                 { vehicle | key = key }
                 model.vehicles
     in
-    case ( vehicle.vtype, vehicle.name ) of
-        ( _, "" ) ->
+    case vehicle.name of
+        "" ->
             ( { model | error = VehicleNameError :: model.error }
             , Cmd.none
             )
 
-        ( _, _ ) ->
+        _ ->
             ( { model
                 | vehicles = newDict
                 , tmpVehicle = Nothing
@@ -348,24 +348,6 @@ deleteVehicle model key =
       }
     , Cmd.none
     )
-
-
-rollSkidDice : Model -> String -> List SkidResult -> ( Model, Cmd Msg )
-rollSkidDice model key skidResults =
-    case Dict.get key model.vehicles of
-        Nothing ->
-            ( model, Cmd.none )
-
-        Just vehicle ->
-            let
-                nv =
-                    { vehicle | skidResults = skidResults }
-            in
-            ( { model
-                | vehicles = Dict.insert key nv model.vehicles
-              }
-            , Cmd.none
-            )
 
 
 setPerkInVehicle : Model -> String -> VehiclePerk -> Bool -> ( Model, Cmd Msg )

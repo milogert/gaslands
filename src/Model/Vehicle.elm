@@ -1,20 +1,19 @@
-module Model.Vehicle.Model exposing
+module Model.Vehicle exposing
     ( GearTracker
     , HullHolder
     , SkidResult(..)
     , Vehicle
     , VehicleEvent(..)
-    , VehicleType(..)
     , WeightClass(..)
     , defaultVehicle
     )
 
 import Model.Shared exposing (..)
 import Model.Sponsors exposing (..)
+import Model.Upgrade exposing (..)
 import Model.Upgrade.Common exposing (..)
-import Model.Upgrade.Model exposing (..)
+import Model.Weapon exposing (..)
 import Model.Weapon.Common exposing (..)
-import Model.Weapon.Model exposing (..)
 
 
 type VehicleEvent
@@ -43,8 +42,9 @@ type VehicleEvent
 
 type alias Vehicle =
     { name : String
+    , category : Category
     , photo : Maybe String
-    , vtype : VehicleType
+    , type_ : String
     , gear : GearTracker
     , hazards : Int
     , handling : Int
@@ -62,22 +62,7 @@ type alias Vehicle =
     , specials : List Special
     , perks : List VehiclePerk
     , requiredSponsor : Maybe Sponsor
-    , expansion : Expansion
     }
-
-
-type VehicleType
-    = Bike
-    | Buggy
-    | Car
-    | PerformanceCar
-    | PickupTruck
-    | MonsterTruck
-    | Bus
-    | WarRig
-    | Tank
-    | Gyrocopter
-    | Helicopter
 
 
 type SkidResult
@@ -110,8 +95,9 @@ defaultVehicle : Vehicle
 defaultVehicle =
     Vehicle
         ""
+        Basic
         Nothing
-        Bike
+        ""
         (GearTracker 1 0)
         0
         0
@@ -129,4 +115,3 @@ defaultVehicle =
         []
         []
         Nothing
-        BaseGame

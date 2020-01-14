@@ -8,9 +8,9 @@ import Model.Decoders.Weapons exposing (..)
 import Model.Encoders.Shared exposing (..)
 import Model.Shared exposing (..)
 import Model.Upgrade.Common
-import Model.Vehicle.Model exposing (defaultVehicle)
+import Model.Vehicle exposing (defaultVehicle)
+import Model.Weapon exposing (..)
 import Model.Weapon.Common exposing (..)
-import Model.Weapon.Model exposing (..)
 import Test exposing (..)
 
 

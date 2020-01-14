@@ -1,11 +1,10 @@
-module Model.Weapon.Model exposing
+module Model.Weapon exposing
     ( Dice
     , Range(..)
     , Weapon
     , WeaponEvent(..)
     , WeaponMounting(..)
     , WeaponStatus(..)
-    , WeaponType(..)
     , defaultWeapon
     )
 
@@ -26,7 +25,6 @@ type WeaponEvent
 
 type alias Weapon =
     { name : String
-    , wtype : WeaponType
     , mountPoint : Maybe WeaponMounting
     , attack : Maybe Dice
     , attackRoll : Int
@@ -36,14 +34,8 @@ type alias Weapon =
     , cost : Int
     , status : WeaponStatus
     , requiredSponsor : Maybe Sponsor
-    , expansion : Expansion
+    , category : Category
     }
-
-
-type WeaponType
-    = Shooting
-    | Dropped
-    | SmashType
 
 
 type WeaponMounting
@@ -58,12 +50,13 @@ type WeaponMounting
 type Range
     = Short
     | Medium
+    | Long
     | Double
     | TemplateLarge
-    | BurstSmall
-    | BurstLarge
+    | BurstRange Size
     | SmashRange
     | SpecialRange String
+    | Dropped
 
 
 type WeaponStatus
@@ -81,7 +74,6 @@ defaultWeapon : Weapon
 defaultWeapon =
     Weapon
         ""
-        Shooting
         Nothing
         Nothing
         0
@@ -91,4 +83,4 @@ defaultWeapon =
         0
         WeaponReady
         Nothing
-        BaseGame
+        Basic

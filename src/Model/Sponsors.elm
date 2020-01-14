@@ -20,29 +20,29 @@ module Model.Sponsors exposing
     , tuning
     )
 
-import Model.Shared exposing (Expansion(..))
-
 
 type alias Sponsor =
     { name : String
     , description : String
     , perks : List TeamPerk
     , grantedClasses : List PerkClass
-    , expansion : Expansion
     }
 
 
 type PerkClass
     = Aggression
     | Badass
+    | Built
     | Daring
+    | Horror
     | Military
     | Precision
+    | Pursuit
+    | Reckless
     | Speed
     | Technology
     | PrisonCars
     | Tuning
-    | Pursuit
 
 
 fromPerkClass : PerkClass -> String
@@ -54,14 +54,26 @@ fromPerkClass perkClass =
         Badass ->
             "Badass"
 
+        Built ->
+            "Built"
+
         Daring ->
             "Daring"
+
+        Horror ->
+            "Horror"
 
         Military ->
             "Military"
 
         Precision ->
             "Precision"
+
+        Pursuit ->
+            "Pursuit"
+
+        Reckless ->
+            "Reckless"
 
         Speed ->
             "Speed"
@@ -74,9 +86,6 @@ fromPerkClass perkClass =
 
         Tuning ->
             "Tuning"
-
-        Pursuit ->
-            "Pursuit"
 
 
 type alias TeamPerk =
@@ -100,7 +109,13 @@ allSponsors =
     , idris
     , slime
     , warden
-    , scarlettAnnie
+    , scarlett
+    , highwayPatrol
+    , verney
+    , maxxine
+    , orderOfTheInferno
+    , beverly
+    , rustysBootleggers
     ]
 
 
@@ -113,14 +128,26 @@ getClassPerks perkClass =
         Badass ->
             badass
 
+        Built ->
+            built
+
         Daring ->
             daring
+
+        Horror ->
+            horror
 
         Military ->
             military
 
         Precision ->
             precision
+
+        Pursuit ->
+            pursuit
+
+        Reckless ->
+            reckless
 
         Speed ->
             speed
@@ -133,9 +160,6 @@ getClassPerks perkClass =
 
         Tuning ->
             tuning
-
-        Pursuit ->
-            pursuit
 
 
 stringToSponsor : String -> Maybe Sponsor
@@ -156,7 +180,6 @@ defaultSponsor =
         ""
         []
         []
-        BaseGame
 
 
 rutherford : Sponsor
@@ -175,7 +198,6 @@ rutherford =
                 "If a vehicle in this team causes 6 or more hits in a single attack step, before evades, this team gains +1 audience votes."
             ]
         , grantedClasses = [ Badass, Military ]
-        , expansion = BaseGame
     }
 
 
@@ -195,7 +217,6 @@ miyazaki =
                 "Once per gear phase, if all of this team's in-play vehicles activated, resolved at least on un-canceled spin result, resolved at least one un-canceled slide result, resolved at least on stick-shift, and did not wipe out, this team gains +1 audience vote for each of this team's in-play vehicles."
             ]
         , grantedClasses = [ Daring, Precision ]
-        , expansion = BaseGame
     }
 
 
@@ -213,7 +234,6 @@ mishkin =
                 "Whenever a vehicle in this team attack with a named weapon that has not been attacked with by any vehicle during this game yet this team gains +1 audience vote."
             ]
         , grantedClasses = [ Military, Technology ]
-        , expansion = BaseGame
     }
 
 
@@ -233,7 +253,6 @@ idris =
                 "This team may not purchase Gyrocopters."
             ]
         , grantedClasses = [ Precision, Speed ]
-        , expansion = BaseGame
     }
 
 
@@ -249,7 +268,6 @@ slime =
                 "If a vehicle in this team is involved in a sideswipe smash attack during its activation, immediately resolve another movement step with that vehicle after the current movement step."
             ]
         , grantedClasses = [ Aggression, Speed ]
-        , expansion = BaseGame
     }
 
 
@@ -265,12 +283,11 @@ warden =
                 "If a vehicle belonging to this team explodes, gain +1 audience vote if it was middleweight or +2 audience votes if it was heavyweight in addition to any votes gained for being wrecked, and then discard all ammo tokens from the wreck."
             ]
         , grantedClasses = [ Aggression, Badass, PrisonCars ]
-        , expansion = BaseGame
     }
 
 
-scarlettAnnie : Sponsor
-scarlettAnnie =
+scarlett : Sponsor
+scarlett =
     { defaultSponsor
         | name = "Scarlett Annie"
         , description = "Gaslands is able to support a vast ecosystem of villainous and scurvy raiders, picking off richer teams as their rigs roll from one televised race to the next. Many of these self-styled pirate crews have gained renown, but none have rivalled the infamy or showmanship of Scarlett Annie. A dashing and flamboyant buccaneer, her cult following is likely more to do with her canny association with the long-running \"Death Valley Death Run\" documentary TV series than any particular skill at dust bowl piracy."
@@ -285,7 +302,102 @@ scarlettAnnie =
                 "When another vehicle in contact with this vehicle is wrecked, this vehicle may gain either 1 crew or 2 audience votes."
             ]
         , grantedClasses = [ Tuning, Aggression ]
-        , expansion = TX 2
+    }
+
+
+highwayPatrol : Sponsor
+highwayPatrol =
+    { defaultSponsor
+        | name = "Highway Patrol"
+        , description = "Along the Wrecked and broken highways, where law is another word fir vengeance, and justice is a forgotten memory; a handful of souls still cling to a dream of order Perhaps they do it for the glory. Maybe they even get a kick out of it. They are unsanctiond unloved and unpaid. Their only power: a badge of bronze. Their only weapon: 600 horsepower offuel-injected steel. The Highway Patrol are the last law in a world gone crazy."
+        , perks =
+            [ TeamPerk "Hot Pursuit" "Before the first Gear Phase of the game, after deployment, this team must nominate one enemy vet - the \"bogey\". If the bogey is Wrecked or disqualified, immediately n, another enemy vehicle to be the bogey."
+            , TeamPerk "Bogey at 12 o'clock" "At the end of this N ovement Step, if the bogey in is this vehicle's front Arc of Fire, and further than Double Range away, and can be seen by this vehicle, this vehicle may immediately resolve another Movement Step."
+            , TeamPerk "Siren" "At the end of this vehicle's Attack Step, if this vehicle is in the bogey's rear Arc of Fire (regardless of range), the bogey must either reduce its Gear by 1 or gain 2 Hazard Tokens."
+            , TeamPerk "Steel Justice" "If the bogey wipes out, this team, as a whole, gains 2 Audience Votes. If the bogey is Wrecked this team, as a whole, gains 4 Audience Votes"
+
+            -- TODO Teams sponsored by Highway Patrol may purchase the following upgrade: • Louder Siren (2 Cans): Replace Thogey" with "any enemy vehicle" for the purposes of the Siren special rules. e
+            ]
+        , grantedClasses = [ Speed, Pursuit ]
+    }
+
+
+verney : Sponsor
+verney =
+    { defaultSponsor
+        | name = "Verney TODO"
+        , description = "Many have taken the bent deal offered by Warden but only one has ever earned their freedom. As skilled an engineer as he is a driven the newly-freed Verney now specialised in building unique Frankenstein's monsters of vehicles for anyone who can afford his high-quality customs."
+        , perks =
+            [ TeamPerk "MicroPlate Armour" "Vehicles in this team may purchase the MicroPlate Armour upgrade, which costs 6 Cans, increases the vehicles Hull Value by 2, and requires 0 build. slots."
+            , TeamPerk "Trunk of Junk" "You may attack with any number of dropped weapons in a single activation."
+            , TeamPerk "Tombstone" "If the shooting template of a shooting attack touches the rear • edge of this vehicle, this vehicle gains +1 to its Evade rolls. During this vehicle's Attack Step, this vehicle may gain 2 Hazard Tokens. If it does, all Collisions involving this vehicle are considered to be Head-on until the start of its next activation."
+            , TeamPerk "That's Entertainment" "Whenever a dropped weapon template that was placed by this team is removed from play, this team gains 1 Audience Vote. "
+            ]
+        , grantedClasses = [ Technology, Built ]
+    }
+
+
+maxxine : Sponsor
+maxxine =
+    { defaultSponsor
+        | name = "Maxxine"
+        , description = "Maxxine is the current grease-smeared face of The Black Swans. While many might assume art to have been the last thing to survive the Martian bombs, The Black Swans dance their mechanised masque for a hypnotised audience. It's ballet, but the dancers weigh 4,000 pounds and are dripping in engine oil."
+        , perks =
+            [ TeamPerk "Dizzy" "This vehicle may resolve any number of Spin results separately • during its Movement Step, one after another. This can allow this vehicle to Spin more than 90 degrees during its Movement Step."
+            , TeamPerk "Maxximum Drift" "If this vehicle resolves two Slide results in a single Movement Step, it may use the Medium Straight in place of the slide template. If this vehicle resolves three or more Slide results in a single Movement Step, it may use the Long Straight in place of the Slide template."
+            , TeamPerk "Meshuggah" "When this vehicle resolves a Slide or Spin that ends within Medium range of a friendly vehicle without causing a Collision, this team gains 1 Audience Vote."
+            ]
+        , grantedClasses = [ Tuning, Pursuit ]
+    }
+
+
+orderOfTheInferno : Sponsor
+orderOfTheInferno =
+    { defaultSponsor
+        | name = "Order of the Inferno"
+        , description = "Yandi Idris is not dead. He cannot die. He rides on in the living flame. His voice can be heard in the roar of the road and the screams of superheated metal. Yandi is free, and we can be too. He has shown us the path. Only by knowing the flames can we know true freedom. Buy your copy of \"Freedom in The Flames\" today to find out more. Available from Order of the Inferno stalls at all major trading outposts."
+        , perks =
+            [ TeamPerk "Fire Walk With Me" "When this -would receive damage from any weapon or effect with the Fire rule, this vehicle may reduce the damage received by up to three, to a minimum of one."
+            , TeamPerk "Burning Man" "If this vehicle is On Fire it gains +1 to all Evade dice."
+            , TeamPerk "Cult of Flame" "At the end of the Gear Phase, if there are more enemy vehicles On Fire than there are friendly vehicles On Fire, or all enemy vehicles are On Fire, this team gains 1 Audience Vote for each friendly vehicle that is On Fire. "
+            ]
+        , grantedClasses = [ Horror, Speed ]
+    }
+
+
+beverly : Sponsor
+beverly =
+    { defaultSponsor
+        | name = "Beverly, the Devil on the Highway"
+        , description = "The low growling of the starting grid was y eclipsed by an ear-splitting, dizzying sound. Eyeball-shakingly loud, the szeeching was suffocating.  A single car drifted forward into the pack, windows like onyx, bumper corroded. The sound changed timbre, dropping suddenly to a sub-audible throb that tightened chests and shattered headlamps. Despite the harsh desert sun, frost began to form  on windshields. Beverly was a stupid story told to scare children. She wasn't real."
+        , perks =
+            [ TeamPerk "Graveyard Shift" "At the start of the game, after deployment, all vehicles in this team except one must gain the Ghost Rider special rule."
+            , TeamPerk "Ghost Rider" "This vehicle ignores, and is ignored by, other vehicles at all times. This vehicle cannot be involved in Collisions. This vehicle may not make shooting attacks or be attacked with shooting weapons. This vehicle may never count towards the victory conditions of a scenario."
+            , TeamPerk "Soul Anchor" "If all in-play vehicles from this team have the Ghost Rider special rule immediately remove all vehicles on this team from play."
+            , TeamPerk "At the Crossroads" "This team may choose to pay only 1 Audience Vote to respawn a vehicle. If they do, the respawned vehicle must gain the Ghost Rider special rule."
+            , TeamPerk "Inexorable" "If a vehicle from to, vehicle may be respawned, e-k, - that."
+            , TeamPerk "Soul Harvest" "If this vehicle's wreck or out of play, the Jles would ordinarily prevent template comes into contact with an enemy vehicle, this vehicle gains Soul Token, even if the enemy vehicle is being ignored. If this vehicle's movement template comes into contact with a friendly vehicle without the Ghost Rider rule that it did not start in contact with, choose one: either gain 1 Audience Vote for each Soul token or repair two Hull Points on the vehicle without the Ghost Rider rule for each Soul Token. Then discard all Soul Tokens from this vehicle. A Ghost Rider may gain a Soul Token and give it to a friendly vehicle in the same activation, as tong as it would come into contact with the enemy vehicle first."
+            ]
+        , grantedClasses = [ Horror, Built ]
+    }
+
+
+rustysBootleggers : Sponsor
+rustysBootleggers =
+    { defaultSponsor
+        | name = "Rusty's Bootleggers"
+        , description = "Zeke Rusty and his boys been wall to wall and treetop-tall since before the world went to hell, running moonshine past Smokey back since before the big red one fell. Their stills are volatile, their delivery vehicles are ramshackle, but they still run liquor that grandpappy would be proud of.. though none the boys can remember just how he liked it right now. Damn that gin."
+        , perks =
+            [ TeamPerk "Party Hard" "At the end of this vehicle's Attack Step, if this vehicle has more Hazard Tokens than the sum of the Hazard Tokens on all other enemy vehicles within Medium range combined, this vehicle's controller gains 1 Audience Vote for each enemy -ve' --/th one or more Hazard Tokens within Medium range of this v."
+            , TeamPerk "Dutch courage" "Vehicles in this team .put when they have 8 Hazard Tokens."
+            , TeamPerk "As Straight as I'm Able" "This vehicle does not gain a Hazard Token from the articulated rule if it selects a template that is not a Straight."
+            , TeamPerk "Over the Limit" "This vehicle never considers any of the Straight movement templates to be permitted. This vehicle considers Veer to be permitted and Trivial in any Gear."
+            , TeamPerk "Trailer Trash" "This team may purchase Trailers. This team must contain either: one or more Medium or Heavyweight vehicles equipped with a trailer upgrade, or a War Rig."
+            , TeamPerk "Haulage" "Each vehicle on this team equipped with a trailer upgrade, and • each War Rig on this team, may equip a single trailer cargo upgrade for free. "
+
+            -- TODO TRAILERS A trailer is an upgrade. A vehicle may be equipped with a single trailer. A War Rig may not be equipped with the trailer upgrade. A vehicle equipped with a trailer gains the Articulated, Ponderous, and Piledriver special rules, (see War Rig, page 116)
+            ]
+        , grantedClasses = [ Reckless, Built ]
     }
 
 
@@ -315,6 +427,17 @@ badass =
     ]
 
 
+built : List VehiclePerk
+built =
+    [ VehiclePerk "Dead Weight" 2 "During this vehicle's Attack Step, this vehicle may gain 2 Hazard Tokens to countas one weight-class heavier (unless already Heavyweight) until the start of its next activation."
+    , VehiclePerk "Barrel Roll" 2 "When this vehicle suffers a Flip, it may choose to place the Flip template touching the centre of either side edge or the rear edge of this vehicle, and perpendicular to that edge, instead of touching the front edge as normal."
+    , VehiclePerk "Bruiser" 4 "In a Collision involving this vehicle, if this vehicle declares a reaction other than Evade against an enemy vehicle, th '.-ehicle immediately gains one Hazard Token."
+    , VehiclePerk "Splash" 5 "Once per step, when this vehicle loses one or more Hull Points, make a 1D6 attack against each vehicle within Medium range at end of that step."
+    , VehiclePerk "Crusher" 7 "This vehicle gains the Up and Over special rule (See the Monster Truck rules, page 71)."
+    , VehiclePerk "Feel No Pain" 8 "During an enemy vehicle's Attack Step, after an attacker has rolled all their attack dice against this vehicle, if the attacks caused a total of 2 or fewer uncancelled hits, cancel all remaining hits."
+    ]
+
+
 daring : List VehiclePerk
 daring =
     [ VehiclePerk "Evasive" 5 "This vehicle counts a roll of a 5+ as a success during an evade attempt."
@@ -323,6 +446,17 @@ daring =
     , VehiclePerk "Trick Driving" 5 "This vehicle may select a maneuver template as if its current gear was on higher or one lower. This vehicle still uses its actual current gear during its skid check. An otherwise unpermitted maneuver template selected using this perk counts as a hazardous maneuver."
     , VehiclePerk "Stunt Driver" 7 "May only be taken on a Bike, Buggy, Car or Performance Car. This vehicle may choose to ignore any number of obstructions during its movement step. After any movement step in which this vehicle chooses to ignore any obstruction using this ability, this vehicle immediately gains 3 hazard tokens."
     , VehiclePerk "Chrome-Whisperer" 2 "This vehicle may push it any number of times during a single skid check, gaining +1 hazard token each time."
+    ]
+
+
+horror : List VehiclePerk
+horror =
+    [ VehiclePerk "Purifying Flames" 1 "once per activation, at the start of this vehicle's 'activation, this vehicle may s ff up to three damage to select any friendly vehicle. For each point of da el. suffered via this effect, repair that number of Hull Points on the target Vehicalgee This damage may not be reduced. This damage counts as having the Fire rule. This effect may not be used to raise a vehicle above its starting Hull Value."
+    , VehiclePerk "Ecstatic Visions" 1 "Once per activation, at the start of this vehicle's activation, this vehicle may gain up to 3 Hazard Tokens to discard 1 Hazard Token from a friendly vehicle for each Hazard Token gained."
+    , VehiclePerk "Sympathy For The Devil" 1 "When this vehicle makes an Evade check, its controller may select a friendly vehicle within Medium range. Add the current Gear of the selected vehicle to this vehicle's current Gear for the purposes of this evade check. Both the selected vehicle and this vehicle suffer any unsaved damage from this attack, including any additional effects."
+    , VehiclePerk "HIGHWAY TO HELL" 2 "At the end of its Movement Step, if this vehic e selected a straight template, this vehicle may suffer two damage. This damage counts as having the Fire rule. If any Hull Points are removed by this effect, this vehicle may leave its movement template (ignoring any slide template) in play as a Napalm dropped weapon template. Remove this template at the start of this vehicle's next activation. (You may wish to download and print out extra paper templates for this effect.)"
+    , VehiclePerk "Violent Manifestation" 3 "When this vehicle is respawned: make an immediate attack (with attack dice based on the weight of the respawned vehicle) against every other vehicle within Medium range as if this vehicle was an exploding wreck. This explosion counts as having both the " Blast " and " Fire " rules."
+    , VehiclePerk "Angel Of Death" 4 "Before making an attack, this vehicle may suffer up to three damage to add that many attack dice to a single weapon used in this attack."
     ]
 
 
@@ -345,6 +479,40 @@ precision =
     , VehiclePerk "Restraint" 2 "When making a skid check, this vehicle does not receive hazard tokens for stick-shifting down a gear."
     , VehiclePerk "Expertise" 3 "This vehicle adds +1 to its handling value."
     , VehiclePerk "Handbrake Artist" 5 "When applying a spin result, this vehicle may choose to face any direction."
+    ]
+
+
+pursuit : List VehiclePerk
+pursuit =
+    [ VehiclePerk "On Your Tail"
+        2
+        "When an enemy vehicle resolves a spin or slide move that ends within short range of this vehicle, that vehicle gains +1 hazard token."
+    , VehiclePerk "Schadenfreude"
+        2
+        "If another vehicle within short range of this vehicle resolves a wipe out, (either before or after any flip), remove all hazard tokens from this vehicle."
+    , VehiclePerk "Taunt"
+        2
+        "At the start of this vehicle’s attack step, roll a skid die. If you roll something other than a SHIFT result, you may place that skid die result onto the dashboard of a target vehicle within short range. This skid die result must be resolved during that vehicle’s next skid check, and may not be re-rolled."
+    , VehiclePerk "Out Run"
+        2
+        "At the start of this vehicle’s attack step, all vehicles within short range of this vehicle and in a current, lower gear than this vehicle gain +1 hazard token."
+    , VehiclePerk "PIT"
+        4
+        "If this vehicle is involved in a collision with an enemy vehicle during its activation that is not head-on, it may declare a “Pursuit Intervention Technique” (PIT) against the enemy vehicle instead of declaring a SMASH ATTACK or an evade. If this vehicle declares a PIT, it may select any maneuver template the target vehicle considers hazardous in its current gear. The target vehicle must immediately resolve a movement step, during which it is forced to must use the maneuver template selected for it and may not roll any skid dice."
+    , VehiclePerk "Unnerving Eye Contact"
+        5
+        "Enemy vehicles within short range of this vehicle may not use shift results to remove hazard tokens from their dashboard."
+    ]
+
+
+reckless : List VehiclePerk
+reckless =
+    [ VehiclePerk "Drive Angry" 1 "At the start of this vehicle's activation, this vehicle gains 1 Hazard Token."
+    , VehiclePerk "Hog Wild" 2 "During a Collision resolved during a Wipeour Step, this vehicle gains +2 Smash Attack dice. "
+    , VehiclePerk "In For a Penny" 2 "If this vehicle has gained six or more Hazard Tokens during this activation, it may double the attack dice of any Smash Attack it makes for the remainder of this activation. "
+    , VehiclePerk "Don't Come Knocking" 4 "At the start of this vehicle's activation, it may gain 4 Hazard Tokens. If it does, this vehicle cannot gain or lose any Hazard Tokens by any means until the start of its next activation. "
+    , VehiclePerk "Bigger'n You" 4 "If this vehicle is involved in a Collision, double any Smash Attack bonuses or penalties resulting from weight differences during that Collision."
+    , VehiclePerk "Beerserker" 5 "When•s vehicle would suffe ion damage by 1, to a minimum of 1. reduce that this damage outside of its activat, "
     ]
 
 
@@ -398,27 +566,4 @@ tuning =
     , VehiclePerk "Momentum"
         3
         "When resolving a skid check, this vehicle may set aside any number of slide results to re-roll 1 non-slide result for each slide result set aside. When resolving a skid check, this vehicle may set aside any number for each spin results to re-roll 1 non-spin result for each spin result set aside. Set aside results must be resolved."
-    ]
-
-
-pursuit : List VehiclePerk
-pursuit =
-    [ VehiclePerk "On Your Tail"
-        2
-        "When an enemy vehicle resolves a spin or slide move that ends within short range of this vehicle, that vehicle gains +1 hazard token."
-    , VehiclePerk "Schadenfreude"
-        2
-        "If another vehicle within short range of this vehicle resolves a wipe out, (either before or after any flip), remove all hazard tokens from this vehicle."
-    , VehiclePerk "Taunt"
-        2
-        "At the start of this vehicle’s attack step, roll a skid die. If you roll something other than a SHIFT result, you may place that skid die result onto the dashboard of a target vehicle within short range. This skid die result must be resolved during that vehicle’s next skid check, and may not be re-rolled."
-    , VehiclePerk "Out Run"
-        2
-        "At the start of this vehicle’s attack step, all vehicles within short range of this vehicle and in a current, lower gear than this vehicle gain +1 hazard token."
-    , VehiclePerk "PIT"
-        4
-        "If this vehicle is involved in a collision with an enemy vehicle during its activation that is not head-on, it may declare a “Pursuit Intervention Technique” (PIT) against the enemy vehicle instead of declaring a SMASH ATTACK or an evade. If this vehicle declares a PIT, it may select any maneuver template the target vehicle considers hazardous in its current gear. The target vehicle must immediately resolve a movement step, during which it is forced to must use the maneuver template selected for it and may not roll any skid dice."
-    , VehiclePerk "Unnerving Eye Contact"
-        5
-        "Enemy vehicles within short range of this vehicle may not use shift results to remove hazard tokens from their dashboard."
     ]

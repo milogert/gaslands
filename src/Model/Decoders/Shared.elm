@@ -1,5 +1,5 @@
 module Model.Decoders.Shared exposing
-    ( expansionDecoder
+    ( categoryDecoderHelper
     , requiredSponsorDecoderHelper
     , specialDecoder
     )
@@ -27,23 +27,14 @@ specialDecoderHelper str =
         "NamedSpecialRule" ->
             namedSpecialRuleDecoder
 
-        "TreacherousSurface" ->
-            succeed TreacherousSurface
-
         "Blast" ->
             blastDecoder
 
         "Fire" ->
             fireDecoder
 
-        "Explosive" ->
-            explosiveDecoder
-
         "Blitz" ->
             blitzDecoder
-
-        "HighlyExplosive" ->
-            highlyExplosiveDecoder
 
         "Electrical" ->
             electricalDecoder
@@ -59,12 +50,6 @@ specialDecoderHelper str =
 
         "CrewMod" ->
             crewModDecoder
-
-        "Specialist" ->
-            specialistDecoder
-
-        "Entangle" ->
-            entangleDecoder
 
         _ ->
             fail <| str ++ " is not a valid special type"
@@ -95,19 +80,9 @@ fireDecoder =
     succeed Fire
 
 
-explosiveDecoder : Decoder Special
-explosiveDecoder =
-    succeed Explosive
-
-
 blitzDecoder : Decoder Special
 blitzDecoder =
     succeed Blitz
-
-
-highlyExplosiveDecoder : Decoder Special
-highlyExplosiveDecoder =
-    succeed HighlyExplosive
 
 
 electricalDecoder : Decoder Special
@@ -135,16 +110,6 @@ crewModDecoder =
     map CrewMod (field "modifier" int)
 
 
-specialistDecoder : Decoder Special
-specialistDecoder =
-    succeed Specialist
-
-
-entangleDecoder : Decoder Special
-entangleDecoder =
-    succeed Entangle
-
-
 requiredSponsorDecoderHelper : String -> Decoder (Maybe Sponsor)
 requiredSponsorDecoderHelper str =
     let
@@ -159,20 +124,14 @@ requiredSponsorDecoderHelper str =
             fail <| str ++ " is not a valid sponsor type"
 
 
-expansionDecoder : Decoder Expansion
-expansionDecoder =
-    field "type" string
-        |> andThen expansionDecoderHelper
+categoryDecoderHelper : String -> Decoder Category
+categoryDecoderHelper str =
+    case str of
+        "Basic" ->
+            succeed Basic
 
-
-expansionDecoderHelper : String -> Decoder Expansion
-expansionDecoderHelper type_ =
-    case type_ of
-        "Base Game" ->
-            succeed BaseGame
-
-        "Time Extended" ->
-            map TX (field "number" int)
+        "Advanced" ->
+            succeed Advanced
 
         _ ->
-            fail <| type_ ++ " is not a valid expansion."
+            fail <| str ++ " is not a valid category type"

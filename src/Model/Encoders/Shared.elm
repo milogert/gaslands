@@ -1,5 +1,5 @@
 module Model.Encoders.Shared exposing
-    ( expansionEncoder
+    ( categoryEncoder
     , requiredSponsorEncoder
     , specialEncoder
     )
@@ -94,13 +94,15 @@ requiredSponsorEncoder mSponsor =
             string <| sponsor.name
 
 
-expansionEncoder : Expansion -> List ( String, Value )
-expansionEncoder expansion =
-    case expansion of
-        BaseGame ->
-            [ ( "type", string "Base Game" ) ]
+categoryEncoder : Category -> Value
+categoryEncoder category =
+    let
+        categoryText =
+            case category of
+                Basic ->
+                    "Basic"
 
-        TX i ->
-            [ ( "type", string "Time Extended" )
-            , ( "number", int i )
-            ]
+                Advanced ->
+                    "Advanced"
+    in
+    string categoryText

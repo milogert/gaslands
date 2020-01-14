@@ -13,7 +13,6 @@ suite : Test
 suite =
     describe "shared decoders tests" <|
         specialDecodeTestGenerator
-            ++ expansionDecodeTestGenerator
             ++ sponsorDecodeTestGenerator
 
 
@@ -79,32 +78,6 @@ specialDecodeTestGenerator =
             )
 
 
-expansionDecodeTestGenerator : List Test
-expansionDecodeTestGenerator =
-    [ ( "{\"type\": \"Base Game\"}"
-      , Ok <| BaseGame
-      )
-    , ( "{\"type\": \"Time Extended\", \"number\": 2}"
-      , Ok <| TX 2
-      )
-    , ( "{\"type\": \"garbo\"}"
-      , Err
-            (Failure
-                "garbo is not a valid expansion."
-                (Json.Encode.object [ ( "type", Json.Encode.string "garbo" ) ])
-            )
-      )
-    ]
-        |> List.map
-            (\( json, expansion ) ->
-                test ("test expansion decoding: " ++ json) <|
-                    \_ ->
-                        json
-                            |> decodeString expansionDecoder
-                            |> Expect.equal expansion
-            )
-
-
 sponsorDecodeTestGenerator : List Test
 sponsorDecodeTestGenerator =
     [ ( "\"Rutherford\""
@@ -121,10 +94,10 @@ sponsorDecodeTestGenerator =
       )
     ]
         |> List.map
-            (\( json, expansion ) ->
-                test ("test expansion decoding: " ++ json) <|
+            (\( json, sponsor ) ->
+                test ("test sponsor decoding: " ++ json) <|
                     \_ ->
                         json
                             |> decodeString (Json.Decode.string |> Json.Decode.andThen requiredSponsorDecoderHelper)
-                            |> Expect.equal expansion
+                            |> Expect.equal sponsor
             )
