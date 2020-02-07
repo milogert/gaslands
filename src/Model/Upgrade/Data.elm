@@ -1,4 +1,4 @@
-module Model.Upgrade.BaseGame exposing (upgrades)
+module Model.Upgrade.Data exposing (upgrades)
 
 import Model.Shared exposing (..)
 import Model.Sponsors exposing (stringToSponsor)

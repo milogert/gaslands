@@ -14,12 +14,12 @@ module Model.Weapon.Common exposing
 import Dict
 import Model.Shared exposing (..)
 import Model.Weapon exposing (..)
-import Model.Weapon.BaseGame
+import Model.Weapon.Data
 
 
 handgun : Weapon
 handgun =
-    Model.Weapon.BaseGame.handgun
+    Model.Weapon.Data.handgun
 
 
 fromWeaponMounting : WeaponMounting -> String
@@ -112,7 +112,7 @@ fromWeaponStatus status =
 
 allWeaponsList : List Weapon
 allWeaponsList =
-    Model.Weapon.BaseGame.weapons
+    Model.Weapon.Data.weapons
 
 
 nameToWeapon : String -> Maybe Weapon

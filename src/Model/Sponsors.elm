@@ -296,7 +296,7 @@ scarlett =
                 "This team may purchase the Extra Crewmember upgrade at half the listed cost."
             , TeamPerk "Raiders"
                 "At the end of the attack step, this vehicle may permanently reduce its crew value by any number, to a minimum of 0 crew: remove 1 hull point from any vehicle in base contact for each crew removed in this way."
-            , TeamPerk "Rais the Sails"
+            , TeamPerk "Raise the Sails"
                 "After rolling skid dice, this vehicle may permanently  reduce its crew value by 1, to a minimum of 0 crew to add 1 free shift result to the skid dice result."
             , TeamPerk "Press Gang or Keelhaul"
                 "When another vehicle in contact with this vehicle is wrecked, this vehicle may gain either 1 crew or 2 audience votes."
@@ -309,10 +309,10 @@ highwayPatrol : Sponsor
 highwayPatrol =
     { defaultSponsor
         | name = "Highway Patrol"
-        , description = "Along the Wrecked and broken highways, where law is another word fir vengeance, and justice is a forgotten memory; a handful of souls still cling to a dream of order Perhaps they do it for the glory. Maybe they even get a kick out of it. They are unsanctiond unloved and unpaid. Their only power: a badge of bronze. Their only weapon: 600 horsepower offuel-injected steel. The Highway Patrol are the last law in a world gone crazy."
+        , description = "Along the Wrecked and broken highways, where law is another word fir vengeance, and justice is a forgotten memory; a handful of souls still cling to a dream of order Perhaps they do it for the glory. Maybe they even get a kick out of it. They are unsanctioned unloved and unpaid. Their only power: a badge of bronze. Their only weapon: 600 horsepower of fuel-injected steel. The Highway Patrol are the last law in a world gone crazy."
         , perks =
             [ TeamPerk "Hot Pursuit" "Before the first Gear Phase of the game, after deployment, this team must nominate one enemy vet - the \"bogey\". If the bogey is Wrecked or disqualified, immediately n, another enemy vehicle to be the bogey."
-            , TeamPerk "Bogey at 12 o'clock" "At the end of this N ovement Step, if the bogey in is this vehicle's front Arc of Fire, and further than Double Range away, and can be seen by this vehicle, this vehicle may immediately resolve another Movement Step."
+            , TeamPerk "Bogey at 12 o'clock" "At the end of this Movement Step, if the bogey in is this vehicle's front Arc of Fire, and further than Double Range away, and can be seen by this vehicle, this vehicle may immediately resolve another Movement Step."
             , TeamPerk "Siren" "At the end of this vehicle's Attack Step, if this vehicle is in the bogey's rear Arc of Fire (regardless of range), the bogey must either reduce its Gear by 1 or gain 2 Hazard Tokens."
             , TeamPerk "Steel Justice" "If the bogey wipes out, this team, as a whole, gains 2 Audience Votes. If the bogey is Wrecked this team, as a whole, gains 4 Audience Votes"
 
@@ -328,7 +328,7 @@ verney =
         | name = "Verney TODO"
         , description = "Many have taken the bent deal offered by Warden but only one has ever earned their freedom. As skilled an engineer as he is a driven the newly-freed Verney now specialised in building unique Frankenstein's monsters of vehicles for anyone who can afford his high-quality customs."
         , perks =
-            [ TeamPerk "MicroPlate Armour" "Vehicles in this team may purchase the MicroPlate Armour upgrade, which costs 6 Cans, increases the vehicles Hull Value by 2, and requires 0 build. slots."
+            [ TeamPerk "MicroPlate Armour" "Vehicles in this team may purchase the MicroPlate Armour upgrade, which costs 6 Cans, increases the vehicles Hull Value by 2, and requires 0 build slots."
             , TeamPerk "Trunk of Junk" "You may attack with any number of dropped weapons in a single activation."
             , TeamPerk "Tombstone" "If the shooting template of a shooting attack touches the rear • edge of this vehicle, this vehicle gains +1 to its Evade rolls. During this vehicle's Attack Step, this vehicle may gain 2 Hazard Tokens. If it does, all Collisions involving this vehicle are considered to be Head-on until the start of its next activation."
             , TeamPerk "That's Entertainment" "Whenever a dropped weapon template that was placed by this team is removed from play, this team gains 1 Audience Vote. "
@@ -369,7 +369,7 @@ beverly : Sponsor
 beverly =
     { defaultSponsor
         | name = "Beverly, the Devil on the Highway"
-        , description = "The low growling of the starting grid was y eclipsed by an ear-splitting, dizzying sound. Eyeball-shakingly loud, the szeeching was suffocating.  A single car drifted forward into the pack, windows like onyx, bumper corroded. The sound changed timbre, dropping suddenly to a sub-audible throb that tightened chests and shattered headlamps. Despite the harsh desert sun, frost began to form  on windshields. Beverly was a stupid story told to scare children. She wasn't real."
+        , description = "The low growling of the starting grid was eclipsed by an ear-splitting, dizzying sound. Eyeball-shakingly loud, the screeching was suffocating.  A single car drifted forward into the pack, windows like onyx, bumper corroded. The sound changed timbre, dropping suddenly to a sub-audible throb that tightened chests and shattered headlamps. Despite the harsh desert sun, frost began to form  on windshields. Beverly was a stupid story told to scare children. She wasn't real."
         , perks =
             [ TeamPerk "Graveyard Shift" "At the start of the game, after deployment, all vehicles in this team except one must gain the Ghost Rider special rule."
             , TeamPerk "Ghost Rider" "This vehicle ignores, and is ignored by, other vehicles at all times. This vehicle cannot be involved in Collisions. This vehicle may not make shooting attacks or be attacked with shooting weapons. This vehicle may never count towards the victory conditions of a scenario."
@@ -386,7 +386,7 @@ rustysBootleggers : Sponsor
 rustysBootleggers =
     { defaultSponsor
         | name = "Rusty's Bootleggers"
-        , description = "Zeke Rusty and his boys been wall to wall and treetop-tall since before the world went to hell, running moonshine past Smokey back since before the big red one fell. Their stills are volatile, their delivery vehicles are ramshackle, but they still run liquor that grandpappy would be proud of.. though none the boys can remember just how he liked it right now. Damn that gin."
+        , description = "Zeke Rusty and his boys been wall to wall and treetop-tall since before the world went to hell, running moonshine past Smokey back since before the big red one fell. Their stills are volatile, their delivery vehicles are ramshackle, but they still run liquor that grandpappy would be proud of.. Though none the boys can remember just how he liked it right now. Damn that gin."
         , perks =
             [ TeamPerk "Party Hard" "At the end of this vehicle's Attack Step, if this vehicle has more Hazard Tokens than the sum of the Hazard Tokens on all other enemy vehicles within Medium range combined, this vehicle's controller gains 1 Audience Vote for each enemy -ve' --/th one or more Hazard Tokens within Medium range of this v."
             , TeamPerk "Dutch courage" "Vehicles in this team .put when they have 8 Hazard Tokens."
@@ -429,9 +429,9 @@ badass =
 
 built : List VehiclePerk
 built =
-    [ VehiclePerk "Dead Weight" 2 "During this vehicle's Attack Step, this vehicle may gain 2 Hazard Tokens to countas one weight-class heavier (unless already Heavyweight) until the start of its next activation."
+    [ VehiclePerk "Dead Weight" 2 "During this vehicle's Attack Step, this vehicle may gain 2 Hazard Tokens to count as one weight-class heavier (unless already Heavyweight) until the start of its next activation."
     , VehiclePerk "Barrel Roll" 2 "When this vehicle suffers a Flip, it may choose to place the Flip template touching the centre of either side edge or the rear edge of this vehicle, and perpendicular to that edge, instead of touching the front edge as normal."
-    , VehiclePerk "Bruiser" 4 "In a Collision involving this vehicle, if this vehicle declares a reaction other than Evade against an enemy vehicle, th '.-ehicle immediately gains one Hazard Token."
+    , VehiclePerk "Bruiser" 4 "In a Collision involving this vehicle, if this vehicle declares a reaction other than Evade against an enemy vehicle, the vehicle immediately gains one Hazard Token."
     , VehiclePerk "Splash" 5 "Once per step, when this vehicle loses one or more Hull Points, make a 1D6 attack against each vehicle within Medium range at end of that step."
     , VehiclePerk "Crusher" 7 "This vehicle gains the Up and Over special rule (See the Monster Truck rules, page 71)."
     , VehiclePerk "Feel No Pain" 8 "During an enemy vehicle's Attack Step, after an attacker has rolled all their attack dice against this vehicle, if the attacks caused a total of 2 or fewer uncancelled hits, cancel all remaining hits."
@@ -451,11 +451,11 @@ daring =
 
 horror : List VehiclePerk
 horror =
-    [ VehiclePerk "Purifying Flames" 1 "once per activation, at the start of this vehicle's 'activation, this vehicle may s ff up to three damage to select any friendly vehicle. For each point of da el. suffered via this effect, repair that number of Hull Points on the target Vehicalgee This damage may not be reduced. This damage counts as having the Fire rule. This effect may not be used to raise a vehicle above its starting Hull Value."
+    [ VehiclePerk "Purifying Flames" 1 "once per activation, at the start of this vehicle's 'activation, this vehicle may s ff up to three damage to select any friendly vehicle. For each point of damage suffered via this effect, repair that number of Hull Points on the target vehicle. This damage may not be reduced. This damage counts as having the Fire rule. This effect may not be used to raise a vehicle above its starting Hull Value."
     , VehiclePerk "Ecstatic Visions" 1 "Once per activation, at the start of this vehicle's activation, this vehicle may gain up to 3 Hazard Tokens to discard 1 Hazard Token from a friendly vehicle for each Hazard Token gained."
     , VehiclePerk "Sympathy For The Devil" 1 "When this vehicle makes an Evade check, its controller may select a friendly vehicle within Medium range. Add the current Gear of the selected vehicle to this vehicle's current Gear for the purposes of this evade check. Both the selected vehicle and this vehicle suffer any unsaved damage from this attack, including any additional effects."
-    , VehiclePerk "HIGHWAY TO HELL" 2 "At the end of its Movement Step, if this vehic e selected a straight template, this vehicle may suffer two damage. This damage counts as having the Fire rule. If any Hull Points are removed by this effect, this vehicle may leave its movement template (ignoring any slide template) in play as a Napalm dropped weapon template. Remove this template at the start of this vehicle's next activation. (You may wish to download and print out extra paper templates for this effect.)"
-    , VehiclePerk "Violent Manifestation" 3 "When this vehicle is respawned: make an immediate attack (with attack dice based on the weight of the respawned vehicle) against every other vehicle within Medium range as if this vehicle was an exploding wreck. This explosion counts as having both the " Blast " and " Fire " rules."
+    , VehiclePerk "HIGHWAY TO HELL" 2 "At the end of its Movement Step, if this vehicle selected a straight template, this vehicle may suffer two damage. This damage counts as having the Fire rule. If any Hull Points are removed by this effect, this vehicle may leave its movement template (ignoring any slide template) in play as a Napalm dropped weapon template. Remove this template at the start of this vehicle's next activation. (You may wish to download and print out extra paper templates for this effect.)"
+    , VehiclePerk "Violent Manifestation" 3 "When this vehicle is respawned: make an immediate attack (with attack dice based on the weight of the respawned vehicle) against every other vehicle within Medium range as if this vehicle was an exploding wreck. This explosion counts as having both the \"Blast\" and \"Fire\" rules."
     , VehiclePerk "Angel Of Death" 4 "Before making an attack, this vehicle may suffer up to three damage to add that many attack dice to a single weapon used in this attack."
     ]
 
@@ -492,10 +492,10 @@ pursuit =
         "If another vehicle within short range of this vehicle resolves a wipe out, (either before or after any flip), remove all hazard tokens from this vehicle."
     , VehiclePerk "Taunt"
         2
-        "At the start of this vehicle’s attack step, roll a skid die. If you roll something other than a SHIFT result, you may place that skid die result onto the dashboard of a target vehicle within short range. This skid die result must be resolved during that vehicle’s next skid check, and may not be re-rolled."
+        "At the start of this vehicle's attack step, roll a skid die. If you roll something other than a SHIFT result, you may place that skid die result onto the dashboard of a target vehicle within short range. This skid die result must be resolved during that vehicle's next skid check, and may not be re-rolled."
     , VehiclePerk "Out Run"
         2
-        "At the start of this vehicle’s attack step, all vehicles within short range of this vehicle and in a current, lower gear than this vehicle gain +1 hazard token."
+        "At the start of this vehicle's attack step, all vehicles within short range of this vehicle and in a current, lower gear than this vehicle gain +1 hazard token."
     , VehiclePerk "PIT"
         4
         "If this vehicle is involved in a collision with an enemy vehicle during its activation that is not head-on, it may declare a “Pursuit Intervention Technique” (PIT) against the enemy vehicle instead of declaring a SMASH ATTACK or an evade. If this vehicle declares a PIT, it may select any maneuver template the target vehicle considers hazardous in its current gear. The target vehicle must immediately resolve a movement step, during which it is forced to must use the maneuver template selected for it and may not roll any skid dice."
@@ -508,11 +508,11 @@ pursuit =
 reckless : List VehiclePerk
 reckless =
     [ VehiclePerk "Drive Angry" 1 "At the start of this vehicle's activation, this vehicle gains 1 Hazard Token."
-    , VehiclePerk "Hog Wild" 2 "During a Collision resolved during a Wipeour Step, this vehicle gains +2 Smash Attack dice. "
+    , VehiclePerk "Hog Wild" 2 "During a Collision resolved during a Wipeout Step, this vehicle gains +2 Smash Attack dice. "
     , VehiclePerk "In For a Penny" 2 "If this vehicle has gained six or more Hazard Tokens during this activation, it may double the attack dice of any Smash Attack it makes for the remainder of this activation. "
     , VehiclePerk "Don't Come Knocking" 4 "At the start of this vehicle's activation, it may gain 4 Hazard Tokens. If it does, this vehicle cannot gain or lose any Hazard Tokens by any means until the start of its next activation. "
     , VehiclePerk "Bigger'n You" 4 "If this vehicle is involved in a Collision, double any Smash Attack bonuses or penalties resulting from weight differences during that Collision."
-    , VehiclePerk "Beerserker" 5 "When•s vehicle would suffe ion damage by 1, to a minimum of 1. reduce that this damage outside of its activat, "
+    , VehiclePerk "Beerserker" 5 "When this vehicle would suffer iddon damage by 1, to a minimum of 1. reduce that this damage outside of its activat, "
     ]
 
 
@@ -562,7 +562,7 @@ tuning =
         "This vehicle does not receive more than 1 hazard token from Spin results each turn. This vehicle does not receive more than 1 hazard token from Slide results each turn. This vehicle does not receive more than 1 hazard token from Hazard results each turn. Excess hazards are ignored. This vehicle may still elect to resolve multiple copies of each result."
     , VehiclePerk "Skiing"
         6
-        "May only be taken on a Bike, Buggy, Car, or Performance Car. This vehicle may take 3 hazard tokens at the end of its activation to be ignored by other vehicles during their movement steps until the start of this vehicle’s next activation. If, by ignoring this vehicle in this way, a vehicle’s final position would overlap it, move that vehicle backwards along their maneuver template by the minimum amount to avoid overlapping any obstruction."
+        "May only be taken on a Bike, Buggy, Car, or Performance Car. This vehicle may take 3 hazard tokens at the end of its activation to be ignored by other vehicles during their movement steps until the start of this vehicle's next activation. If, by ignoring this vehicle in this way, a vehicle's final position would overlap it, move that vehicle backwards along their maneuver template by the minimum amount to avoid overlapping any obstruction."
     , VehiclePerk "Momentum"
         3
         "When resolving a skid check, this vehicle may set aside any number of slide results to re-roll 1 non-slide result for each slide result set aside. When resolving a skid check, this vehicle may set aside any number for each spin results to re-roll 1 non-spin result for each spin result set aside. Set aside results must be resolved."

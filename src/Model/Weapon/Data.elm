@@ -1,4 +1,4 @@
-module Model.Weapon.BaseGame exposing (handgun, weapons)
+module Model.Weapon.Data exposing (handgun, weapons)
 
 import Model.Shared exposing (..)
 import Model.Sponsors exposing (stringToSponsor)
@@ -580,8 +580,8 @@ rcCarBombs =
         , specials =
             [ ammoInit 3
             , BurstSpecial Large
-            , SpecialRule "Bombs are taped to remote-controleld cars, which are dropped from a vehicle and then piloted to impact."
-            , SpecialRule "When attack with this dropped weapon, placea RC Car (use a tiny car miniature, no larger than 20mm square) so that it is within Short range of the attacking vehicle, and facing in any diretion. This placement triggers a Collision Window."
+            , SpecialRule "Bombs are taped to remote-controlled cars, which are dropped from a vehicle and then piloted to impact."
+            , SpecialRule "When attack with this dropped weapon, place a RC Car (use a tiny car miniature, no larger than 20mm square) so that it is within Short range of the attacking vehicle, and facing in any direction. This placement triggers a Collision Window."
             , SpecialRule "The RC Car counts as a lightweight vehicle in current Gear 3 with 1 Hull Point, 1 Crew, and 0 Handling. This tiny car can make shooting attacks but cannot change Gear. Although controlled by the player that dropped it, the RC Car does not count as part of the player's team, and so cannot be used for the purposes of scenario rules, Audience Votes, or perks."
             , SpecialRule "The RC Car is involved in a Collision, it suffers one damage before the Collision is resolved. When the RC Car would be Wrecked it instead explodes. When the RC Car explodes, it rolls 4D6 attack dice, as if it were a middleweight vehicle."
             , SpecialRule "If the RC Car wipes out, it suffers one damage before the Wipeout is resolved."
@@ -598,9 +598,9 @@ sentryGun =
         , specials =
             [ ammoInit 2
             , BurstSpecial Large
-            , SpecialRule "When attacking with this dropped weapon, palce a Sentry Gun so that it is within Short range of the attacking vehicle."
+            , SpecialRule "When attacking with this dropped weapon, place a Sentry Gun so that it is within Short range of the attacking vehicle."
             , SpecialRule "The Sentry Gun remains in play as a lightweight destructible obstacle. They may be targeted with shooting attacks and have 2 Hull Points."
-            , SpecialRule "This Sentry Gun automatically makes a 2D6 shooting attack agains any vehicle taht ends their Movement Step within Medium range of the Sentry Gun in a 360-degree Arc of Fire. the target may Evade as normal. this Sentry Gun will never target vehicles from the team of the vehicle that dropped it."
+            , SpecialRule "This Sentry Gun automatically makes a 2D6 shooting attack against any vehicle that ends their Movement Step within Medium range of the Sentry Gun in a 360-degree Arc of Fire. The target may Evade as normal. This Sentry Gun will never target vehicles from the team of the vehicle that dropped it."
             , SpecialRule "Although controlled by the player that dropped it, the Sentry Gun does not count as part of the player's team, and so cannot be used for the purposes of scenario rules, Audience Votes, or perks."
             ]
     }
@@ -617,6 +617,6 @@ smokeDropper =
             , BurstSpecial Large
             , SpecialRule "This dropped weapon template counts as an obstruction for the purposes of determining Cover."
             , SpecialRule "Whilst a vehicle is in contact with this dropped weapon template, that vehicle counts as distracted."
-            , SpecialRule "If any part of a vehicle's movement template or Final Position toughes this dropped weapon template, the vehicle gains 1 Hazard Token at the end of its Movement Step."
+            , SpecialRule "If any part of a vehicle's movement template or Final Position touches this dropped weapon template, the vehicle gains 1 Hazard Token at the end of its Movement Step."
             ]
     }

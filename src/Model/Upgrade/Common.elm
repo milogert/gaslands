@@ -6,12 +6,12 @@ module Model.Upgrade.Common exposing
 import Dict
 import Model.Shared exposing (..)
 import Model.Upgrade exposing (Upgrade)
-import Model.Upgrade.BaseGame
+import Model.Upgrade.Data
 
 
 allUpgradesList : List Upgrade
 allUpgradesList =
-    Model.Upgrade.BaseGame.upgrades
+    Model.Upgrade.Data.upgrades
 
 
 nameToUpgrade : String -> Maybe Upgrade

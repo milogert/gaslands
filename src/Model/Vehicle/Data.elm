@@ -1,4 +1,4 @@
-module Model.Vehicle.BaseGame exposing (vehicles)
+module Model.Vehicle.Data exposing (vehicles)
 
 import Model.Shared exposing (..)
 import Model.Sponsors exposing (..)

@@ -27,23 +27,14 @@ specialDecodeTestGenerator =
     , ( "{\"type\": \"NamedSpecialRule\", \"name\": \"named\", \"text\": \"the named special rule\"}"
       , Ok <| NamedSpecialRule "named" "the named special rule"
       )
-    , ( "{\"type\": \"TreacherousSurface\"}"
-      , Ok TreacherousSurface
-      )
     , ( "{\"type\": \"Blast\"}"
       , Ok Blast
       )
     , ( "{\"type\": \"Fire\"}"
       , Ok Fire
       )
-    , ( "{\"type\": \"Explosive\"}"
-      , Ok Explosive
-      )
     , ( "{\"type\": \"Blitz\"}"
       , Ok Blitz
-      )
-    , ( "{\"type\": \"HighlyExplosive\"}"
-      , Ok HighlyExplosive
       )
     , ( "{\"type\": \"Electrical\"}"
       , Ok Electrical

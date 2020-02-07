@@ -12,7 +12,6 @@ import Model.Vehicle
     exposing
         ( Vehicle
         , VehicleEvent(..)
-        , VehicleType(..)
         , defaultVehicle
         )
 import Model.Weapon exposing (defaultWeapon)
@@ -153,7 +152,7 @@ tmpVehicleTests =
                             |> Maybe.withDefault defaultVehicle
                 in
                 Expect.equal
-                    "Car"
+                    "Performance Car"
                     vehicle.type_
         , test "notes" <|
             \_ ->

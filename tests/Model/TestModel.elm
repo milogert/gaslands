@@ -5,7 +5,7 @@ import Expect exposing (Expectation)
 import Json.Decode exposing (decodeValue, errorToString)
 import Json.Encode
 import Model.Model exposing (..)
-import Model.Vehicle exposing (VehicleType(..), defaultVehicle)
+import Model.Vehicle exposing (defaultVehicle)
 import Model.Vehicle.Common exposing (allVehicles)
 import Model.Views exposing (..)
 import Test exposing (..)

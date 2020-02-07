@@ -28,19 +28,14 @@ specialSuite =
     [ Ammo [ True, False, True ]
     , SpecialRule "Special Rule"
     , NamedSpecialRule "Special Rule" "Description."
-    , TreacherousSurface
     , Blast
     , Fire
-    , Explosive
     , Blitz
-    , HighlyExplosive
     , Electrical
     , HandlingMod 0
     , HullMod 1
     , GearMod 10
     , CrewMod -100
-    , Specialist
-    , Entangle
     ]
         |> List.map testSpecial
 
@@ -62,8 +57,6 @@ rangeSuite =
     , Medium
     , Double
     , TemplateLarge
-    , BurstLarge
-    , BurstSmall
     , SmashRange
 
     -- , SpecialRange "testing"

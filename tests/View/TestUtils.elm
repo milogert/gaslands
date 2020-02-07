@@ -69,8 +69,6 @@ detailsTest =
 specialTests : List Test
 specialTests =
     [ ( "ammo, no event", Ammo [ True ], [ Selector.tag "div", Selector.tag "div" ] )
-    , ( "high explosive", HighlyExplosive, [ Selector.text "Highly Explosive" ] )
-    , ( "TreacherousSurface", TreacherousSurface, [ Selector.text "The dropped template counts as a treacherous surface." ] )
     , ( "special rule", SpecialRule "test rule", [ Selector.text "test rule" ] )
     , ( "named special rule"
       , NamedSpecialRule "name" "desc"
@@ -78,17 +76,14 @@ specialTests =
         , Selector.text "desc"
         ]
       )
-    , ( "mod: handling", HandlingMod 1, [ Selector.text "Handling mod", Selector.text "1" ] )
-    , ( "mod: hull", HullMod 1, [ Selector.text "Hull mod", Selector.text "1" ] )
-    , ( "mod: gear", GearMod 1, [ Selector.text "Gear mod", Selector.text "1" ] )
-    , ( "mod: crew", CrewMod 1, [ Selector.text "Crew mod", Selector.text "1" ] )
+    , ( "mod: handling", HandlingMod 1, [ Selector.text "Handling Mod", Selector.text "1" ] )
+    , ( "mod: hull", HullMod 1, [ Selector.text "Hull Mod", Selector.text "1" ] )
+    , ( "mod: gear", GearMod 1, [ Selector.text "Gear Mod", Selector.text "1" ] )
+    , ( "mod: crew", CrewMod 1, [ Selector.text "Crew Mod", Selector.text "1" ] )
     , ( "blast", Blast, [ Selector.text "Blast" ] )
     , ( "fire", Fire, [ Selector.text "Fire" ] )
-    , ( "explosive", Explosive, [ Selector.text "Explosive" ] )
     , ( "blitz", Blitz, [ Selector.text "Blitz" ] )
     , ( "electrical", Electrical, [ Selector.text "Electrical" ] )
-    , ( "specialist", Specialist, [ Selector.text "Specialist" ] )
-    , ( "entangle", Entangle, [ Selector.text "Entangle" ] )
     ]
         |> List.map
             (\( name, special, selectors ) ->

@@ -16,7 +16,7 @@ import Model.Sponsors exposing (..)
 import Model.Upgrade exposing (..)
 import Model.Upgrade.Common exposing (..)
 import Model.Vehicle exposing (..)
-import Model.Vehicle.BaseGame
+import Model.Vehicle.Data
 import Model.Weapon exposing (..)
 import Model.Weapon.Common exposing (..)
 
@@ -152,4 +152,4 @@ slotsRemaining v =
 
 allVehicles : List Vehicle
 allVehicles =
-    Model.Vehicle.BaseGame.vehicles
+    Model.Vehicle.Data.vehicles
