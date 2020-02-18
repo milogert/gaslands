@@ -8,6 +8,7 @@ module Model.Vehicle.Common exposing
     , totalGear
     , totalHandling
     , totalHull
+    , totalSlots
     , vehicleCost
     )
 
@@ -34,6 +35,9 @@ modToInt s =
             i
 
         CrewMod i ->
+            i
+
+        SlotMod i ->
             i
 
         _ ->
@@ -109,6 +113,20 @@ totalCrew v =
     v.crew + totalForModType v.upgrades crewFilter
 
 
+totalSlots : Vehicle -> Int
+totalSlots v =
+    let
+        slotFilter m =
+            case m of
+                SlotMod _ ->
+                    True
+
+                _ ->
+                    False
+    in
+    v.equipment + totalForModType v.upgrades slotFilter
+
+
 isWrecked : Vehicle -> Bool
 isWrecked v =
     v.hull.current >= totalHull v
@@ -135,9 +153,6 @@ fromVehicleWeight weight =
 
         Heavy ->
             "Heavy"
-
-        Airborne ->
-            "Airborne"
 
 
 slotsUsed : Vehicle -> Int

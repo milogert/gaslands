@@ -27,6 +27,7 @@ type Special
     | HullMod Int
     | GearMod Int
     | CrewMod Int
+    | SlotMod Int
     | Indirect
     | Splash
     | FullFireArc
@@ -96,6 +97,9 @@ fromSpecial special =
         CrewMod i ->
             "CrewMod " ++ String.fromInt i
 
+        SlotMod i ->
+            "SlotMod " ++ String.fromInt i
+
         Indirect ->
             "Indirect"
 
@@ -148,6 +152,10 @@ specialToNamedSpecial special =
         CrewMod i ->
             NamedSpecialRule "Crew Mod"
                 (needPlus i ++ " modification to the vehicle's base Crew value.")
+
+        SlotMod i ->
+            NamedSpecialRule "Slot Mod"
+                (needPlus i ++ " modification to the vehicle's base Slot value.")
 
         Indirect ->
             NamedSpecialRule "Indirect" "When making a shooting attack with a weapon with this special rule, the vehicle may ignore Terrain and Cover during that attack."

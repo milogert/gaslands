@@ -8,12 +8,10 @@ module Model.Vehicle exposing
     , defaultVehicle
     )
 
-import Model.Shared exposing (..)
-import Model.Sponsors exposing (..)
-import Model.Upgrade exposing (..)
-import Model.Upgrade.Common exposing (..)
-import Model.Weapon exposing (..)
-import Model.Weapon.Common exposing (..)
+import Model.Shared exposing (Category(..), Special)
+import Model.Sponsors exposing (Sponsor, VehiclePerk)
+import Model.Upgrade exposing (Upgrade)
+import Model.Weapon exposing (Weapon)
 
 
 type VehicleEvent
@@ -82,7 +80,6 @@ type WeightClass
     = Light
     | Middle
     | Heavy
-    | Airborne
 
 
 type alias HullHolder =

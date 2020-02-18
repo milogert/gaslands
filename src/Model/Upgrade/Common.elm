@@ -4,7 +4,6 @@ module Model.Upgrade.Common exposing
     )
 
 import Dict
-import Model.Shared exposing (..)
 import Model.Upgrade exposing (Upgrade)
 import Model.Upgrade.Data
 

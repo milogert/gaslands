@@ -63,9 +63,6 @@ weightDecoder =
                     "Heavy" ->
                         succeed Heavy
 
-                    "Ariborne" ->
-                        succeed Airborne
-
                     _ ->
                         fail <| str ++ " is not a valid weight."
             )

@@ -3,6 +3,7 @@ module Model.Upgrade.Data exposing (upgrades)
 import Model.Shared exposing (..)
 import Model.Sponsors exposing (stringToSponsor)
 import Model.Upgrade exposing (..)
+import Model.Vehicle exposing (WeightClass(..))
 
 
 upgrades : List Upgrade
@@ -19,6 +20,11 @@ upgrades =
     , tankTracks
 
     -- TODO , turretMountingForWeapon
+    , louderSiren -- Highway Patrol.
+    , microPlateArmour -- Verney.
+    , trailer Light -- Rusty's Bootleggers.
+    , trailer Middle -- Rusty's Bootleggers.
+    , trailer Heavy -- Rusty's Bootleggers.
     ]
 
 
@@ -162,3 +168,63 @@ turretMountingForWeapon =
     { defaultUpgrade
         | name = "Turrent Mounting For Weapon"
     }--}
+-- Perk-related upgrades.
+-- Highway Patrol
+
+
+louderSiren : Upgrade
+louderSiren =
+    { defaultUpgrade
+        | name = "Louder Siren"
+        , slots = 0
+        , cost = 2
+        , specials = [ SpecialRule "Replace \"bogey\" with \"any enemy vehicle\" for the purposes of the Siren special rules." ]
+        , requiredSponsor = stringToSponsor "Highway Patrol"
+    }
+
+
+
+-- Verney
+
+
+microPlateArmour : Upgrade
+microPlateArmour =
+    { defaultUpgrade
+        | name = "MicroPlate Armour"
+        , slots = 0
+        , cost = 6
+        , specials = [ HullMod 2 ]
+        , requiredSponsor = stringToSponsor "Verney"
+    }
+
+
+trailer : WeightClass -> Upgrade
+trailer weightClass =
+    let
+        baseUpgrade =
+            { defaultUpgrade
+                | name = "Trailer"
+                , specials =
+                    [ NamedSpecialRule "Stowage"
+                        "Middleweight trailers provide 1 additional build slot to the towing vehicle. Heavyweight trailers provide 3 additional build slots to the towing vehicle. When purchasing a weapon for a vehicle with a trailer, the player must declare whether that weapons is installed on the cab or the trailer. When measuring range, place the shooting template touching either the cab or the trailer, depending on where the weapon is mounted, as per the Articulated rules (see War Rig, page 118)."
+                    ]
+                , requiredSponsor = stringToSponsor "Rusty's Bootleggers"
+            }
+    in
+    case weightClass of
+        Light ->
+            { baseUpgrade
+                | cost = 4
+            }
+
+        Middle ->
+            { baseUpgrade
+                | cost = 8
+                , specials = SlotMod 1 :: baseUpgrade.specials
+            }
+
+        Heavy ->
+            { baseUpgrade
+                | cost = 8
+                , specials = SlotMod 3 :: baseUpgrade.specials
+            }
