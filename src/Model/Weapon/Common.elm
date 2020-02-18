@@ -88,7 +88,7 @@ fromWeaponRange range =
             "Large"
 
         BurstRange size ->
-            "TODO Burst"
+            stringFromSize size ++ " Burst"
 
         SmashRange ->
             "Smash"

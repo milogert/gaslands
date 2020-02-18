@@ -9,6 +9,7 @@ module Model.Shared exposing
     , needPlus
     , setCategory
     , specialToNamedSpecial
+    , stringFromSize
     )
 
 import List.Extra as ListE
@@ -129,7 +130,7 @@ specialToNamedSpecial special =
             NamedSpecialRule "Blitz" "This Vehicle counts as being armed with a number of copies of this weapon equal to this weapon's remaining Ammo Tokens, where each copy counts as having a single Ammo Token. this means that during its Attack Step, this vehicle may attack with this weapon any number of times, as long as it doesn't attack more times than it has Ammo Tokens, and doesn't attack more times than its Crew Value."
 
         BurstSpecial size ->
-            NamedSpecialRule (stringFromSize size ++ " Burst") "TODO"
+            NamedSpecialRule (stringFromSize size ++ " Burst") "Burst templates based on size."
 
         Fire ->
             NamedSpecialRule "Fire" "If a vehicle suffers at least one damage from a weapon or effect with the first special rule, it gains the On-Fire rule in addition to suffering damage. A vehicle cannot gain the On-Fire rule a second time.\n\nOn Fire: At the start of this vehicle's activation, it loses 1 Hull Point. This vehile's Smash Attacks count as having the Fire special rule. If this vehicle ever has zero Hazard Tokens, the fire goes out and this vehicle loses the On-Fire rule."
@@ -164,7 +165,7 @@ specialToNamedSpecial special =
             NamedSpecialRule "Splash" "When a weapon with the splash rule is used to attack, the weapon must target, and attack, every vehicle beneath the shooting template, including friendly vehicles. Each target must suffer a separate attack from the weapon."
 
         FullFireArc ->
-            NamedSpecialRule "Full Fire Arc" "TODO"
+            NamedSpecialRule "Full Fire Arc" "Weapon has a 360-degree Arc of Fire."
 
 
 getAmmoClip : List Special -> ( Maybe Int, Maybe Special )
