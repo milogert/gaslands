@@ -1,12 +1,10 @@
 module Model.TestUtils exposing (suite)
 
-import Expect exposing (Expectation)
-import Model.Shared exposing (..)
+import Expect
 import Model.Upgrade.Common
-import Model.Utils exposing (..)
-import Model.Vehicle.Common exposing (..)
-import Model.Vehicle.Model exposing (defaultVehicle)
-import Test exposing (..)
+import Model.Vehicle exposing (defaultVehicle)
+import Model.Vehicle.Common exposing (totalCrew, totalGear, totalHandling, totalHull, totalSlots)
+import Test exposing (Test, describe, test)
 
 
 suite : Test
@@ -23,11 +21,14 @@ suite =
                 Expect.equal 1 <| totalHandling v
         , test "total hull for vehicle" <|
             \_ ->
-                Expect.equal 2 <| totalHull v
+                Expect.equal 4 <| totalHull v
         , test "total gear for vehicle" <|
             \_ ->
                 Expect.equal 1 <| totalGear v
         , test "total crew for vehicle" <|
             \_ ->
                 Expect.equal 1 <| totalCrew v
+        , test "total slots for vehicle" <|
+            \_ ->
+                Expect.equal 4 <| totalSlots v
         ]

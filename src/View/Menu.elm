@@ -5,22 +5,17 @@ import Bulma.Elements exposing (..)
 import Bulma.Form exposing (..)
 import Bulma.Modifiers exposing (..)
 import Dict
-import FontAwesome.Icon as Icon exposing (Icon)
+import FontAwesome.Icon as Icon
 import FontAwesome.Solid as Icon
 import Html
     exposing
         ( Html
-        , br
-        , div
-        , hr
         , span
         , text
         )
 import Html.Attributes
     exposing
         ( attribute
-        , class
-        , classList
         , disabled
         , style
         )
@@ -30,7 +25,7 @@ import Html.Events
         )
 import Model.Features
 import Model.Model exposing (..)
-import Model.Vehicle.Model exposing (..)
+import Model.Vehicle exposing (..)
 import Model.Views exposing (NewType(..), ViewEvent(..))
 import View.Sponsor
 import View.Utils exposing (..)

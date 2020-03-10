@@ -1,11 +1,10 @@
 module Update.Upgrade exposing (update)
 
-import Browser.Navigation as Nav
-import Dict exposing (Dict)
+import Dict
 import List.Extra
 import Model.Model exposing (..)
+import Model.Upgrade exposing (..)
 import Model.Upgrade.Common exposing (..)
-import Model.Upgrade.Model exposing (..)
 import Model.Vehicle.Common exposing (..)
 import Model.Views exposing (ViewEvent(..))
 import Update.Utils exposing (goTo, goToTab)

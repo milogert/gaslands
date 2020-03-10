@@ -1,9 +1,9 @@
 module Model.Weapon.Common exposing
     ( allWeaponsList
+    , fromDice
     , fromWeaponMounting
     , fromWeaponRange
     , fromWeaponStatus
-    , fromWeaponType
     , handgun
     , nameToWeapon
     , rollDice
@@ -13,27 +13,13 @@ module Model.Weapon.Common exposing
 
 import Dict
 import Model.Shared exposing (..)
-import Model.Weapon.BaseGame
-import Model.Weapon.Model exposing (..)
-import Model.Weapon.TimeExtended2
+import Model.Weapon exposing (..)
+import Model.Weapon.Data
 
 
 handgun : Weapon
 handgun =
-    Model.Weapon.BaseGame.handgun
-
-
-fromWeaponType : WeaponType -> String
-fromWeaponType wt =
-    case wt of
-        Shooting ->
-            "Shooting"
-
-        Dropped ->
-            "Dropped"
-
-        SmashType ->
-            "Smashing"
+    Model.Weapon.Data.handgun
 
 
 fromWeaponMounting : WeaponMounting -> String
@@ -92,23 +78,26 @@ fromWeaponRange range =
         Medium ->
             "Medium"
 
+        Long ->
+            "Long"
+
         Double ->
             "Double"
 
         TemplateLarge ->
             "Large"
 
-        BurstSmall ->
-            "Small Burst"
-
-        BurstLarge ->
-            "Large Burst"
+        BurstRange size ->
+            stringFromSize size ++ " Burst"
 
         SmashRange ->
             "Smash"
 
         SpecialRange s ->
             "Special: " ++ s
+
+        Dropped ->
+            "Dropped"
 
 
 fromWeaponStatus : WeaponStatus -> String
@@ -123,8 +112,7 @@ fromWeaponStatus status =
 
 allWeaponsList : List Weapon
 allWeaponsList =
-    Model.Weapon.BaseGame.weapons
-        ++ Model.Weapon.TimeExtended2.weapons
+    Model.Weapon.Data.weapons
 
 
 nameToWeapon : String -> Maybe Weapon
@@ -138,6 +126,11 @@ nameToWeapon s =
 rollDice : Dice -> Int
 rollDice dice =
     -100
+
+
+fromDice : Dice -> String
+fromDice dice =
+    String.fromInt dice.number ++ "d" ++ String.fromInt dice.die
 
 
 weaponCost : Weapon -> Int

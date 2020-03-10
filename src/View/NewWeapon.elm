@@ -3,14 +3,14 @@ module View.NewWeapon exposing (view)
 import Bulma.Elements exposing (..)
 import Bulma.Form exposing (..)
 import Bulma.Modifiers exposing (..)
-import Html exposing (Html, div, hr, option, text)
-import Html.Attributes exposing (class, disabled, size, value)
+import Html exposing (Html, div, option, text)
+import Html.Attributes exposing (disabled, value)
 import Html.Events exposing (onClick, onInput)
 import Model.Model exposing (..)
 import Model.Shared exposing (..)
-import Model.Vehicle.Model exposing (..)
+import Model.Vehicle exposing (..)
+import Model.Weapon exposing (..)
 import Model.Weapon.Common exposing (..)
-import Model.Weapon.Model exposing (..)
 import View.Weapon exposing (defaultWeaponConfig)
 
 
@@ -61,18 +61,13 @@ view model vehicle weapons =
                 Nothing ->
                     text "Select a weapon type from the dropdown."
 
-        thingToTuple : Weapon -> ( String, String )
-        thingToTuple t =
-            ( t.name, fromExpansionAbbrev t.expansion )
-
         options =
             weapons
-                |> List.map thingToTuple
                 |> List.map
-                    (\( name, exp ) ->
+                    (\weapon ->
                         option
-                            [ value name ]
-                            [ text <| name ++ " (" ++ exp ++ ")" ]
+                            [ value weapon.name ]
+                            [ text <| weapon.name ]
                     )
                 |> (::) (option [] [ text "" ])
 

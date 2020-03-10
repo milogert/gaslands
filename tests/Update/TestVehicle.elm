@@ -7,15 +7,14 @@ import Json.Encode
 import List.Extra as ListE
 import Model.Model exposing (Model, Msg, defaultModel)
 import Model.Sponsors exposing (VehiclePerk)
-import Model.Upgrade.Model exposing (Upgrade, defaultUpgrade)
-import Model.Vehicle.Model
+import Model.Upgrade exposing (Upgrade, defaultUpgrade)
+import Model.Vehicle
     exposing
         ( Vehicle
         , VehicleEvent(..)
-        , VehicleType(..)
         , defaultVehicle
         )
-import Model.Weapon.Model exposing (defaultWeapon)
+import Model.Weapon exposing (defaultWeapon)
 import Test exposing (..)
 import Update.Vehicle exposing (update)
 
@@ -153,8 +152,8 @@ tmpVehicleTests =
                             |> Maybe.withDefault defaultVehicle
                 in
                 Expect.equal
-                    Car
-                    vehicle.vtype
+                    "Performance Car"
+                    vehicle.type_
         , test "notes" <|
             \_ ->
                 let

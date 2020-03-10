@@ -2,7 +2,6 @@ module Update.Utils exposing (doNavClose, doSaveModel, goTo, goToTab)
 
 import Model.Model exposing (..)
 import Model.Views exposing (ViewEvent)
-import Task
 import Update.UtilsGeneric exposing (do)
 
 

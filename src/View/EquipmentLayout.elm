@@ -5,27 +5,24 @@ import Bulma.Elements exposing (..)
 import Bulma.Form exposing (..)
 import Bulma.Layout exposing (..)
 import Bulma.Modifiers exposing (..)
-import FontAwesome.Icon as Icon exposing (Icon)
+import FontAwesome.Icon as Icon
 import FontAwesome.Solid as Icon
 import Html
     exposing
         ( Html
-        , a
         , div
-        , small
         , text
         )
-import Html.Attributes exposing (class, hidden, style)
+import Html.Attributes exposing (class, style)
 import Html.Events exposing (onClick)
 import Model.Model exposing (..)
 import Model.Shared exposing (..)
-import View.Utils exposing (icon)
 
 
 render :
     List (Html.Attribute Msg)
-    -> { a | name : String, expansion : Expansion, specials : List Special }
-    -> Maybe ({ a | name : String, expansion : Expansion, specials : List Special } -> Msg)
+    -> { a | name : String, specials : List Special }
+    -> Maybe ({ a | name : String, specials : List Special } -> Msg)
     -> List (Html Msg)
     -> List (Html Msg)
     -> Html Msg
@@ -40,7 +37,7 @@ render attrs thing mRemoveMsg factsHolderBody specialsBody =
                     controlButton
                         { buttonModifiers
                             | iconLeft = Just ( Standard, [], Icon.viewIcon Icon.times )
-                            , size = Small
+                            , size = Bulma.Modifiers.Small
                             , color = Danger
                         }
                         []
@@ -50,14 +47,11 @@ render attrs thing mRemoveMsg factsHolderBody specialsBody =
                         []
     in
     div attrs
-        [ title H6
-            []
-            [ level []
-                [ levelLeft []
-                    [ levelItem [] [ text thing.name ] ]
-                , levelRight []
-                    [ levelItem [] [ deleteButton ] ]
-                ]
+        [ level [ class "is-mobile" ]
+            [ levelLeft []
+                [ levelItem [] [ title H6 [] [ text thing.name ] ] ]
+            , levelRight []
+                [ levelItem [] [ deleteButton ] ]
             ]
         , div [ class "facts-holder" ] factsHolderBody
         , div [ class "special-holder" ] specialsBody

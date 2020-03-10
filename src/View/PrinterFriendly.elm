@@ -1,10 +1,10 @@
 module View.PrinterFriendly exposing (view)
 
 import Bulma.Columns exposing (..)
-import Html exposing (Html, div, hr)
+import Html exposing (Html, hr)
 import Html.Attributes exposing (style)
 import Model.Model exposing (Model, Msg)
-import Model.Vehicle.Model exposing (Vehicle)
+import Model.Vehicle exposing (Vehicle)
 import View.Vehicle exposing (renderPrint)
 
 

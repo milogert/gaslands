@@ -1,26 +1,25 @@
 module Model.Vehicle.Common exposing
     ( allVehicles
-    , fromVehicleType
     , fromVehicleWeight
     , isWrecked
     , slotsRemaining
     , slotsUsed
-    , strToVT
     , totalCrew
     , totalGear
     , totalHandling
     , totalHull
+    , totalSlots
     , vehicleCost
     )
 
 import Model.Shared exposing (..)
 import Model.Sponsors exposing (..)
+import Model.Upgrade exposing (..)
 import Model.Upgrade.Common exposing (..)
-import Model.Upgrade.Model exposing (..)
-import Model.Vehicle.BaseGame
-import Model.Vehicle.Model exposing (..)
+import Model.Vehicle exposing (..)
+import Model.Vehicle.Data
+import Model.Weapon exposing (..)
 import Model.Weapon.Common exposing (..)
-import Model.Weapon.Model exposing (..)
 
 
 modToInt : Special -> Int
@@ -36,6 +35,9 @@ modToInt s =
             i
 
         CrewMod i ->
+            i
+
+        SlotMod i ->
             i
 
         _ ->
@@ -111,6 +113,20 @@ totalCrew v =
     v.crew + totalForModType v.upgrades crewFilter
 
 
+totalSlots : Vehicle -> Int
+totalSlots v =
+    let
+        slotFilter m =
+            case m of
+                SlotMod _ ->
+                    True
+
+                _ ->
+                    False
+    in
+    v.equipment + totalForModType v.upgrades slotFilter
+
+
 isWrecked : Vehicle -> Bool
 isWrecked v =
     v.hull.current >= totalHull v
@@ -126,83 +142,6 @@ vehicleCost v =
         ]
 
 
-fromVehicleType : VehicleType -> String
-fromVehicleType t =
-    case t of
-        Bike ->
-            "Bike"
-
-        Buggy ->
-            "Buggy"
-
-        Car ->
-            "Car"
-
-        PerformanceCar ->
-            "Performance Car"
-
-        PickupTruck ->
-            "Pickup Truck"
-
-        MonsterTruck ->
-            "Monster Truck"
-
-        Bus ->
-            "Bus"
-
-        WarRig ->
-            "War Rig"
-
-        Tank ->
-            "Tank"
-
-        Gyrocopter ->
-            "Gyrocopter"
-
-        Helicopter ->
-            "Helicopter"
-
-
-strToVT : String -> Maybe VehicleType
-strToVT s =
-    case s of
-        "Bike" ->
-            Just Bike
-
-        "Buggy" ->
-            Just Buggy
-
-        "Car" ->
-            Just Car
-
-        "Performance Car" ->
-            Just PerformanceCar
-
-        "Pickup Truck" ->
-            Just PickupTruck
-
-        "Monster Truck" ->
-            Just MonsterTruck
-
-        "Bus" ->
-            Just Bus
-
-        "War Rig" ->
-            Just WarRig
-
-        "Tank" ->
-            Just Tank
-
-        "Gyrocopter" ->
-            Just Gyrocopter
-
-        "Helicopter" ->
-            Just Helicopter
-
-        _ ->
-            Nothing
-
-
 fromVehicleWeight : WeightClass -> String
 fromVehicleWeight weight =
     case weight of
@@ -214,9 +153,6 @@ fromVehicleWeight weight =
 
         Heavy ->
             "Heavy"
-
-        Airborne ->
-            "Airborne"
 
 
 slotsUsed : Vehicle -> Int
@@ -231,4 +167,4 @@ slotsRemaining v =
 
 allVehicles : List Vehicle
 allVehicles =
-    Model.Vehicle.BaseGame.vehicles
+    Model.Vehicle.Data.vehicles

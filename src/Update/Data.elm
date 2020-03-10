@@ -6,7 +6,6 @@ import Model.Decoders.Model exposing (modelDecoder)
 import Model.Encoders.Model exposing (modelEncoder)
 import Model.Model exposing (..)
 import Ports.Storage
-import Url exposing (Url)
 
 
 import_ : Model -> String -> String -> ( Model, Cmd Msg )

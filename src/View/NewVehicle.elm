@@ -3,19 +3,18 @@ module View.NewVehicle exposing (addButton, view)
 import Bulma.Elements exposing (..)
 import Bulma.Form exposing (..)
 import Bulma.Modifiers exposing (..)
-import Html exposing (Html, div, hr, option, text)
+import Html exposing (Html, div, option, text)
 import Html.Attributes
     exposing
         ( class
         , disabled
         , placeholder
-        , size
         , value
         )
 import Html.Events exposing (onClick, onInput)
 import Model.Model exposing (..)
+import Model.Vehicle exposing (..)
 import Model.Vehicle.Common exposing (..)
-import Model.Vehicle.Model exposing (..)
 import View.Utils
 import View.Vehicle
 
@@ -93,7 +92,7 @@ vehicleOption : Int -> Vehicle -> Html Msg
 vehicleOption i vt =
     option
         [ value <| String.fromInt i ]
-        [ text <| fromVehicleType vt.vtype ]
+        [ text vt.type_ ]
 
 
 addButton : Maybe Vehicle -> Html Msg

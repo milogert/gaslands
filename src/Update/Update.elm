@@ -1,18 +1,14 @@
 module Update.Update exposing (update)
 
-import Dict
 import Model.Model exposing (..)
 import Model.Settings exposing (..)
 import Model.Sponsors exposing (..)
+import Model.Upgrade exposing (..)
 import Model.Upgrade.Common exposing (..)
-import Model.Upgrade.Model exposing (..)
-import Ports.Modals
-import Ports.Photo
 import Ports.Storage
 import Task
 import Time
 import Update.Data
-import Update.Routes
 import Update.Settings
 import Update.Sponsor
 import Update.Upgrade
@@ -21,7 +17,6 @@ import Update.UtilsGeneric exposing (do)
 import Update.Vehicle
 import Update.View
 import Update.Weapon
-import Url exposing (Url)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )

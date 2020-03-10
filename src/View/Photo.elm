@@ -1,10 +1,10 @@
 module View.Photo exposing (renderPhoto, view)
 
-import Html exposing (Html, a, button, div, img, text, video)
+import Html exposing (Html, a, div, img, text, video)
 import Html.Attributes exposing (autoplay, class, classList, src, style)
 import Html.Events exposing (onClick)
 import Model.Model exposing (..)
-import Model.Vehicle.Model exposing (..)
+import Model.Vehicle exposing (..)
 
 
 view : Model -> Vehicle -> Html Msg

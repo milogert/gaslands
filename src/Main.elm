@@ -1,8 +1,7 @@
 module Main exposing (main)
 
 import Browser
-import Html
-import Model.Model as Model exposing (Model, Msg(..), init)
+import Model.Model as Model exposing (Model, Msg(..))
 import Subscriptions.Subscriptions as Subscriptions
 import Update.Update as Update
 import View.View as View

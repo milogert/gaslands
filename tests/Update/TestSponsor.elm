@@ -4,7 +4,7 @@ import Dict
 import Expect exposing (Expectation)
 import Model.Model exposing (Msg(..), defaultModel)
 import Model.Sponsors exposing (VehiclePerk, allSponsors, stringToSponsor)
-import Model.Vehicle.Model exposing (defaultVehicle)
+import Model.Vehicle exposing (defaultVehicle)
 import Test exposing (..)
 import Update.Update
 

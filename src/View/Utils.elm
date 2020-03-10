@@ -1,7 +1,6 @@
 module View.Utils exposing
     ( crewUsed
     , detailSection
-    , expansionMarker
     , factBadge
     , factsHolder
     , icon
@@ -9,7 +8,6 @@ module View.Utils exposing
     , iconb
     , plural
     , renderCountDown
-    , renderDice
     , renderSpecialRow
     , specialToHeaderBody
     , tagGen
@@ -26,21 +24,18 @@ import Bulma.Modifiers exposing (..)
 import Html
     exposing
         ( Html
-        , b
         , div
-        , h5
         , hr
         , node
-        , span
         , text
         )
-import Html.Attributes exposing (checked, class, classList, hidden, id)
-import Html.Events exposing (onCheck, onInput)
+import Html.Attributes exposing (checked, class, classList, id)
+import Html.Events exposing (onCheck)
 import Model.Model exposing (..)
 import Model.Shared exposing (..)
 import Model.Sponsors exposing (..)
-import Model.Vehicle.Model exposing (..)
-import Model.Weapon.Model exposing (..)
+import Model.Vehicle exposing (..)
+import Model.Weapon exposing (..)
 
 
 icon : String -> Html Msg
@@ -67,7 +62,7 @@ detailSection : String -> List (Html Msg) -> List (Html Msg) -> Html Msg
 detailSection titleString detailButtons bodyContents =
     div []
         [ hr [] []
-        , level []
+        , level [ class "is-mobile" ]
             [ levelLeft []
                 [ levelItem []
                     [ title H5 [] [ text titleString ] ]
@@ -99,7 +94,7 @@ specialToHeaderBody isPreview isPrinting mMsg mEvent special =
         ( Ammo ammo, Just msg, Just event ) ->
             case ( isPreview, isPrinting ) of
                 ( True, _ ) ->
-                    Just ( text "Ammo", text (String.fromInt <| List.length ammo) )
+                    Just <| specialToText special
 
                 ( _, True ) ->
                     Just
@@ -122,61 +117,18 @@ specialToHeaderBody isPreview isPrinting mMsg mEvent special =
         ( Ammo _, _, Nothing ) ->
             Nothing
 
-        ( HighlyExplosive, _, _ ) ->
-            Just
-                ( text "Highly Explosive"
-                , text ""
-                )
-
-        ( TreacherousSurface, _, _ ) ->
-            Just
-                ( text "Treacherous Surface"
-                , text "The dropped template counts as a treacherous surface."
-                )
-
-        ( SpecialRule rule, _, _ ) ->
-            Just
-                ( text "Note", text rule )
-
-        ( NamedSpecialRule name rule, _, _ ) ->
-            Just ( text name, text rule )
-
-        ( HandlingMod i, _, _ ) ->
-            Just
-                ( text "Handling mod"
-                , text <| needPlus i ++ " modification to the vehicle's base Handling value."
-                )
-
-        ( HullMod i, _, _ ) ->
-            Just
-                ( text "Hull mod"
-                , text <| needPlus i ++ " modification to the vehicle's base Hull value."
-                )
-
-        ( GearMod i, _, _ ) ->
-            Just
-                ( text "Gear mod"
-                , text <| needPlus i ++ " modification to the vehicle's maximum Gear."
-                )
-
-        ( CrewMod i, _, _ ) ->
-            Just
-                ( text "Crew mod"
-                , text <| needPlus i ++ " modification to the vehicle's base Crew value."
-                )
-
-        ( _, _, _ ) ->
-            Just ( text <| fromSpecial special, text "" )
+        _ ->
+            Just <| specialToText special
 
 
-needPlus : Int -> String
-needPlus i =
-    case compare i 0 of
-        LT ->
-            String.fromInt i
+specialToText : Special -> ( Html Msg, Html Msg )
+specialToText special =
+    case special of
+        NamedSpecialRule name rule ->
+            ( text name, text rule )
 
         _ ->
-            "+" ++ String.fromInt i
+            specialToText <| specialToNamedSpecial special
 
 
 renderCountDown : (event -> Msg) -> (Int -> Bool -> event) -> List Bool -> Html Msg
@@ -195,11 +147,6 @@ renderCountDown msg event checks =
     in
     multilineFields [] <|
         List.indexedMap checkboxFunc checks
-
-
-renderDice : Dice -> String
-renderDice dice =
-    String.fromInt dice.number ++ "d" ++ String.fromInt dice.die
 
 
 crewUsed : Vehicle -> Int
@@ -274,9 +221,3 @@ tagGen ( title, titleColor ) ( mValue, valueColor ) =
                 [ titleTag
                 , easyTag { tagModifiers | color = valueColor } [] value
                 ]
-
-
-expansionMarker : Expansion -> Html Msg
-expansionMarker expansion =
-    ( Just <| fromExpansion expansion, Info )
-        |> tagGen ( "expansion", Bulma.Modifiers.Light )

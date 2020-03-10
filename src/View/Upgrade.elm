@@ -6,19 +6,12 @@ import Html
     exposing
         ( Html
         , div
-        , h6
-        , li
-        , small
-        , span
         , text
-        , ul
         )
-import Html.Attributes exposing (class, classList, hidden)
-import Html.Events exposing (onClick, onInput)
-import Model.Model exposing (..)
-import Model.Shared exposing (..)
-import Model.Upgrade.Model exposing (..)
-import Model.Vehicle.Model exposing (..)
+import Html.Attributes exposing (class, classList)
+import Model.Model exposing (Model, Msg(..))
+import Model.Upgrade exposing (Upgrade, UpgradeEvent(..))
+import Model.Vehicle exposing (Vehicle)
 import View.EquipmentLayout
 import View.Utils exposing (plural, tagGen)
 

@@ -5,8 +5,8 @@ import Expect exposing (Expectation)
 import Json.Decode exposing (decodeValue, errorToString)
 import Json.Encode
 import Model.Model exposing (..)
+import Model.Vehicle exposing (defaultVehicle)
 import Model.Vehicle.Common exposing (allVehicles)
-import Model.Vehicle.Model exposing (VehicleType(..), defaultVehicle)
 import Model.Views exposing (..)
 import Test exposing (..)
 
@@ -35,7 +35,7 @@ totalPointsTest =
                 Dict.fromList
                     [ ( ""
                       , allVehicles
-                            |> List.filter (\v -> v.vtype == Bike)
+                            |> List.filter (\v -> v.type_ == "Bike")
                             |> List.head
                             |> Maybe.withDefault defaultVehicle
                       )

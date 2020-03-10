@@ -7,17 +7,14 @@ import Bulma.Components exposing (..)
 import Bulma.Elements exposing (..)
 import Bulma.Layout exposing (..)
 import Bulma.Modifiers exposing (..)
-import Dict exposing (Dict)
-import FontAwesome.Icon as Icon exposing (Icon)
+import Dict
+import FontAwesome.Icon as Icon
 import FontAwesome.Styles as Icon
 import Html
     exposing
         ( Html
         , div
-        , h2
-        , hr
         , node
-        , pre
         , span
         , text
         )
@@ -25,21 +22,18 @@ import Html.Attributes
     exposing
         ( attribute
         , class
-        , classList
         , href
         , rel
-        , style
         )
-import Html.Events exposing (onClick, onInput)
 import Model.Model exposing (..)
 import Model.Shared exposing (..)
+import Model.Upgrade exposing (..)
 import Model.Upgrade.Common as UpgradeC
-import Model.Upgrade.Model exposing (..)
+import Model.Vehicle exposing (..)
 import Model.Vehicle.Common as VehicleC
-import Model.Vehicle.Model exposing (..)
 import Model.Views exposing (..)
+import Model.Weapon exposing (..)
 import Model.Weapon.Common as WeaponC
-import Model.Weapon.Model exposing (..)
 import View.Dashboard
 import View.Details
 import View.Menu
@@ -48,38 +42,12 @@ import View.NewVehicle
 import View.NewWeapon
 import View.PrinterFriendly
 import View.Settings
-import View.Sponsor
 import View.SponsorSelect
-import View.Upgrade
 import View.Utils exposing (..)
-import View.Weapon
 
 
 view : Model -> Document Msg
 view model =
-    let
-        viewToGoTo =
-            case model.view of
-                ViewPrint key ->
-                    ViewDetails key
-
-                _ ->
-                    ViewDashboard
-
-        backButton =
-            button
-                { buttonModifiers
-                    | disabled = model.view == ViewDashboard
-                    , size = Small
-                }
-                [ onClick <| ViewMsg viewToGoTo, attribute "aria-label" "Back Button" ]
-                [ View.Utils.icon "arrow-left" ]
-
-        viewDisplay =
-            title H4
-                []
-                [ text <| viewToStr model ]
-    in
     Document
         (viewToStr model)
         [ stylesheet
@@ -154,7 +122,6 @@ render model =
                                 model
                                 vehicle
                                 (WeaponC.allWeaponsList
-                                    |> List.filter (expansionFilter model.settings.expansions.enabled)
                                     |> List.filter
                                         (\x -> x.slots <= VehicleC.slotsRemaining vehicle)
                                     |> List.filter
@@ -173,7 +140,6 @@ render model =
                                 model
                                 vehicle
                                 (UpgradeC.allUpgradesList
-                                    |> List.filter (expansionFilter model.settings.expansions.enabled)
                                     |> List.filter
                                         (\x -> x.slots <= VehicleC.slotsRemaining vehicle)
                                 )

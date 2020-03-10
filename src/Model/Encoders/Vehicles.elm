@@ -5,16 +5,17 @@ import Model.Encoders.Shared exposing (..)
 import Model.Encoders.Sponsors exposing (vehiclePerkEncoder)
 import Model.Encoders.Upgrades exposing (upgradeEncoder)
 import Model.Encoders.Weapons exposing (weaponEncoder)
+import Model.Vehicle exposing (..)
 import Model.Vehicle.Common exposing (..)
-import Model.Vehicle.Model exposing (..)
 
 
 vehicleEncoder : Vehicle -> Value
 vehicleEncoder v =
     object
         [ ( "name", string v.name )
+        , ( "category", categoryEncoder v.category )
         , ( "photo", photoEncoder v.photo )
-        , ( "vtype", string <| fromVehicleType v.vtype )
+        , ( "type_", string v.type_ )
         , ( "gear", object <| gearEncoder v.gear )
         , ( "handling", int v.handling )
         , ( "hull", object <| hullEncoder v.hull )
@@ -30,7 +31,6 @@ vehicleEncoder v =
         , ( "specials", list object <| List.map specialEncoder v.specials )
         , ( "perks", list object <| List.map vehiclePerkEncoder v.perks )
         , ( "requiredSponsor", requiredSponsorEncoder v.requiredSponsor )
-        , ( "expansion", object <| expansionEncoder v.expansion )
         ]
 
 

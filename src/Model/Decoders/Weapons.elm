@@ -5,21 +5,20 @@ module Model.Decoders.Weapons exposing
     , rangeDecoder
     , rangeHelper
     , weaponDecoder
-    , wtypeDecoder
     )
 
 import Json.Decode exposing (..)
 import Json.Decode.Pipeline exposing (..)
 import Model.Decoders.Shared exposing (..)
+import Model.Shared exposing (Size(..))
+import Model.Weapon exposing (..)
 import Model.Weapon.Common exposing (..)
-import Model.Weapon.Model exposing (..)
 
 
 weaponDecoder : Decoder Weapon
 weaponDecoder =
     succeed Weapon
         |> required "name" string
-        |> required "wtype" wtypeDecoder
         |> optional "mountPoint" (map Just mountPointDecoder) Nothing
         |> optional "attack" (map Just diceDecoder) Nothing
         |> hardcoded 0
@@ -29,7 +28,7 @@ weaponDecoder =
         |> required "cost" int
         |> hardcoded WeaponReady
         |> optional "requiredSponsor" (string |> andThen requiredSponsorDecoderHelper) Nothing
-        |> required "expansion" expansionDecoder
+        |> required "category" (string |> andThen categoryDecoderHelper)
 
 
 mountPointDecoder : Decoder WeaponMounting
@@ -63,26 +62,6 @@ mountPointDecoderHelper mountPointString =
             fail <| mountPointString ++ " is not a valid mount point type"
 
 
-wtypeDecoder : Decoder WeaponType
-wtypeDecoder =
-    string
-        |> andThen
-            (\str ->
-                case str of
-                    "Shooting" ->
-                        succeed Shooting
-
-                    "Dropped" ->
-                        succeed Dropped
-
-                    "SmashType" ->
-                        succeed SmashType
-
-                    _ ->
-                        fail <| str ++ " is not a valid weapon type"
-            )
-
-
 diceDecoder : Decoder Dice
 diceDecoder =
     succeed Dice
@@ -112,10 +91,10 @@ rangeHelper str =
             succeed TemplateLarge
 
         "Large Burst" ->
-            succeed BurstLarge
+            succeed <| BurstRange Large
 
         "Small Burst" ->
-            succeed BurstSmall
+            succeed <| BurstRange Small
 
         "Smash" ->
             succeed SmashRange

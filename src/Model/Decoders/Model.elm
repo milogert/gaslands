@@ -1,18 +1,13 @@
 module Model.Decoders.Model exposing (modelDecoder)
 
-import Browser.Navigation as Nav
-import Dict exposing (Dict)
 import Json.Decode exposing (..)
-import Json.Decode.Pipeline exposing (hardcoded, optional, required)
+import Json.Decode.Pipeline exposing (hardcoded, optional)
 import Model.Decoders.Settings exposing (settingsDecoder)
 import Model.Decoders.Sponsors exposing (sponsorDecoder)
 import Model.Decoders.Vehicles exposing (vehicleDecoder)
 import Model.Features
 import Model.Model exposing (..)
-import Model.Settings
-import Model.Sponsors exposing (stringToSponsor)
 import Model.Views exposing (ViewEvent(..))
-import Url exposing (Url)
 
 
 modelDecoder : Decoder Model

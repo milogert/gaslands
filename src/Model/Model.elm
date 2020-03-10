@@ -15,18 +15,17 @@ import Model.Features
 import Model.Settings exposing (..)
 import Model.Shared exposing (..)
 import Model.Sponsors exposing (..)
+import Model.Upgrade exposing (..)
 import Model.Upgrade.Common exposing (..)
-import Model.Upgrade.Model exposing (..)
+import Model.Vehicle exposing (..)
 import Model.Vehicle.Common exposing (..)
-import Model.Vehicle.Model exposing (..)
 import Model.Views exposing (NewType(..), ViewEvent(..))
+import Model.Weapon exposing (..)
 import Model.Weapon.Common exposing (..)
-import Model.Weapon.Model exposing (..)
 import Ports.Storage exposing (StorageEntry)
 import Task
 import Time
 import Update.UtilsGeneric exposing (do)
-import Url exposing (Url)
 
 
 type alias Model =

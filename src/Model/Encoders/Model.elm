@@ -1,6 +1,5 @@
 module Model.Encoders.Model exposing (modelEncoder)
 
-import Dict exposing (Dict)
 import Json.Encode exposing (..)
 import Model.Encoders.Settings exposing (settingsEncoder)
 import Model.Encoders.Sponsors exposing (sponsorEncoder)
